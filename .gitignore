@@ -1,0 +1,15 @@
+.vs
+.vscode
+bin
+obj
+packages
+release/_PROGRAM/datafiles
+release/_PROGRAM/teacups
+release/_PROGRAM/de
+release/_PROGRAM/runtimes
+release/*.txt
+release/test-output
+release/logfiles
+src/TestResults
+src/DroughtDataDownloaderV2/historicalData/
+release/_PROGRAM/historicalData/

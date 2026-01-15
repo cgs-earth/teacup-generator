@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CalculateStatistics": {
+      "commandName": "Project",
+      "commandLineArgs": "-r"
+    }
+  }
+}

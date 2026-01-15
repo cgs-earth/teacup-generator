@@ -1,0 +1,23 @@
+Machine:
+	ibr8drogis02 & ibrsacgis006
+
+Working Directory:
+	E:\teacupsScript
+
+Programs (E:\teacupsScript\_PROGRAM):
+	Teacup.exe - custom program that builds the PNG and PDF graphics
+	DroughtDataDownloader.exe - custom program that builds the data files for the teacups
+
+Automation Batch Files (E:\teacupsScript):
+	runUsbrTeacupDataGenerator.bat - runs DroughtDataDownloader.exe
+	runUsbrTeacupGenerator.bat - runs Teacup.exe
+
+Notes:
+- The batch files are somewhat self documenting and shows how one might run the programs that generate the data and graphics files
+- Source code for both programs are available from Jon Rocha (jrocha@usbr.gov) upon request
+- JR 12DEC2023: The source code is located in the same directory where this text-file is located. A Visual Studio solution-file is also in the same directory to build and compile the programs from source code
+
+Workflow:
+1. There are Scheduled Tasks on the machine that runs the batch files
+2. The programs and batch files generate the required files and copy them over to the RISE staging server at \\ibr8drofp001\PROD_RISEDATA\rise_resviz\intake
+3. There is a sync program that copies files from the staging server to the public web server

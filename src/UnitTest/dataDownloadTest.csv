@@ -1,0 +1,3 @@
+﻿DATA_SOURCE,DATA_IDENTIFIER,SITE_NAME,LAT,LON,UNITS,MINDATE,STATE,DOIREGION,HUC8,MAX_CAPACITY,STATS_PERIOD,TEACUP_NAME,DATA_URL,COMMENT,LOCATION_ID
+mock_ds,data_id,test site name,42.01,-120.453,ACRE-FEET,1/1/1980,FL,RGN,123456,1000,30,https://www.teacup_name.png,placeholder-url,placeholder-comment,
+rise,123,test rise site,50.23,-121.987,ACRE-FEET,1/1/1980,CO,RGN,100200,9999,30,https://www.rise_locationid.png,placeholder-url,placeholder-comment,123
