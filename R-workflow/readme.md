@@ -352,3 +352,5 @@ Edit `config/locations.csv` to add, remove, or modify reservoir locations. Chang
 ### Updating Historical Data Range
 
 Modify the `HISTORICAL_START_DATE` and `HISTORICAL_END_DATE` constants in the script header to adjust the period used for statistical calculations.
+
+Note: This documentation was developed with assistance from Claude (Anthropic) to translate the original .NET application architecture into an R-based workflow optimized for containerized deployment and cloud data sharing via HydroShare.
