@@ -112,16 +112,33 @@ For each reservoir location, the script calculates:
 ### Output Format
 
 The daily CSV file contains one row per reservoir with columns:
-- `date` - Date of observation
-- `location_id` - Reservoir identifier
-- `location_name` - Display name
-- `current_value` - Most recent valid storage value
-- `percentile_10`, `percentile_25`, `percentile_50`, `percentile_75`, `percentile_90`
-- `mean`, `std_dev`
-- `percent_median`, `percent_average`, `percent_full`
-- `max_capacity`
+- `SiteName` - Reservoir name
+- `Lat`, `Lon` - Geographic coordinates (decimal degrees)
+- `State` - State abbreviation
+- `DoiRegion` - Department of Interior region code
+- `Huc8` - 8-digit Hydrologic Unit Code
+- `DataUnits` - Units of measurement (ACRE-FEET)
+- `DataValue` - Most recent valid storage value
+- `DataDate` - Date of observation (MM/DD/YYYY)
+- `DateQueried` - Date data was queried (MM/DD/YYYY)
+- `DataDateMax`, `DataDateMin` - Historical minimum and maximum
+- `DataDateP10`, `DataDateP25`, `DataDateP50`, `DataDateP75`, `DataDateP90` - Historical percentiles
+- `DataDateAvg` - Mean of historical values
+- `DataValuePctMdn` - Current value / median (as decimal, not percentage)
+- `DataValuePctAvg` - Current value / mean (as decimal, not percentage)
+- `StatsPeriod` - Number of days in historical period (9120 for 1990-2020)
+- `MaxCapacity` - Maximum storage capacity
+- `PctFull` - Current value / capacity (as decimal, not percentage)
+- `TeacupUrl` - URL to teacup diagram visualization
+- `DataUrl` - Data source URL (placeholder in current implementation)
+- `Comment` - Additional notes (placeholder in current implementation)
 
 Missing or failed calculations are represented as `NA`.
+
+Missing or failed calculations are represented as `NA`.
+
+Note: Percentage columns are stored as decimals (e.g., 0.75 = 75%), not as percentages.
+Output Format
 
 ## Execution
 
