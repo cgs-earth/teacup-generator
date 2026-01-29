@@ -135,8 +135,6 @@ The daily CSV file contains one row per reservoir with columns:
 
 Missing or failed calculations are represented as `NA`.
 
-Missing or failed calculations are represented as `NA`.
-
 Note: Percentage columns are stored as decimals (e.g., 0.75 = 75%), not as percentages.
 Output Format
 
