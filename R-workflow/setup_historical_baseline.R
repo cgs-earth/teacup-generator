@@ -1,5 +1,3 @@
-#!/usr/bin/env Rscript
-################################################################################
 # setup_historical_baseline.R
 #
 # ONE-TIME SETUP: Generate historical baseline data and statistics for RISE 
