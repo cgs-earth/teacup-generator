@@ -1,184 +1,504 @@
-﻿Include in Dashboard?,Include in Dashboard? (Initial Decision),Decision Tree Group,Data Needed,Maximal List Name,"Reservoir Label not including ""Lake/Reservoir"" (typically equivalent to Maximal List Name)","Reservoir Label including ""Lake/Reservoir"" (typically equivalent to EAR Asset Name)","Dam Label, including Dam",Preferred Label for Map and Table,Preferred Label for PopUp and Modal,In Reservoir Conditions Visualization?,EAR OBJECTID,EAR Asset Class,EAR Asset Name,Reservoir/Lake/Pool Name Simplified,EAR Asset Type,EAR Dam Facility Name,EAR Dams Asset ID,EAR Dams Simplified Dam Name,EAR Project,EAR Interior Region,EAR Managing Region,EAR Reservoir Function,EAR Total Capacity,EAR Original Completion Date,RISE Location ID,RISE Location Name,RISE Region,RISE Reservoir Name,RISE Dam Name,Has Storage in RISE?,RISE Item ID for storage,RISE Storage Start Date,RISE Storage End Date,RISE Number of Results,Start Date Before 10/1/1990?,End Date After 9/30/2020?,Has  Storage for Full Averaging Period?,Completion Year Before 1990?,Completion Year Before Start Date of Storage Data?,Notes
-Include,Include,Group A,,Alcova,Alcova,Alcova Reservoir,Alcova Dam,,,FALSE,2,Reservoirs,Alcova Reservoir,Alcova,Reservoir,Alcova Dam,5,Alcova,0144-Kendrick Project,7-Upper Colorado Basin,MB/ART,Instream Storage,"184,405","1,938",259,Alcova Reservoir Dam and Powerplant,Missouri Basin,Alcova,Alcova,Y,113,10/1/45,12/16/25,29301,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Alice,Alice,Lake Alice,Lake Alice Dams,,,FALSE,202,Reservoirs,Lake Alice,Alice,Reservoir,Lake Alice Dams,316,Lake Alice,0020-North Platte Project,5-Missouri Basin,MB/ART,Conveyance (used for water conveyance),11034,1912,266,Lake Alice and Dams,Missouri Basin,Alice,Alice,Y,134,9/30/90,12/16/25,12863,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Alice 2,Alice 2,Lake Alice 2,Lake Alice Dam 2,,,FALSE,203,Reservoirs,Lake Alice 2,Alice 2,Reservoir,Lake Alice Dam 2,318,Lake Alice,0020-North Platte Project,5-Missouri Basin,MB/ART,Conveyance (used for water conveyance),"1,166","1,909",394,Little Lake Alice Reservoir,Missouri Basin,Little Lake Alice,#N/A,Y,515,4/19/90,12/15/25,13026,OK,OK,OK,TRUE,TRUE,RISE Location is Little Lake Alice Reservoir
-Include,Include,Group A,,Anchor,Anchor,Anchor Reservoir,Anchor Dam,,,FALSE,6,Reservoirs,Anchor Reservoir,Anchor,Reservoir,Anchor Dam,16,Anchor,0339-Pick-Sloan Missouri Basin Program-Bighorn Basin Division-Owl Creek Unit,7-Upper Colorado Basin,MB/ART,Instream Storage,"17,228","1,960",262,Anchor Reservoir and Dam,Missouri Basin,Anchor,Anchor,Y,125,10/1/61,12/16/25,23273,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Angostura,Angostura,Angostura Reservoir,Angostura Dam,,,FALSE,10,Reservoirs,Angostura Reservoir,Angostura,Reservoir,Angostura Dam,19,Angostura,0454-Pick-Sloan Missouri Basin Program-Cheyenne Division-Angostura Unit,5-Missouri Basin,MB/ART,Instream Storage,"123,048","1,949",257,Angostura Reservoir and Dam,Missouri Basin,Angostura,Angostura,Y,105,10/1/51,12/16/25,27107,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Avalon,Avalon,Avalon Reservoir,Avalon Dam,,,FALSE,17,Reservoirs,Avalon Reservoir,Avalon,Reservoir,Avalon Dam,31,Avalon,0005-Carlsbad Project,7-Upper Colorado Basin,UCB,Instream Storage,"4,466","1,907",267,Avalon Reservoir and Dam,Upper Colorado Basin,Avalon,Avalon,Y,139,10/1/65,12/16/25,21993,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Belle Fourche,Belle Fourche,Belle Fourche Reservoir,Belle Fourche Dam,,,FALSE,25,Reservoirs,Belle Fourche Reservoir,Belle Fourche,Reservoir,Belle Fourche Dam,39,Belle Fourche,1459-Pick-Sloan Missouri Basin Program-Cheyenne Division-Belle Fourche Unit,5-Missouri Basin,MB/ART,Instream Storage,172873,1911,274,Belle Fourche Reservoir and Dam,Missouri Basin,Belle Fourche,Belle Fourche,Y,158,10/1/77,12/16/25,14171,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Berryessa,Berryessa,Lake Berryessa,Monticello Dam,,,FALSE,205,Reservoirs,Lake Berryessa,Berryessa,Reservoir,Monticello Dam,385,Monticello,0413-Solano Project,10-California-Great Basin,CGB,Instream Storage,"1,602,278","1,957",272,Lake Berryessa and Monticello Dam,California-Great Basin,Berryessa,Monticello,Y,10782,1/9/57,12/14/25,25173,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Big Sandy,Big Sandy,Big Sandy Reservoir,Big Sandy Dam,,,FALSE,27,Reservoirs,Big Sandy Reservoir,Big Sandy,Reservoir,Big Sandy Dam,42,Big Sandy,0153-Eden Project,7-Upper Colorado Basin,UCB,Instream Storage,"38,100","1,952",277,Big Sandy Reservoir and Dam,Upper Colorado Basin,Big Sandy,Big Sandy,Y,178,5/12/70,12/16/25,20309,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Bighorn,Bighorn,Bighorn Lake,Yellowtail Dam,,,TRUE,29,Reservoirs,Bighorn Lake,Bighorn,Reservoir,Yellowtail Dam,685,Yellowtail,0459-Pick-Sloan Missouri Basin Program-Lower Bighorn Division-Yellowtail Unit,5-Missouri Basin,MB/ART,Instream Storage,"1,263,682","1,966",275,Bighorn Lake Yellowtail Dam and Powerplant,Missouri Basin,Bighorn,Bighorn,Y,163,10/1/65,12/16/25,22115,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Blue Mesa,Blue Mesa,Blue Mesa Reservoir,Blue Mesa Dam,,,TRUE,33,Reservoirs,Blue Mesa Reservoir,Blue Mesa,Reservoir,Blue Mesa Dam,49,Blue Mesa,0622-Colorado River Storage Project-Gunnison Division-Wayne M. Aspinall Unit,7-Upper Colorado Basin,UCB,Instream Storage,"938,469","1,966",1533,Blue Mesa Reservoir Dam and Powerplant,Upper Colorado Basin,Blue Mesa,Blue Mesa,Y,76,1/31/66,12/16/25,21871,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Boysen,Boysen,Boysen Reservoir,Boysen Dam,,,TRUE,39,Reservoirs,Boysen Reservoir,Boysen,Reservoir,Boysen Dam,55,Boysen,0285-Pick-Sloan Missouri Basin Program-Boysen Division-Boysen Unit,7-Upper Colorado Basin,MB/ART,Instream Storage,"892,226","1,952",281,Boysen Reservoir Dam and Powerplant,Missouri Basin,Boysen,Boysen,Y,195,10/1/51,12/16/25,27113,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Brantley,Brantley,Brantley Reservoir,Brantley Dam,,,FALSE,40,Reservoirs,Brantley Reservoir,Brantley,Reservoir,Brantley Dam,57,Brantley,0963-Brantley Project,7-Upper Colorado Basin,UCB,Instream Storage,"384,035","1,989",282,Brantley Reservoir and Dam,Upper Colorado Basin,Brantley,Brantley,Y,203,1/1/88,12/16/25,13866,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Buffalo Bill,Buffalo Bill,Buffalo Bill Reservoir,Buffalo Bill Dam,,,TRUE,45,Reservoirs,Buffalo Bill Reservoir,Buffalo Bill,Reservoir,Buffalo Bill Dam,64,Buffalo Bill,0026-Shoshone Project,7-Upper Colorado Basin,MB/ART,Instream Storage,"646,565","1,993",269,Buffalo Bill Reservoir Dam and Powerplant,Missouri Basin,Buffalo Bill,Buffalo Bill,Y,145,10/1/51,12/16/25,27110,OK,OK,OK,FALSE,FALSE,
-Include,Include,Group A,,Bull,Bull,Bull Lake,Bull Lake Dam,,,FALSE,46,Reservoirs,Bull Lake,Bull,Reservoir,Bull Lake Dam,68,Bull Lake,1236-Pick-Sloan Missouri Basin Program-Wind Division-Riverton Unit,7-Upper Colorado Basin,MB/ART,Instream Storage,"152,459","1,938",278,Bull Lake Reservoir and Dam ,Missouri Basin,Bull Lake Bull,Bull Lake Bull,Y,183,12/1/68,12/16/25,20836,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Caballo,Caballo,Caballo Reservoir,Caballo Dam,,,FALSE,51,Reservoirs,Caballo Reservoir,Caballo,Reservoir,Caballo Dam,73,Caballo,0023-Rio Grande Project,7-Upper Colorado Basin,UCB,Instream Storage,"324,509","1,938",286,Caballo Reservoir and Dam,Upper Colorado Basin,Caballo,Caballo,Y,209,2/8/38,12/16/25,32090,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Cachuma,Cachuma,Lake Cachuma,Bradbury Dam,,,FALSE,207,Reservoirs,Lake Cachuma,Cachuma,Reservoir,Bradbury Dam,56,Bradbury,0368-Cachuma Project,8-Lower Colorado Basin,CGB,Instream Storage,"193,305","1,953",292,Cachuma Lake and Bradbury Dam,California-Great Basin,Cachuma,Bradbury,Y,10787,11/17/52,12/16/25,26691,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Canyon Ferry,Canyon Ferry,Canyon Ferry Lake,Canyon Ferry Dam,,,TRUE,55,Reservoirs,Canyon Ferry Lake,Canyon Ferry,Reservoir,Canyon Ferry Dam,77,Canyon Ferry,0296-Pick-Sloan Missouri Basin Program-Helena-Great Falls Division-Canyon Ferry Unit,5-Missouri Basin,MB/ART,Instream Storage,"1,993,036","1,954",295,Canyon Ferry Lake Dam Powerplant and Helena Valley Pumping Plant,Missouri Basin,Canyon Ferry,Canyon Ferry,Y,13,3/27/53,12/16/25,26581,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Carter Lake,Carter Lake,Carter Lake Reservoir,Carter Lake (Dams),,,TRUE,61,Reservoirs,Carter Lake Reservoir,Carter Lake,Reservoir,Carter Lake (Dams),86,Carter Lake (Dams),0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Offstream Storage,"112,230","1,952",288,Carter Lake Reservoir and Dam ,Missouri Basin,Carter Lake Carter,Carter Lake Carter,Y,216,5/1/86,12/16/25,12183,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Causey,Causey,Causey Reservoir,Causey Dam,,,FALSE,63,Reservoirs,Causey Reservoir,Causey,Reservoir,Causey Dam,93,Causey,0526-Weber Basin Project,7-Upper Colorado Basin,UCB,Instream Storage,"7,870","1,966",289,Causey Reservoir and Dam,Upper Colorado Basin,Causey,Causey,Y,219,10/7/74,12/16/25,18700,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Choke Canyon,Choke Canyon,Choke Canyon Reservoir,Choke Canyon Dam,,,TRUE,67,Reservoirs,Choke Canyon Reservoir,Choke Canyon,Reservoir,Choke Canyon Dam,98,Choke Canyon,1012-Nueces River Project,6-Arkansas-Rio Grande-Texas Gulf,MB/ART,Instream Storage,"695,271","1,982",291,Choke Canyon Reservoir and Dam,Arkansas-Rio Grande-Texas-Gulf,Choke Canyon,Choke Canyon,Y,231,11/3/89,12/16/25,12822,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Clark Canyon,Clark Canyon,Clark Canyon Reservoir,Clark Canyon Dam,,,TRUE,68,Reservoirs,Clark Canyon Reservoir,Clark Canyon,Reservoir,Clark Canyon Dam,100,Clark Canyon,0699-Pick-Sloan Missouri Basin Program-Three Forks Division-East Bench Unit,5-Missouri Basin,MB/ART,Instream Storage,"251,436","1,964",294,Clark Canyon Reservoir and Dam,Missouri Basin,Clark Canyon,Clark Canyon,Y,238,10/1/63,12/16/25,22725,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Crawford,Crawford,Crawford Reservoir,Crawford Dam,,,FALSE,83,Reservoirs,Crawford Reservoir,Crawford,Reservoir,Crawford Dam,126,Crawford,0517-Smith Fork Project,7-Upper Colorado Basin,UCB,Offstream Storage,"14,395","1,962",3683,Crawford Dam and Reservoir,Upper Colorado Basin,Crawford,Crawford,Y,128733,10/28/74,12/16/25,18679,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Crystal,Crystal,Crystal Reservoir,Crystal Dam,,,FALSE,84,Reservoirs,Crystal Reservoir,Crystal,Reservoir,Crystal Dam,127,Crystal,0622-Colorado River Storage Project-Gunnison Division-Wayne M. Aspinall Unit,7-Upper Colorado Basin,UCB,Instream Storage,25273,1977,1534,Crystal Reservoir Dam and Powerplant,Upper Colorado Basin,Crystal,Crystal,Y,274,3/13/77,12/16/25,17812,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Currant Creek,Currant Creek,Currant Creek Reservoir,Currant Creek Dam,,,FALSE,86,Reservoirs,Currant Creek Reservoir,Currant Creek,Reservoir,Currant Creek Dam,129,Currant Creek,0066-Central Utah Project-Initial Division-Bonneville Unit,7-Upper Colorado Basin,UCB,Conveyance (used for water conveyance),"15,671","1,975",310,Currant Creek Reservoir and Dam,Upper Colorado Basin,Currant Creek,Currant Creek,Y,278,10/4/82,12/15/25,15780,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Deer Creek,Deer Creek,Deer Creek Reservoir,Deer Creek Dam,,,FALSE,92,Reservoirs,Deer Creek Reservoir,Deer Creek,Reservoir,Deer Creek Dam,136,Deer Creek,0244-Provo River Project,7-Upper Colorado Basin,UCB,Instream Storage,153445,1941,314,Deer Creek Reservoir Dam and Powerplant,Upper Colorado Basin,Deer Creek,Deer Creek,Y,290,1/1/50,12/11/25,27744,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Deerfield,Deerfield,Deerfield Lake,Deerfield Dam,,,FALSE,93,Reservoirs,Deerfield Lake,Deerfield,Reservoir,Deerfield Dam,141,Deerfield,0252-Rapid Valley Project,5-Missouri Basin,MB/ART,Instream Storage,"15,654","1,947",315,Deerfield Reservoir and Dam,Missouri Basin,Deerfield,Deerfield,Y,295,10/1/52,12/16/25,26741,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,East Canyon,East Canyon,East Canyon Reservoir,East Canyon Dam,,,FALSE,104,Reservoirs,East Canyon Reservoir,East Canyon,Reservoir,East Canyon Dam,153,East Canyon,0526-Weber Basin Project,7-Upper Colorado Basin,UCB,Instream Storage,"51,200","1,966",319,East Canyon Reservoir and Dam,Upper Colorado Basin,East Canyon,East Canyon,Y,310,4/26/83,12/16/25,15577,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Echo,Echo,Echo Reservoir,Echo Dam,,,FALSE,109,Reservoirs,Echo Reservoir,Echo,Reservoir,Echo Dam,165,Echo,0762-Weber River Project,7-Upper Colorado Basin,UCB,Instream Storage,"73,940","1,931",320,Echo Reservoir and Dam,Upper Colorado Basin,Echo,Echo,Y,314,1/1/67,12/16/25,21536,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Eden,Eden,Eden Reservoir,Eden Dikes,,,FALSE,110,Reservoirs,Eden Reservoir,Eden,Reservoir,Eden Dikes,166,Eden Dikes,0153-Eden Project,7-Upper Colorado Basin,UCB,Offstream Storage,14421,1910,321,Eden Reservoir and Dam,Upper Colorado Basin,Eden,Eden,Y,319,11/30/74,12/16/25,18646,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Edward Arthur Patterson,Edward Arthur Patterson,Edward Arthur Patterson Lake,Dickinson Dam,,,FALSE,111,Reservoirs,Edward Arthur Patterson Lake,Edward Arthur Patterson,Reservoir,Dickinson Dam,143,Dickinson,1111-Pick-Sloan Missouri Basin Program-Heart Division-Dickinson Unit,5-Missouri Basin,MB/ART,Instream Storage,"8,479","1,950",318,Edward Arthur Patterson Lake,Missouri Basin,Edward Arthur Patterson,#N/A,Y,304,10/1/51,12/16/25,27107,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,El Vado,El Vado,El Vado Reservoir,El Vado Dam,,,FALSE,112,Reservoirs,El Vado Reservoir,El Vado,Reservoir,El Vado Dam,169,El Vado,0163-Middle Rio Grande Project,7-Upper Colorado Basin,UCB,Instream Storage,"214,091","1,935",324,El Vado Lake and Dam,Upper Colorado Basin,El Vado,El Vado,Y,335,12/31/74,12/16/25,18615,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Elephant Butte,Elephant Butte,Elephant Butte Reservoir,Elephant Butte Dam,,,TRUE,113,Reservoirs,Elephant Butte Reservoir,Elephant Butte,Reservoir,Elephant Butte Dam,170,Elephant Butte,0023-Rio Grande Project,7-Upper Colorado Basin,UCB,Instream Storage,"2,357,104","1,916",323,Elephant Butte Reservoir Dam and Powerplant,Upper Colorado Basin,Elephant Butte,Elephant Butte,Y,329,3/21/15,12/15/25,40449,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Elwell,Elwell,Lake Elwell,Tiber Dam,,,TRUE,214,Reservoirs,Lake Elwell,Elwell,Reservoir,Tiber Dam,601,Tiber,0084-Pick-Sloan Missouri Basin Program-Marias Division-Lower Marias Unit,5-Missouri Basin,MB/ART,Instream Storage,"1,328,723","1,956",396,Lake Elwell and Tiber Dam,Missouri Basin,Elwell,Tiber,Y,525,10/1/55,12/16/25,25689,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Flaming Gorge,Flaming Gorge,Flaming Gorge Reservoir,Flaming Gorge Dam,,,TRUE,119,Reservoirs,Flaming Gorge Reservoir,Flaming Gorge,Reservoir,Flaming Gorge Dam,183,Flaming Gorge,0591-Colorado River Storage Project-Green Division-Flaming Gorge Unit,7-Upper Colorado Basin,UCB,Instream Storage,"3,791,700","1,964",1535,Flaming Gorge Reservoir Dam and Powerplant,Upper Colorado Basin,Flaming Gorge,Flaming Gorge,Y,337,12/2/62,12/16/25,23027,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Folsom,Folsom,Folsom Lake,Folsom Dam,,,TRUE,122,Reservoirs,Folsom Lake,Folsom,Reservoir,Folsom Dam,186,Folsom,0859-Central Valley Project-American River Division-Auburn-Folsom South Unit,10-California-Great Basin,CGB,Instream Storage,"977,000","1,956",334,Folsom Lake Dam and Powerplant,California-Great Basin,Folsom,Folsom,Y,10774,3/1/55,12/16/25,25129,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Fontenelle,Fontenelle,Fontenelle Reservoir,Fontenelle Dam,,,FALSE,123,Reservoirs,Fontenelle Reservoir,Fontenelle,Reservoir,Fontenelle Dam,198,Fontenelle,0154-Seedskadee Project,7-Upper Colorado Basin,UCB,Instream Storage,334459,1964,1536,Fontenelle Reservoir Dam and Powerplant,Upper Colorado Basin,Fontenelle,Fontenelle,Y,347,10/25/65,12/16/25,21969,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Fresno,Fresno,Fresno Reservoir,Fresno Dam,,,TRUE,135,Reservoirs,Fresno Reservoir,Fresno,Reservoir,Fresno Dam,210,Fresno,0015-Milk River Project,5-Missouri Basin,MB/ART,Instream Storage,"91,746","1,939",337,Fresno Reservoir and Dam,Missouri Basin,Fresno,Fresno,Y,354,10/1/47,12/16/25,28570,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Fruitgrowers,Fruitgrowers,Fruitgrowers Reservoir,Fruitgrowers Dam,,,FALSE,136,Reservoirs,Fruitgrowers Reservoir,Fruitgrowers,Reservoir,Fruitgrowers Dam,214,Fruitgrowers,0270-Fruitgrowers Dam Project,7-Upper Colorado Basin,UCB,Offstream Storage,"4,030","1,939",338,Fruitgrowers Reservoir and Dam,Upper Colorado Basin,Fruitgrowers,Fruitgrowers,Y,4820,11/25/74,12/16/25,18651,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Gibson,Gibson,Gibson Reservoir,Gibson Dam,,,TRUE,141,Reservoirs,Gibson Reservoir,Gibson,Reservoir,Gibson Dam,221,Gibson,0028-Sun River Project,5-Missouri Basin,MB/ART,Instream Storage,"98,688","1,929",342,Gibson Reservoir and Dam,Missouri Basin,Gibson,Gibson,Y,364,1/1/30,12/16/25,35116,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Glendo,Glendo,Glendo Reservoir,Glendo Dam,,,TRUE,143,Reservoirs,Glendo Reservoir,Glendo,Reservoir,Glendo Dam,227,Glendo,0449-Pick-Sloan Missouri Basin Program-Oregon Trail Division-Glendo Unit,7-Upper Colorado Basin,MB/ART,Instream Storage,"763,039","1,958",345,Glendo Reservoir Dam and Powerplant,Missouri Basin,Glendo,Glendo,Y,373,10/17/57,12/16/25,24902,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Granby,Granby,Lake Granby,Granby Dam,,,TRUE,216,Reservoirs,Lake Granby,Granby,Reservoir,Granby Dam,234,Granby,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Instream Storage,"539,758","1,950",351,Lake Granby and Dam,Upper Colorado Basin,Granby,Granby,Y,383,10/1/53,12/16/25,24482,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Green Mountain,Green Mountain,Green Mountain Reservoir,Green Mountain Dam,,,TRUE,151,Reservoirs,Green Mountain Reservoir,Green Mountain,Reservoir,Green Mountain Dam,245,Green Mountain,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Instream Storage,"153,639","1,943",353,Green Mountain Reservoir Dam and Powerplant,Upper Colorado Basin,Green Mountain,Green Mountain,Y,21,10/1/45,12/16/25,27254,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Havasu,Havasu,Lake Havasu,Parker Dam,,,TRUE,217,Reservoirs,Lake Havasu,Havasu,Reservoir,Parker Dam,457,Parker,0351-Parker-Davis Project,8-Lower Colorado Basin,LCB,Instream Storage,590262,1938,3515,Lake Havasu Parker Dam and Powerplant,Lower Colorado Basin,Havasu,Parker,Y,6129,10/1/38,12/16/25,31855,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Heron,Heron,Heron Reservoir,Heron Dam,,,FALSE,166,Reservoirs,Heron Reservoir,Heron,Reservoir,Heron Dam,262,Heron,0465-San Juan-Chama Project,7-Upper Colorado Basin,UCB,Offstream Storage,"428,360","1,971",365,Heron Reservoir and Dam,Upper Colorado Basin,Heron,Heron,Y,420,12/31/74,12/16/25,18615,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Horsetooth,Horsetooth,Horsetooth Reservoir,Horsetooth Dam,,,TRUE,169,Reservoirs,Horsetooth Reservoir,Horsetooth,Reservoir,Horsetooth Dam,268,Horsetooth,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Offstream Storage,"156,735","1,949",369,Horsetooth Reservoir and Dam,Missouri Basin,Horsetooth,Horsetooth,Y,86,5/1/86,12/16/25,14373,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Hyrum,Hyrum,Hyrum Reservoir,Hyrum Dam,,,FALSE,177,Reservoirs,Hyrum Reservoir,Hyrum,Reservoir,Hyrum Dam,281,Hyrum,0188-Hyrum Project,7-Upper Colorado Basin,UCB,Instream Storage,"17,746","1,935",372,Hyrum Reservoir and Dam,Upper Colorado Basin,Hyrum,Hyrum,Y,439,1/31/74,12/16/25,18949,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Jackson Gulch,Jackson Gulch,Jackson Gulch Reservoir,Jackson Gulch Dam,,,FALSE,183,Reservoirs,Jackson Gulch Reservoir,Jackson Gulch,Reservoir,Jackson Gulch Dam,292,Jackson Gulch,0341-Mancos Project,7-Upper Colorado Basin,UCB,Offstream Storage,"9,980","1,949",378,Jackson Gulch Reservoir and Dam,Upper Colorado Basin,Jackson Gulch,Jackson Gulch,Y,4277,1/1/60,12/16/25,24093,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Jamestown,Jamestown,Jamestown Reservoir,Jamestown Dam,,,TRUE,186,Reservoirs,Jamestown Reservoir,Jamestown,Reservoir,Jamestown Dam,295,Jamestown,0769-Pick-Sloan Missouri Basin Program-Garrison Division-Garrison Diversion Unit,5-Missouri Basin,MB/ART,Instream Storage,"220,990","1,954",379,Jamestown Dam and Reservoir,Missouri Basin,Jamestown,Jamestown,Y,450,10/1/53,12/16/25,26376,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Keith Sebelius,Keith Sebelius,Keith Sebelius Lake,Norton Dam,,,TRUE,192,Reservoirs,Keith Sebelius Lake,Keith Sebelius,Reservoir,Norton Dam,424,Norton,0492-Pick-Sloan Missouri Basin Program-Kanaska Division-Almena Unit,5-Missouri Basin,MB/ART,Instream Storage,133740,1964,390,Keith Sebelius Lake and Norton Dam,Missouri Basin,Keith Sebelius,Norton,Y,488,7/1/64,12/16/25,22437,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Keswick,Keswick,Keswick Reservoir,Keswick Dam,,,FALSE,194,Reservoirs,Keswick Reservoir,Keswick,Reservoir,Keswick Dam,308,Keswick,0416-Central Valley Project-Trinity River Division,10-California-Great Basin,CGB,Instream Storage,"23,772","1,950",387,Keswick Reservoir Dam and Powerplant,California-Great Basin,Keswick,Keswick,Y,10794,10/1/74,12/16/25,18706,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Keyhole,Keyhole,Keyhole Reservoir,Keyhole Dam,,,TRUE,195,Reservoirs,Keyhole Reservoir,Keyhole,Reservoir,Keyhole Dam,309,Keyhole,0486-Pick-Sloan Missouri Basin Program-Cheyenne Division-Keyhole Unit,7-Upper Colorado Basin,MB/ART,Instream Storage,"329,134","1,952",388,Keyhole Reservoir and Dam,Missouri Basin,Keyhole,Keyhole,Y,477,10/1/51,12/16/25,27109,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Kirwin,Kirwin,Kirwin Reservoir,Kirwin Dam,,,TRUE,196,Reservoirs,Kirwin Reservoir,Kirwin,Reservoir,Kirwin Dam,310,Kirwin,0371-Pick-Sloan Missouri Basin Program-Solomon Division-Kirwin Unit,5-Missouri Basin,MB/ART,Instream Storage,"313,290","1,955",391,Kirwin Reservoir and Dam,Missouri Basin,Kirwin,Kirwin,Y,494,1/1/76,12/16/25,14744,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Lemon,Lemon,Lemon Reservoir,Lemon Dam,,,FALSE,241,Reservoirs,Lemon Reservoir,Lemon,Reservoir,Lemon Dam,325,Lemon,0519-Florida Project,7-Upper Colorado Basin,UCB,Instream Storage,"40,146","1,963",395,Lemon Reservoir and Dam,Upper Colorado Basin,Lemon,Lemon,Y,520,12/13/63,12/16/25,22651,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Lewiston,Lewiston,Lewiston Lake,Lewiston Dam,,,FALSE,243,Reservoirs,Lewiston Lake,Lewiston,Reservoir,Lewiston Dam,327,Lewiston,0416-Central Valley Project-Trinity River Division,10-California-Great Basin,CGB,Instream Diversion (created by a diversion dam),"14,660","1,963",397,Lewiston Lake Dam and Powerplant ,California-Great Basin,Lewiston,Lewiston,Y,10798,4/1/64,12/16/25,22541,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Lost Creek,Lost Creek,Lost Creek Reservoir,Lost Creek Dam,,,FALSE,253,Reservoirs,Lost Creek Reservoir,Lost Creek,Reservoir,Lost Creek Dam,340,Lost Creek,0526-Weber Basin Project,7-Upper Colorado Basin,UCB,Instream Storage,"22,510","1,966",400,Lost Creek Reservoir and Dam,Upper Colorado Basin,Lost Creek,Lost Creek,Y,544,10/30/82,12/16/25,15755,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Lovewell,Lovewell,Lovewell Reservoir,Lovewell Dam,,,FALSE,257,Reservoirs,Lovewell Reservoir,Lovewell,Reservoir,Lovewell Dam,345,Lovewell,0271-Pick-Sloan Missouri Basin Program-Bostwick Division,5-Missouri Basin,MB/ART,Instream Storage,"86,131","1,957",404,Lovewell Reservoir and Dam,Missouri Basin,Lovewell,Lovewell,Y,556,1/1/76,12/16/25,14671,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Marys,Marys,Marys Lake,Marys Lake Dikes,,,FALSE,266,Reservoirs,Marys Lake,Marys,Reservoir,Marys Lake Dikes,361,Marys Lake Dikes,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Conveyance (used for water conveyance),927,"1,949",1,Marys Lake,Missouri Basin,Marys,#N/A,Y,4222,5/1/86,12/16/25,12033,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,McGee Creek,McGee Creek,McGee Creek Reservoir,McGee Creek Dam,,,TRUE,269,Reservoirs,McGee Creek Reservoir,McGee Creek,Reservoir,Mcgee Creek Dam,365,McGee Creek,1283-McGee Creek Project,6-Arkansas-Rio Grande-Texas Gulf,MB/ART,Instream Storage,"199,276","1,987",408,Mcgee Creek Reservoir and Dam,Arkansas-Rio Grande-Texas-Gulf,Mcgee Creek,Mcgee Creek,Y,563,4/1/87,12/16/25,13848,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,McPhee,McPhee,McPhee Reservoir,McPhee Dam,,,TRUE,271,Reservoirs,McPhee Reservoir,McPhee,Reservoir,McPhee Dam,369,McPhee,0071-Dolores Project,7-Upper Colorado Basin,UCB,Instream Storage,"381,200","1,983",410,Mcphee Reservoir and Dam,Upper Colorado Basin,Mcphee,Mcphee,Y,569,3/20/84,12/16/25,15248,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Mead,Mead,Lake Mead,Hoover Dam,,,TRUE,220,Reservoirs,Lake Mead,Mead,Reservoir,Hoover Dam,265,Hoover,0045-Boulder Canyon Project-Hoover Division,8-Lower Colorado Basin,LCB,Instream Storage,"30,167,000","1,935",3514,Lake Mead Hoover Dam and Powerplant,Lower Colorado Basin,Mead,Hoover,Y,6124,5/28/37,12/16/25,32346,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Meeks Cabin,Meeks Cabin,Meeks Cabin Reservoir,Meeks Cabin Dam,,,FALSE,272,Reservoirs,Meeks Cabin Reservoir,Meeks Cabin,Reservoir,Meeks Cabin Dam,372,Meeks Cabin,0145-Lyman Project,7-Upper Colorado Basin,UCB,Instream Storage,"32,470","1,971",411,Meeks Cabin Reservoir and Dam,Upper Colorado Basin,Meeks Cabin,Meeks Cabin,Y,574,5/9/73,12/16/25,19216,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Millerton,Millerton,Millerton Lake,Friant Dam,,,TRUE,279,Reservoirs,Millerton Lake,Millerton,Reservoir,Friant Dam,211,Friant,1785-Central Valley Project-Friant Division,10-California-Great Basin,CGB,Instream Storage,"520,500","1,942",413,Millerton Lake and Friant Dam,California-Great Basin,Millerton,Friant,Y,10807,2/22/44,12/16/25,29885,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Minatare,Minatare,Lake Minatare,Minatare Dam,,,FALSE,222,Reservoirs,Lake Minatare,Minatare,Reservoir,Minatare Dam,381,Minatare,0020-North Platte Project,5-Missouri Basin,MB/ART,Conveyance (used for water conveyance),"58,795","1,915",399,Lake Minatare and Dam,Missouri Basin,Minatare,Minatare,Y,541,9/30/90,12/16/25,12865,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Mohave,Mohave,Lake Mohave,Davis Dam,,,TRUE,223,Reservoirs,Lake Mohave,Mohave,Reservoir,Davis Dam,132,Davis,0351-Parker-Davis Project,8-Lower Colorado Basin,LCB,Instream Storage,1887167,1950,3513,Lake Mohave Davis Dam and Powerplant,Lower Colorado Basin,Mohave,Mohave,Y,6134,2/2/50,12/16/25,27713,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Moon,Moon,Moon Lake,Moon Lake Dam,,,FALSE,282,Reservoirs,Moon Lake,Moon,Reservoir,Moon Lake Dam,387,Moon Lake,0209-Moon Lake Project,7-Upper Colorado Basin,UCB,Instream Storage,"53,633","1,938",416,Moon Lake Reservoir and Dam,Upper Colorado Basin,Moon Lake,Moon Lake,Y,587,10/31/74,12/16/25,18676,OK,OK,OK,TRUE,TRUE,RISE Location is Moon Lake Reservoir
-Include,Include,Group A,,Morrow Point,Morrow Point,Morrow Point Reservoir,Morrow Point Dam,,,FALSE,284,Reservoirs,Morrow Point Reservoir,Morrow Point,Reservoir,Morrow Point Dam,390,Morrow Point,0622-Colorado River Storage Project-Gunnison Division-Wayne M. Aspinall Unit,7-Upper Colorado Basin,UCB,Instream Storage,"117,190","1,968",417,Morrow Point Reservoir Dam and Powerplant,Upper Colorado Basin,Morrow Point,Morrow Point,Y,592,12/1/70,12/16/25,20106,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Nambe Falls,Nambe Falls,Nambe Falls Reservoir,Nambe Falls Dam,,,FALSE,288,Reservoirs,Nambe Falls Reservoir,Nambe Falls,Reservoir,Nambe Falls Dam,399,Nambe Falls,0465-San Juan-Chama Project,7-Upper Colorado Basin,UCB,Instream Storage,"1,729","1,976",3511,Nambe Falls Reservoir and Dam ,Upper Colorado Basin,Nambe Falls,Nambe Falls,Y,6113,12/31/74,12/16/25,18615,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Natoma,Natoma,Lake Natoma,Nimbus Dam,,,FALSE,224,Reservoirs,Lake Natoma,Natoma,Reservoir,Nimbus Dam,414,Nimbus,0859-Central Valley Project-American River Division-Auburn-Folsom South Unit,10-California-Great Basin,CGB,Instream Diversion (created by a diversion dam),8760,1955,422,Lake Natoma Nimbus Dam and Powerplant,California-Great Basin,Natoma,Natoma,Y,10819,10/1/75,12/16/25,18341,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Navajo,Navajo,Navajo Reservoir,Navajo Dam,,,TRUE,289,Reservoirs,Navajo Reservoir,Navajo,Reservoir,Navajo Dam,401,Navajo,0711-Colorado River Storage Project-San Juan Division-Navajo Unit,7-Upper Colorado Basin,UCB,Instream Storage,"1,713,900","1,963",423,Navajo Reservoir and Dam,Upper Colorado Basin,Navajo,Navajo,Y,613,7/1/62,12/16/25,23181,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Nelson,Nelson,Nelson Reservoir,Nelson Dikes,,,FALSE,290,Reservoirs,Nelson Reservoir,Nelson,Reservoir,Nelson Dikes,402,Nelson Dikes,0015-Milk River Project,5-Missouri Basin,MB/ART,Offstream Storage,"78,950","1,922",424,Nelson Reservoir and Nelson Dikes,Missouri Basin,Nelson,#N/A,Y,618,10/31/46,12/16/25,16074,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,New Melones,New Melones,New Melones Lake,New Melones Dam,,,TRUE,292,Reservoirs,New Melones Lake,New Melones,Reservoir,New Melones Dam,410,New Melones,0881-Central Valley Project-East Side Division-New Melones Unit,10-California-Great Basin,CGB,Instream Storage,2400000,1979,3204,New Melones Lake Dam and Powerplant,California-Great Basin,New Melones,New Melones,Y,10843,10/1/43,12/16/25,30020,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Newton,Newton,Newton Reservoir,Newton Dam,,,FALSE,294,Reservoirs,Newton Reservoir,Newton,Reservoir,Newton Dam,413,Newton,0292-Newton Project,7-Upper Colorado Basin,UCB,Instream Storage,"5,594","1,946",425,Newton Reservoir and Dam,Upper Colorado Basin,Newton,Newton,Y,623,1/31/74,12/16/25,18949,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Pactola,Pactola,Pactola Reservoir,Pactola Dam,,,FALSE,316,Reservoirs,Pactola Reservoir,Pactola,Reservoir,Pactola Dam,447,Pactola,0494-Pick-Sloan Missouri Basin Program-Cheyenne Division-Rapid Valley Unit,5-Missouri Basin,MB/ART,Instream Storage,"99,029","1,956",444,Pactola Reservoir and Dam,Missouri Basin,Pactola,Pactola,Y,674,10/1/55,12/16/25,25646,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Paonia,Paonia,Paonia Reservoir,Paonia Dam,,,FALSE,318,Reservoirs,Paonia Reservoir,Paonia,Reservoir,Paonia Dam,453,Paonia,0551-Paonia Project,7-Upper Colorado Basin,UCB,Instream Storage,15522,1962,431,Paonia Reservoir and Dam,Upper Colorado Basin,Paonia,Paonia,Y,4827,10/25/74,12/16/25,18682,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Pathfinder,Pathfinder,Pathfinder Reservoir,Pathfinder Dam,,,TRUE,321,Reservoirs,Pathfinder Reservoir,Pathfinder,Reservoir,Pathfinder Dam,458,Pathfinder,0020-North Platte Project,7-Upper Colorado Basin,MB/ART,Instream Storage,1070185,1909,433,Pathfinder Reservoir and Dam,Missouri Basin,Pathfinder,Pathfinder,Y,644,10/1/45,12/16/25,29301,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Pilot Butte,Pilot Butte,Pilot Butte Reservoir,Pilot Butte Dam,,,FALSE,326,Reservoirs,Pilot Butte Reservoir,Pilot Butte,Reservoir,Pilot Butte Dam,464,Pilot Butte,1236-Pick-Sloan Missouri Basin Program-Wind Division-Riverton Unit,7-Upper Colorado Basin,MB/ART,Offstream Storage,33721,1926,435,Pilot Butte Reservoir and Dam,Missouri Basin,Pilot Butte,Pilot Butte,Y,648,10/31/49,12/16/25,21119,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Pineview,Pineview,Pineview Reservoir,Pineview Dam,,,FALSE,327,Reservoirs,Pineview Reservoir,Pineview,Reservoir,Pineview Dam,468,Pineview,0526-Weber Basin Project,7-Upper Colorado Basin,UCB,Instream Storage,110150,1936,437,Pineview Reservoir Dam and Powerplant,Upper Colorado Basin,Pineview,Pineview,Y,652,12/1/77,12/16/25,17549,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Pinewood,Pinewood,Pinewood Lake,Rattlesnake Dam,,,FALSE,328,Reservoirs,Pinewood Lake,Pinewood,Reservoir,Rattlesnake Dam,489,Rattlesnake,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Conveyance (used for water conveyance),2104,1952,438,Pinewood Reservoir and Rattlesnake Dam ,Missouri Basin,Pinewood,Rattlesnake,Y,657,5/1/86,12/16/25,11619,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Pishkun,Pishkun,Pishkun Reservoir,Pishkun Dikes,,,FALSE,330,Reservoirs,Pishkun Reservoir,Pishkun,Reservoir,Pishkun Dikes,470,Pishkun Dikes,0028-Sun River Project,5-Missouri Basin,MB/ART,Offstream Storage,46694,1940,443,Pishkun Reservoir and Dikes,Missouri Basin,Pishkun,#N/A,Y,670,10/31/89,12/16/25,12213,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Powell,Powell,Lake Powell,Glen Canyon Dam,,,TRUE,229,Reservoirs,Lake Powell,Powell,Reservoir,Glen Canyon Dam,223,Glen Canyon,0557-Colorado River Storage Project-Middle River Division-Glen Canyon Unit,8-Lower Colorado Basin,UCB,Instream Storage,"26,215,000","1,963",393,Lake Powell Glen Canyon Dam and Powerplant,Upper Colorado Basin,Powell,Powell,Y,509,6/28/63,12/16/25,22819,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Pueblo,Pueblo,Pueblo Reservoir,Pueblo Dam,,,TRUE,338,Reservoirs,Pueblo Reservoir,Pueblo,Reservoir,Pueblo Dam,485,Pueblo,0382-Fryingpan-Arkansas Project,7-Upper Colorado Basin,MB/ART,Instream Storage,338374,1975,445,Pueblo Reservoir and Dam,Arkansas-Rio Grande-Texas-Gulf,Pueblo,Pueblo,Y,681,5/15/74,12/16/25,18838,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Red Fleet,Red Fleet,Red Fleet Reservoir,Red Fleet Dam,,,FALSE,345,Reservoirs,Red Fleet Reservoir,Red Fleet,Reservoir,Red Fleet Dam,498,Red Fleet,0450-Central Utah Project-Initial Division-Jensen Unit,7-Upper Colorado Basin,UCB,Instream Storage,26000,1980,447,Red Fleet Reservoir and Dam,Upper Colorado Basin,Red Fleet,Red Fleet,Y,685,5/1/80,12/12/25,16665,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Ridgway,Ridgway,Ridgway Reservoir,Ridgway Dam,,,FALSE,347,Reservoirs,Ridgway Reservoir,Ridgway,Reservoir,Ridgway Dam,503,Ridgway,0894-Dallas Creek Project,7-Upper Colorado Basin,UCB,Instream Storage,84410,1987,448,Ridgway Reservoir and Dam,Upper Colorado Basin,Ridgway,Ridgway,Y,4834,10/20/86,12/16/25,14304,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Rockport,Rockport,Rockport Lake,Wanship Dam,,,FALSE,352,Reservoirs,Rockport Lake,Rockport,Reservoir,Wanship Dam,627,Wanship,0526-Weber Basin Project,7-Upper Colorado Basin,UCB,Instream Storage,62120,1957,453,Rockport Reservoir and Wanship Dam,Upper Colorado Basin,Rockport,Wanship,Y,706,10/1/68,12/16/25,20897,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Ruedi,Ruedi,Ruedi Reservoir,Ruedi Dam,,,FALSE,355,Reservoirs,Ruedi Reservoir,Ruedi,Reservoir,Ruedi Dam,513,Ruedi,0382-Fryingpan-Arkansas Project,7-Upper Colorado Basin,MB/ART,Instream Storage,102373,1968,456,Ruedi Reservoir and Dam ,Upper Colorado Basin,Ruedi,Ruedi,Y,711,4/1/69,12/16/25,20804,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Scofield,Scofield,Scofield Reservoir,Scofield Dam,,,FALSE,369,Reservoirs,Scofield Reservoir,Scofield,Reservoir,Scofield Dam,528,Scofield,0132-Scofield Project,7-Upper Colorado Basin,UCB,Instream Storage,73600,1946,466,Scofield Reservoir and Dam,Upper Colorado Basin,Scofield,Scofield,Y,727,10/31/74,12/16/25,18676,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Seminoe,Seminoe,Seminoe Reservoir,Seminoe Dam,,,TRUE,372,Reservoirs,Seminoe Reservoir,Seminoe,Reservoir,Seminoe Dam,536,Seminoe,0144-Kendrick Project,7-Upper Colorado Basin,MB/ART,Instream Storage,1017273,1938,467,Seminoe Reservoir Dam and Powerplant,Missouri Basin,Seminoe,Seminoe,Y,732,10/1/45,12/16/25,29301,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Shadehill,Shadehill,Shadehill Reservoir,Shadehill Dam,,,TRUE,374,Reservoirs,Shadehill Reservoir,Shadehill,Reservoir,Shadehill Dam,540,Shadehill,0276-Pick-Sloan Missouri Basin Program-Grand Division-Shadehill Unit,5-Missouri Basin,MB/ART,Instream Storage,350176,1951,476,Shadehill Reservoir and Dam,Missouri Basin,Shadehill,Shadehill,Y,748,10/1/51,12/16/25,27107,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Shadow Mountain,Shadow Mountain,Shadow Mountain Lake,Shadow Mountain Dam,,,FALSE,375,Reservoirs,Shadow Mountain Lake,Shadow Mountain,Reservoir,Shadow Mountain Dam,543,Shadow Mountain,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Conveyance (used for water conveyance),18369,1946,473,Shadow Mountain Lake and Dam,Upper Colorado Basin,Shadow Mountain,Shadow Mountain,Y,737,10/1/53,12/16/25,23861,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Shasta,Shasta,Shasta Lake,Shasta Dam,,,TRUE,834,Reservoirs,Shasta Lake,Shasta,Reservoir,Shasta Dam,545,Shasta,0416-Central Valley Project-Trinity River Division,10-California-Great Basin,CGB,Instream Storage,4552090,1945,471,Shasta Lake Dam and Powerplant,California-Great Basin,Shasta,Shasta,Y,10864,12/30/43,12/16/25,29939,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Sherburne,Sherburne,Lake Sherburne,Lake Sherburne Dam,,,TRUE,230,Reservoirs,Lake Sherburne,Sherburne,Reservoir,Lake Sherburne Dam,320,Lake Sherburne,0015-Milk River Project,5-Missouri Basin,MB/ART,Instream Storage,"66,147","1,919",475,Lake Sherburne and Dam,Missouri Basin,Sherburne,Sherburne,Y,741,10/1/24,12/16/25,36987,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Silver Jack,Silver Jack,Silver Jack Reservoir,Silver Jack Dam,,,FALSE,380,Reservoirs,Silver Jack Reservoir,Silver Jack,Reservoir,Silver Jack Dam,548,Silver Jack,0860-Bostwick Park Project,7-Upper Colorado Basin,UCB,Instream Storage,13520,1971,477,Silver Jack Reservoir and Dam,Upper Colorado Basin,Silver Jack,Silver Jack,Y,4842,8/1/73,12/16/25,19132,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Spring Creek,Spring Creek,Spring Creek Reservoir,Spring Creek Debris Dam,,,FALSE,400,Reservoirs,Spring Creek Reservoir,Spring Creek,Reservoir,Spring Creek Debris Dam,570,Spring Creek Debris,0416-Central Valley Project-Trinity River Division,10-California-Great Basin,CGB,Instream Storage,5874,1963,6,Spring Creek Reservoir and Debris Dam,California-Great Basin,Spring Creek,Debris,Y,10837,9/13/63,12/16/25,22742,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Starvation,Starvation,Starvation Reservoir,Starvation Dam,,,FALSE,402,Reservoirs,Starvation Reservoir,Starvation,Reservoir,Starvation Dam,573,Starvation,0066-Central Utah Project-Initial Division-Bonneville Unit,7-Upper Colorado Basin,UCB,Instream Storage,164118,1970,484,Starvation Reservoir and Dam,Upper Colorado Basin,Starvation,Starvation,Y,764,12/1/69,12/15/25,20470,OK,OK,OK,TRUE,FALSE,
-Include,Include,Group A,,Stateline,Stateline,Stateline Reservoir,Stateline Dam,,,FALSE,403,Reservoirs,Stateline Reservoir,Stateline,Reservoir,Stateline Dam,574,Stateline,0145-Lyman Project,7-Upper Colorado Basin,UCB,Instream Storage,14000,1979,485,Stateline Reservoir and Dam,Upper Colorado Basin,Stateline,Stateline,Y,769,6/28/79,12/16/25,16975,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Steinaker,Steinaker,Steinaker Reservoir,Steinaker Dam,,,FALSE,404,Reservoirs,Steinaker Reservoir,Steinaker,Reservoir,Steinaker Dam,577,Steinaker,0325-Central Utah Project-Initial Division-Vernal Unit,7-Upper Colorado Basin,UCB,Offstream Storage,40043,1961,486,Steinaker Reservoir and Dam,Upper Colorado Basin,Steinaker,Steinaker,Y,774,10/1/74,12/12/25,18704,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Strawberry,Strawberry,Strawberry Reservoir,Soldier Creek Dam,,,FALSE,407,Reservoirs,Strawberry Reservoir,Strawberry,Reservoir,Soldier Creek Dam,555,Soldier Creek,0066-Central Utah Project-Initial Division-Bonneville Unit,7-Upper Colorado Basin,UCB,Offstream Storage,1106500,1974,488,Strawberry Reservoir and Soldier Creek Dam,Upper Colorado Basin,Strawberry,Soldier Creek,Y,779,4/30/75,12/15/25,18494,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Sumner,Sumner,Sumner Lake,Sumner Dam,,,FALSE,409,Reservoirs,Sumner Lake,Sumner,Reservoir,Sumner Dam,585,Sumner,0005-Carlsbad Project,7-Upper Colorado Basin,UCB,Instream Storage,124119,1937,489,Lake Sumner and Dam,Upper Colorado Basin,Sumner,Sumner,Y,784,10/1/65,12/16/25,21993,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Taylor Park,Taylor Park,Taylor Park Reservoir,Taylor Park Dam,,,FALSE,414,Reservoirs,Taylor Park Reservoir,Taylor Park,Reservoir,Taylor Park Dam,592,Taylor Park,0031-Uncompahgre Project,7-Upper Colorado Basin,UCB,Instream Storage,106225,1937,491,Taylor Park Reservoir and Dam,Upper Colorado Basin,Taylor Park,Taylor Park,Y,793,10/1/58,12/16/25,24550,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Tom Steed,Tom Steed,Tom Steed Reservoir,Mountain Park Dam,,,FALSE,422,Reservoirs,Tom Steed Reservoir,Tom Steed,Reservoir,Mountain Park Dam,392,Mountain Park,0827-Mountain Park Project,6-Arkansas-Rio Grande-Texas Gulf,MB/ART,Instream Storage,119051,1975,3670,Tom Steed Reservoir and Mountain Park Dam,Arkansas-Rio Grande-Texas-Gulf,Tom Steed,Mountain Park,Y,133815,2/1/88,12/16/25,13781,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Trinity,Trinity,Trinity Lake,Trinity Dam,,,TRUE,425,Reservoirs,Trinity Lake,Trinity,Reservoir,Trinity Dam,609,Trinity,0416-Central Valley Project-Trinity River Division,10-California-Great Basin,CGB,Instream Storage,2447650,1962,3203,Trinity Lake Dam and Powerplant,California-Great Basin,Trinity,Trinity,Y,10854,11/1/62,12/16/25,23058,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Tschida,Tschida,Lake Tschida,Heart Butte Dam,,,TRUE,233,Reservoirs,Lake Tschida,Tschida,Reservoir,Heart Butte Dam,257,Heart Butte,1112-Pick-Sloan Missouri Basin Program-Heart Division-Heart Butte Unit,5-Missouri Basin,MB/ART,Instream Storage,212696,1949,402,Lake Tschida and Heart Butte Dam,Missouri Basin,Tschida,Heart Butte,Y,549,10/1/49,12/16/25,27833,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Turquoise,Turquoise,Turquoise Lake,Sugar Loaf Dam,,,FALSE,427,Reservoirs,Turquoise Lake,Turquoise,Reservoir,Sugar Loaf Dam,582,Sugar Loaf,0382-Fryingpan-Arkansas Project,7-Upper Colorado Basin,MB/ART,Instream Storage,129398,1968,498,Turquoise Lake and Sugar Loaf Dam,Arkansas-Rio Grande-Texas-Gulf,Turquoise,Sugar Loaf,Y,814,5/14/69,12/16/25,20747,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Twin Lakes,Twin Lakes,Twin Lakes,Twin Lakes Dam,,,FALSE,429,Reservoirs,Twin Lakes,Twin Lakes,Reservoir,Twin Lakes Dam,613,Twin Lakes,0382-Fryingpan-Arkansas Project,7-Upper Colorado Basin,MB/ART,Instream Storage,141000,1978,499,Twin Lakes Reservoir and Dam,Arkansas-Rio Grande-Texas-Gulf,Twin Lakes,Twin Lakes,Y,818,12/16/80,12/16/25,15431,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Upper Stillwater,Upper Stillwater,Upper Stillwater Reservoir,Upper Stillwater Dam,,,FALSE,435,Reservoirs,Upper Stillwater Reservoir,Upper Stillwater,Reservoir,Upper Stillwater Dam,619,Upper Stillwater,0066-Central Utah Project-Initial Division-Bonneville Unit,7-Upper Colorado Basin,UCB,Instream Storage,32009,1987,500,Upper Stillwater Reservoir and Dam,Upper Colorado Basin,Upper Stillwater,Upper Stillwater,Y,826,7/2/89,12/15/25,13317,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Vallecito,Vallecito,Vallecito Reservoir,Vallecito Dam,,,FALSE,436,Reservoirs,Vallecito Reservoir,Vallecito,Reservoir,Vallecito Dam,621,Vallecito,0191-Pine River Project,7-Upper Colorado Basin,UCB,Instream Storage,129700,1941,501,Vallecito Reservoir and Dam,Upper Colorado Basin,Vallecito,Vallecito,Y,831,5/3/41,12/16/25,30910,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Waconda,Waconda,Waconda Lake,Glen Elder Dam,,,TRUE,440,Reservoirs,Waconda Lake,Waconda,Reservoir,Glen Elder Dam,224,Glen Elder,0495-Pick-Sloan Missouri Basin Program-Solomon Division-Glen Elder Unit,5-Missouri Basin,MB/ART,Instream Storage,942408,1969,504,Waconda Lake and Glen Elder Dam,Missouri Basin,Waconda,Glen Elder,Y,840,1/1/76,12/16/25,14675,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Webster,Webster,Webster Reservoir,Webster Dam,,,FALSE,469,Reservoirs,Webster Reservoir,Webster,Reservoir,Webster Dam,657,Webster,0468-Pick-Sloan Missouri Basin Program-Solomon Division-Webster Unit,5-Missouri Basin,MB/ART,Instream Storage,259510,1956,506,Webster Reservoir and Dam,Missouri Basin,Webster,Webster,Y,846,1/1/76,12/16/25,14675,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Whiskeytown,Whiskeytown,Whiskeytown Lake,Whiskeytown Dam,,,TRUE,472,Reservoirs,Whiskeytown Lake,Whiskeytown,Reservoir,Whiskeytown Dam,665,Whiskeytown,0416-Central Valley Project-Trinity River Division,10-California-Great Basin,CGB,Offstream Storage,241096,1963,509,Whiskeytown Lake and Dam,California-Great Basin,Whiskeytown,Whiskeytown,Y,10827,5/1/63,12/16/25,22694,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Willard Bay,Willard Bay,Willard Bay Reservoir,Arthur V. Watkins Dam,,,FALSE,474,Reservoirs,Willard Bay Reservoir,Willard Bay,Reservoir,Arthur V. Watkins Dam,27,Arthur V. Watkins,0526-Weber Basin Project,7-Upper Colorado Basin,UCB,Offstream Storage,247302,1964,512,Willard Bay Reservoir and Arthur V Watkins Dam,Upper Colorado Basin,Willard Bay,Arthur V Watkins,Y,866,12/22/85,12/16/25,14606,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Willow Creek Reservoir CO,Willow Creek Reservoir CO,Willow Creek Reservoir CO,Willow Creek BOR CO Dam,,,FALSE,476,Reservoirs,Willow Creek Reservoir CO,Willow Creek Reservoir CO,Reservoir,Willow Creek BOR CO Dam,671,Willow Creek BOR CO,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Instream Storage,10553,1953,515,Willow Creek Reservoir and Dam (CO),Upper Colorado Basin,Willow Creek,Willow Creek,Y,871,10/1/53,12/16/25,23951,OK,OK,OK,TRUE,TRUE,
-Include,Include,Group A,,Willow Creek Reservoir MT,Willow Creek Reservoir MT,Willow Creek Reservoir MT,Willow Creek MT Dam,,,FALSE,477,Reservoirs,Willow Creek Reservoir MT,Willow Creek Reservoir MT,Reservoir,Willow Creek MT Dam,672,Willow Creek MT,0028-Sun River Project,5-Missouri Basin,MB/ART,Instream Storage,31848,1941,508,Willow Creek Reservoir and Dam (MT),Missouri Basin,Willow Creek,Willow Creek,Y,856,10/1/85,12/16/25,14765,OK,OK,OK,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Box Butte,Box Butte,Box Butte Reservoir,Box Butte Dam,,,FALSE,38,Reservoirs,Box Butte Reservoir,Box Butte,Reservoir,Box Butte Dam,54,Box Butte,0278-Mirage Flats Project,5-Missouri Basin,MB/ART,Instream Storage,"29,161",1946,268,Box Butte Reservoir and Dam,Missouri Basin,Box Butte,Box Butte,Y,141,10/31/91,12/16/25,11304,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Calamus,Calamus,Calamus Reservoir,Virginia Smith Dam,,,TRUE,52,Reservoirs,Calamus Reservoir,Calamus,Reservoir,Virginia Smith Dam,625,Virginia Smith,0628-Pick-Sloan Missouri Basin Program-North Loup Division,5-Missouri Basin,MB/ART,Instream Storage,119469,1985,287,Calamus Reservoir and Virginia Smith Dam,Missouri Basin,Calamus,Virginia Smith,Y,214,5/31/93,12/16/25,10454,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Davis Creek,Davis Creek,Davis Creek Reservoir,Davis Creek Dam,,,FALSE,88,Reservoirs,Davis Creek Reservoir,Davis Creek,Reservoir,Davis Creek Dam,131,Davis Creek,0628-Pick-Sloan Missouri Basin Program-North Loup Division,5-Missouri Basin,MB/ART,Offstream Storage,"31,158",1990,311,Davis Creek Reservoir and Dam,Missouri Basin,Davis Creek,Davis Creek,Y,283,1/31/93,12/16/25,10782,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Estes,Estes,Lake Estes,Olympus Dam,,,FALSE,215,Reservoirs,Lake Estes,Estes,Reservoir,Olympus Dam,438,Olympus,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Conveyance (used for water conveyance),2783,1949,429,Lake Estes and Olympus Dam,Missouri Basin,Estes,Olympus,Y,631,11/28/94,12/16/25,11238,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Flatiron,Flatiron,Flatiron Reservoir,Flatiron Dam,,,FALSE,120,Reservoirs,Flatiron Reservoir,Flatiron,Reservoir,Flatiron Dam,184,Flatiron,0245-Colorado-Big Thompson Project,7-Upper Colorado Basin,MB/ART,Conveyance (used for water conveyance),730,1953,331,Flatiron Reservoir and Dam,Missouri Basin,Flatiron,Flatiron,Y,343,2/13/03,12/16/25,8339,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,Current storage data needed,Gray Reef,Gray Reef,Gray Reef Reservoir,Gray Reef Dam,,,FALSE,150,Reservoirs,Gray Reef Reservoir,Gray Reef,Reservoir,Gray Reef Dam,244,Gray Reef,0449-Pick-Sloan Missouri Basin Program-Oregon Trail Division-Glendo Unit,7-Upper Colorado Basin,MB/ART,Regulating Reservoir,"1,800",1961,3,Gray Reef Dam,Missouri Basin,,,Y,18,5/11/95,8/18/18,3732,!,!,!,TRUE,TRUE,RISE Location is Gray Reef Dam only (no Reservoir)
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Guernsey,Guernsey,Guernsey Reservoir,Guernsey Dam,,,TRUE,152,Reservoirs,Guernsey Reservoir,Guernsey,Reservoir,Guernsey Dam,246,Guernsey,0020-North Platte Project,7-Upper Colorado Basin,MB/ART,Instream Storage,"45,612",1927,357,Guernsey Reservoir Dam and Powerplant,Missouri Basin,Guernsey,Guernsey,Y,394,2/26/10,12/16/25,5766,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Jordanelle,Jordanelle,Jordanelle Reservoir,Jordanelle Dam,,,FALSE,188,Reservoirs,Jordanelle Reservoir,Jordanelle,Reservoir,Jordanelle Dam,301,Jordanelle,0066-Central Utah Project-Initial Division-Bonneville Unit,7-Upper Colorado Basin,UCB,Instream Storage,"361,500",1993,384,Jordanelle Reservoir Dam and Powerplant,Upper Colorado Basin,Jordanelle,Jordanelle,Y,468,2/5/93,12/15/25,12003,!,OK,!,FALSE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Lost,Lost,Lost Lake,Lost Lake Dam,,,FALSE,254,Reservoirs,Lost Lake,Lost,Reservoir,Lost Lake Dam,341,Lost Lake,0066-Central Utah Project-Initial Division-Bonneville Unit,7-Upper Colorado Basin,UCB,Instream Storage,"1,155",1931,3209,Lost Lake,Upper Colorado Basin,Lost,#N/A,Y,4523,10/1/03,12/15/25,8113,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Merritt,Merritt,Merritt Reservoir,Merritt Dam,,,FALSE,273,Reservoirs,Merritt Reservoir,Merritt,Reservoir,Merritt Dam,375,Merritt,0719-Pick-Sloan Missouri Basin Program-Sandhills Division-Ainsworth Unit,5-Missouri Basin,MB/ART,Instream Storage,"66,726",1964,418,Merritt Reservoir and Dam,Missouri Basin,Merritt,Merritt,Y,598,5/31/93,12/16/25,11307,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Mt. Elbert Forebay,Mt. Elbert Forebay,Mt. Elbert Forebay,Mt. Elbert Forebay Dam,,,FALSE,286,Reservoirs,Mt. Elbert Forebay,Mt. Elbert Forebay,Reservoir,Mt. Elbert Forebay Dam,395,Mt. Elbert Forebay,0382-Fryingpan-Arkansas Project,7-Upper Colorado Basin,MB/ART,Offstream Storage,"11,143",1981,419,Mount Elbert Forebay Reservoir and Dam,Arkansas-Rio Grande-Texas-Gulf,Mount Elbert Forebay,Mount Elbert Forebay,Y,602,4/26/07,12/16/25,6772,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Nighthorse,Nighthorse,Lake Nighthorse,Ridges Basin Dam,,,FALSE,225,Reservoirs,Lake Nighthorse,Nighthorse,Reservoir,Ridges Basin Dam,502,Ridges Basin,0069-Animas-La Plata Project,7-Upper Colorado Basin,UCB,Offstream Storage,"123,541",2008,392,Lake Nighthorse and Ridges Basin Dam,Upper Colorado Basin,Nighthorse,Ridges Basin,Y,504,6/9/09,12/16/25,6036,!,OK,!,FALSE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Platoro,Platoro,Platoro Reservoir,Platoro Dam,,,FALSE,331,Reservoirs,Platoro Reservoir,Platoro,Reservoir,Platoro Dam,478,Platoro,0253-San Luis Valley Project,7-Upper Colorado Basin,UCB,Instream Storage,59571,1951,3512,Platoro Reservoir and Dam ,Upper Colorado Basin,Platoro,Platoro,Y,6120,3/12/16,12/16/25,3568,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Trial,Trial,Trial Lake,Trial Lake Dam,,,FALSE,424,Reservoirs,Trial Lake,Trial,Reservoir,Trial Lake Dam,608,Trial Lake,0066-Central Utah Project-Initial Division-Bonneville Unit,7-Upper Colorado Basin,UCB,Instream Storage,1928,1990,3208,Trial Lake,Upper Colorado Basin,Trial,#N/A,Y,4516,10/1/03,12/15/25,8113,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg),Include (Omit % Avg),Group B,,Washington,Washington,Washington Lake,Washington Lake Dam,,,FALSE,445,Reservoirs,Washington Lake,Washington,Reservoir,Washington Lake Dam,633,Washington Lake,0066-Central Utah Project-Initial Division-Bonneville Unit,7-Upper Colorado Basin,UCB,Instream Storage,3055,1910,3207,Washington Lake,Upper Colorado Basin,Washington,#N/A,Y,4530,10/1/03,12/11/25,8113,!,OK,!,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Agate,Agate,Agate Reservoir,Agate Dam,,,FALSE,1,Reservoirs,Agate Reservoir,Agate,Reservoir,Agate Dam,2,Agate,0415-Rogue River Basin Project-Talent Division,9-Columbia-Pacific Northwest,CPN,Offstream Storage,"4,780","1,965",7166,Agate Reservoir and Dam (AGA),Columbia-Pacific Northwest,Agate,Agate,Y,129059,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,American Falls,American Falls,American Falls Reservoir,American Falls Dam,,,TRUE,5,Reservoirs,American Falls Reservoir,American Falls,Reservoir,American Falls Dam,15,American Falls,0017-Minidoka Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,1672590,1985,7167,American Falls Reservoir and Dam (AMF),Columbia-Pacific Northwest,American Falls,American Falls,Y,129132,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Anderson Ranch,Anderson Ranch,Anderson Ranch Reservoir,Anderson Ranch Dam,,,TRUE,8,Reservoirs,Anderson Ranch Reservoir,Anderson Ranch,Reservoir,Anderson Ranch Dam,18,Anderson Ranch,0004-Boise Project-Arrowrock Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,474942,1950,3641,"Anderson Ranch Reservoir, Dam, and Powerplant (AND)",Columbia-Pacific Northwest,Anderson Ranch,Anderson Ranch,Y,129152,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Arrowrock,Arrowrock,Arrowrock Reservoir,Arrowrock Dam,,,TRUE,13,Reservoirs,Arrowrock Reservoir,Arrowrock,Reservoir,Arrowrock Dam,25,Arrowrock,0004-Boise Project-Arrowrock Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,272224,1915,3642,Arrowrock Reservoir and Dam (ARK),Columbia-Pacific Northwest,Arrowrock,Arrowrock,Y,129217,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Banks,Banks,Banks Lake,Dry Falls Dam,,,FALSE,18,Reservoirs,Banks Lake,Banks,Reservoir,Dry Falls Dam,148,Dry Falls,0222-Columbia Basin Project-Gravity Division,9-Columbia-Pacific Northwest,CPN,Offstream Storage,"1,275,000","1,949",7264,Banks Lake and Dry Falls Dam (BNK),Columbia-Pacific Northwest,Banks,Dry Falls,Y,129465,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Beulah,Beulah,Beulah Reservoir,Agency Valley Dam,,,FALSE,26,Reservoirs,Beulah Reservoir,Beulah,Reservoir,Agency Valley Dam,3,Agency Valley,0126-Vale Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"59,212",2034,3643,Beulah Reservoir and Agency Valley Dam (BEU),Columbia-Pacific Northwest,Beulah,Agency Valley,Y,129308,,,,,,,FALSE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Billy Clapp,Billy Clapp,Billy Clapp Lake,Pinto Dam,,,FALSE,30,Reservoirs,Billy Clapp Lake,Billy Clapp,Reservoir,Pinto Dam,469,Pinto,0222-Columbia Basin Project-Gravity Division,9-Columbia-Pacific Northwest,CPN,Offstream Storage,"64,200","1,948",7168,Billy Clapp Lake and Pinto Dam (BCP),Columbia-Pacific Northwest,Billy Clapp,Pinto,Y,129300,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Black Canyon,Black Canyon,Black Canyon Reservoir,Black Canyon Diversion Dam,,,FALSE,31,Reservoirs,Black Canyon Reservoir,Black Canyon,Reservoir,Black Canyon Diversion Dam,46,Black Canyon Diversion,0003-Boise Project-Payette Division,9-Columbia-Pacific Northwest,CPN,Instream Diversion (created by a diversion dam),"29,822","1,924",7175,"Black Canyon Reservoir, Diversion Dam, and Powerplant (EMM)",Columbia-Pacific Northwest,Black Canyon,Black Canyon,Y,130357,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Bully Creek,Bully Creek,Bully Creek Reservoir,Bully Creek Dam,,,FALSE,48,Reservoirs,Bully Creek Reservoir,Bully Creek,Reservoir,Bully Creek Dam,69,Bully Creek,0126-Vale Project,9-Columbia-Pacific Northwest,CPN,Offstream Storage,"31,600","1,963",3646,Bully Creek Reservoir and Dam (BUL),Columbia-Pacific Northwest,Bully Creek,Bully Creek,Y,129587,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Bumping,Bumping,Bumping Lake,Bumping Lake Dam,,,TRUE,49,Reservoirs,Bumping Lake,Bumping,Reservoir,Bumping Lake Dam,71,Bumping Lake,0033-Yakima Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"35,400","1,910",3647,Bumping Lake and Bumping Lake Dam (BUM),Columbia-Pacific Northwest,Bumping,Bumping Lake,Y,129605,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Cascade,Cascade,Lake Cascade,Cascade Dam,,,TRUE,210,Reservoirs,Lake Cascade,Cascade,Reservoir,Cascade Dam,90,Cascade,0003-Boise Project-Payette Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,"693,000","1,948",3645,Lake Cascade and Cascade Dam (CSC),Columbia-Pacific Northwest,Cascade,Cascade,Y,129978,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Cle Elum,Cle Elum,Cle Elum Lake,Cle Elum Dam,,,TRUE,69,Reservoirs,Cle Elum Lake,Cle Elum,Reservoir,Cle Elum Dam,101,Cle Elum,0033-Yakima Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,705500,1933,7170,Cle Elum Lake and Dam (CLE),Columbia-Pacific Northwest,Cle Elum,Cle Elum,Y,129798,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Clear Lake (OR),Clear Lake (OR),Clear Lake (OR),Wasco Dam,,,FALSE,70,Reservoirs,Clear Lake (OR),Clear Lake (OR),Reservoir,Wasco Dam,632,Wasco,0350-Wapinitia Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,13066,1959,7200,Clear Lake and Wasco Dam (WAS),Columbia-Pacific Northwest,Clear,Wasco,Y,133710,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Cold Springs,Cold Springs,Cold Springs Reservoir,Cold Springs Dam,,,FALSE,75,Reservoirs,Cold Springs Reservoir,Cold Springs,Reservoir,Cold Springs Dam,112,Cold Springs,0030-Umatilla Project,9-Columbia-Pacific Northwest,CPN,Offstream Storage,"39,260","1,908",7171,Cold Springs Reservoir and Dam (CLS),Columbia-Pacific Northwest,Cold Springs,Cold Springs,Y,129818,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Como,Como,Lake Como,Como Dam,,,FALSE,212,Reservoirs,Lake Como,Como,Reservoir,Como Dam,114,Como,0226-Bitter Root Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"45,326","1,910",3653,Lake Como and Como Dam (CMO),Columbia-Pacific Northwest,Como,Como,Y,129824,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Conconully Lake,Conconully Lake,Conconully Lake,Salmon Lake Dam,,,FALSE,77,Reservoirs,Conconully Lake,Conconully Lake,Reservoir,Salmon Lake Dam,518,Salmon Lake,0021-Okanogan Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"15,700","1,921",7169,Conconully Lake and Salmon Lake Dam (CCL),Columbia-Pacific Northwest,Conconully Lake,Salmon Lake,Y,129646,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Crane Prairie,Crane Prairie,Crane Prairie Reservoir,Crane Prairie Dam,,,TRUE,82,Reservoirs,Crane Prairie Reservoir,Crane Prairie,Reservoir,Crane Prairie Dam,125,Crane Prairie,0112-Deschutes Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"59,724","1,940",7172,Crane Prairie Reservoir and Dam (CRA),Columbia-Pacific Northwest,Crane Prairie,Crane Prairie,Y,129873,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Deadwood,Deadwood,Deadwood Reservoir,Deadwood Dam,,,FALSE,90,Reservoirs,Deadwood Reservoir,Deadwood,Reservoir,Deadwood Dam,134,Deadwood,0003-Boise Project-Payette Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,162000,1931,3649,Deadwood Reservoir and Dam,Columbia-Pacific Northwest,Deadwood,Deadwood,Y,130055,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Emigrant,Emigrant,Emigrant Reservoir,Emigrant Dam,,,FALSE,114,Reservoirs,Emigrant Reservoir,Emigrant,Reservoir,Emigrant Dam,173,Emigrant,0415-Rogue River Basin Project-Talent Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,40500,1960,7174,Emigrant Lake and Dam (EMI),Columbia-Pacific Northwest,Emigrant,Emigrant,Y,130338,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Fish,Fish,Fish Lake,Fish Lake Dam,,,FALSE,118,Reservoirs,Fish Lake,Fish,Reservoir,Fish Lake Dam,182,Fish Lake,0415-Rogue River Basin Project-Talent Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,"7,836","1,908",7176,Fish Lake and Fish Lake Dam (FIS),Columbia-Pacific Northwest,Fish,Fish Lake,Y,130493,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Fourmile,Fourmile,Fourmile Lake,Fourmile Lake Dam,,,FALSE,130,Reservoirs,Fourmile Lake,Fourmile,Reservoir,Fourmile Lake Dam,207,Fourmile Lake,0529-Rogue River Basin Project-Medford Division,10-California-Great Basin,CPN,Instream Storage,"15,600","1,922",7177,Fourmile Lake and Fourmile Lake Dam (FOR),California-Great Basin,Fourmile,Fourmile Lake,Y,130544,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Grassy,Grassy,Grassy Lake,Grassy Lake Dam,,,TRUE,149,Reservoirs,Grassy Lake,Grassy,Reservoir,Grassy Lake Dam,243,Grassy Lake,0017-Minidoka Project,7-Upper Colorado Basin,CPN,Instream Storage,"15,452","1,939",7178,Grassy Lake and Grassy Lake Dam (GRS),Upper Colorado Basin,Grassy,Grassy Lake,Y,130755,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Haystack,Haystack,Haystack Reservoir,Haystack Dam,,,TRUE,162,Reservoirs,Haystack Reservoir,Haystack,Reservoir,Haystack Dam,255,Haystack,0112-Deschutes Project,9-Columbia-Pacific Northwest,CPN,Offstream Storage,"5,650","1,957",7179,Haystack Reservoir and Dam (HAY),Columbia-Pacific Northwest,Haystack,Haystack,Y,130821,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Henry Hagg,Henry Hagg,Henry Hagg Lake,Scoggins Dam,,,FALSE,165,Reservoirs,Henry Hagg Lake,Henry Hagg,Reservoir,Scoggins Dam,529,Scoggins,0417-Tualatin Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"62,216","1,975",3651,Henry Hagg Lake and Scoggins Dam (SCO),Columbia-Pacific Northwest,Henry Hagg,Scoggins,Y,132997,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Howard Prairie,Howard Prairie,Howard Prairie Reservoir,Howard Prairie Dam,,,FALSE,170,Reservoirs,Howard Prairie Reservoir,Howard Prairie,Reservoir,Howard Prairie Dam,273,Howard Prairie,0415-Rogue River Basin Project-Talent Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,"62,100","1,958",7182,Howard Prairie Lake and Dam (HPD),Columbia-Pacific Northwest,Howard Prairie,Howard Prairie,Y,130954,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Hungry Horse,Hungry Horse,Hungry Horse Reservoir,Hungry Horse Dam,,,TRUE,173,Reservoirs,Hungry Horse Reservoir,Hungry Horse,Reservoir,Hungry Horse Dam,275,Hungry Horse,0447-Hungry Horse Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"3,467,179","1,953",7181,"Hungry Horse Reservoir, Dam, and Powerplant (HGH)",Columbia-Pacific Northwest,Hungry Horse,Hungry Horse,Y,130874,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Hyatt,Hyatt,Hyatt Reservoir,Hyatt Dam,,,FALSE,176,Reservoirs,Hyatt Reservoir,Hyatt,Reservoir,Hyatt Dam,280,Hyatt,0415-Rogue River Basin Project-Talent Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,16200,1923,7183,Hyatt Reservoir and Dam (HYA),Columbia-Pacific Northwest,Hyatt,Hyatt,Y,131063,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Island Park,Island Park,Island Park Reservoir,Island Park Dam,,,TRUE,180,Reservoirs,Island Park Reservoir,Island Park,Reservoir,Island Park Dam,288,Island Park,0017-Minidoka Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"135,585","1,938",7184,Island Park Reservoir and Dam (ISL),Columbia-Pacific Northwest,Island Park,Island Park,Y,131168,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Jackson,Jackson,Jackson Lake,Jackson Lake Dam,,,TRUE,184,Reservoirs,Jackson Lake,Jackson,Reservoir,Jackson Lake Dam,293,Jackson Lake,0017-Minidoka Project,7-Upper Colorado Basin,CPN,Instream Storage,"847,000","1,911",7185,Jackson Lake and Jackson Lake Dam (JCK),Upper Colorado Basin,Jackson,Jackson Lake,Y,131199,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Kachess,Kachess,Kachess Lake,Kachess Dam,,,TRUE,189,Reservoirs,Kachess Lake,Kachess,Reservoir,Kachess Dam,302,Kachess,0033-Yakima Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,239000,1912,7186,Kachess Lake and Dam (KAC),Columbia-Pacific Northwest,Kachess,Kachess,Y,131227,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Keechelus,Keechelus,Keechelus Lake,Keechelus Dam,,,TRUE,190,Reservoirs,Keechelus Lake,Keechelus,Reservoir,Keechelus Dam,304,Keechelus,0033-Yakima Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"158,000","1,917",7187,Keechelus Lake and Dam (KEE),Columbia-Pacific Northwest,Keechelus,Keechelus,Y,131246,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Little Wood River,Little Wood River,Little Wood River Reservoir,Little Wood River Dam,,,FALSE,251,Reservoirs,Little Wood River Reservoir,Little Wood River,Reservoir,Little Wood River Dam,337,Little Wood River,0811-Little Wood River Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"30,000","1,960",7202,Little Wood River Reservoir and Dam (WOD),Columbia-Pacific Northwest,Little Wood River,Little Wood River,Y,133735,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Lowell,Lowell,Lake Lowell,Deer Flat Dam,,,FALSE,219,Reservoirs,Lake Lowell,Lowell,Reservoir,Deer Flat Dam,137,Deer Flat,0004-Boise Project-Arrowrock Division,9-Columbia-Pacific Northwest,CPN,Offstream Storage,"173,043","1,911",7188,Lake Lowell and Deer Flat Dams (LOW),Columbia-Pacific Northwest,Lowell,Deer Flat,Y,131590,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Mann,Mann,Mann Lake,Reservoir A Dam,,,FALSE,263,Reservoirs,Mann Lake,Mann,Reservoir,Reservoir A Dam,501,Reservoir A,0336-Lewiston Orchards Project,9-Columbia-Pacific Northwest,CPN,Offstream Storage,2440,1907,7198,Mann Lake and Reservoir A Dam (RSA),Columbia-Pacific Northwest,Mann,Reservoir A,Y,132896,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Mann Creek,Mann Creek,Mann Creek Reservoir,Mann Creek Dam,,,FALSE,262,Reservoirs,Mann Creek Reservoir,Mann Creek,Reservoir,Mann Creek Dam,357,Mann Creek,0354-Mann Creek Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"12,536","1,967",3663,Mann Creek Reservoir and Dam (MAN),Columbia-Pacific Northwest,Mann Creek,Mann Creek,Y,131641,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Mason,Mason,Mason Reservoir,Mason Dam,,,FALSE,267,Reservoirs,Mason Reservoir,Mason,Reservoir,Mason Dam,363,Mason,0569-Baker Project-Upper Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,"95,500","1,968",7195,Phillips Lake and Mason Dam (PHL),Columbia-Pacific Northwest,Phillips,Mason,Y,132418,,,,,,,TRUE,TRUE,RISE Location is Phillips Lake and Mason Dam
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,McKay,McKay,McKay Reservoir,McKay Dam,,,FALSE,270,Reservoirs,McKay Reservoir,McKay,Reservoir,McKay Dam,367,McKay,0030-Umatilla Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"71,534","1,927",3664,McKay Reservoir and Dam (MCK),Columbia-Pacific Northwest,McKay,McKay,Y,131673,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Ochoco,Ochoco,Ochoco Reservoir,Ochoco Dam,,,TRUE,303,Reservoirs,Ochoco Reservoir,Ochoco,Reservoir,Ochoco Dam,429,Ochoco,0113-Crooked River Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"44,248","1,920",3665,Ochoco Reservoir and Dam (OCH),Columbia-Pacific Northwest,Ochoco,Ochoco,Y,132075,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Owyhee,Owyhee,Lake Owyhee,Owyhee Dam,,,TRUE,227,Reservoirs,Lake Owyhee,Owyhee,Reservoir,Owyhee Dam,445,Owyhee,0048-Owyhee Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,"1,120,000","1,932",7192,Lake Owyhee and Owyhee Dam (OWY),Columbia-Pacific Northwest,Owyhee,Owyhee,Y,132261,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Palisades,Palisades,Palisades Reservoir,Palisades Dam,,,TRUE,317,Reservoirs,Palisades Reservoir,Palisades,Reservoir,Palisades Dam,451,Palisades,0456-Palisades Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,1402000,1957,7193,"Palisades Reservoir, Dam, and Powerplant (PAL)",Columbia-Pacific Northwest,Palisades,Palisades,Y,132284,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Potholes,Potholes,Potholes Reservoir,O'Sullivan Dam,,,FALSE,334,Reservoirs,Potholes Reservoir,Potholes,Reservoir,O'Sullivan Dam,444,O'Sullivan,0222-Columbia Basin Project-Gravity Division,9-Columbia-Pacific Northwest,CPN,Offstream Storage,511700,1949,7265,Potholes Reservoir and O'Sullivan Dam (POT),Columbia-Pacific Northwest,Potholes,O'Sullivan,Y,132563,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Prineville,Prineville,Prineville Reservoir,Arthur R. Bowman Dam,,,TRUE,335,Reservoirs,Prineville Reservoir,Prineville,Reservoir,Arthur R. Bowman Dam,26,Arthur R. Bowman,0113-Crooked River Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,150216,1961,3666,Prineville Reservoir and Arthur R. Bowman Dam (PRV),Columbia-Pacific Northwest,Prineville,Arthur R. Bowman,Y,132575,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Rimrock,Rimrock,Rimrock Lake,Tieton Dam,,,TRUE,349,Reservoirs,Rimrock Lake,Rimrock,Reservoir,Tieton Dam,603,Tieton,0033-Yakima Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,198000,1925,7196,Rimrock Lake and Tieton Dam (RIM),California-Great Basin,Rimrock,Tieton,Y,132729,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Ririe,Ririe,Ririe Reservoir,Ririe Dam,,,TRUE,350,Reservoirs,Ririe Reservoir,Ririe,Reservoir,Ririe Dam,506,Ririe,1308-Ririe Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,100500,1977,7197,Ririe Reservoir and Dam (RIR),Columbia-Pacific Northwest,Ririe,Ririe,Y,132745,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Scooteney,Scooteney,Scooteney Reservoir,Scooteney Dikes,,,FALSE,370,Reservoirs,Scooteney Reservoir,Scooteney,Reservoir,Scooteney Dikes,530,Scooteney Dikes,0222-Columbia Basin Project-Gravity Division,9-Columbia-Pacific Northwest,CPN,Conveyance (used for water conveyance),15250,1952,7266,Scooteney Reservoir and Dikes (SCT),Columbia-Pacific Northwest,Scooteney,#N/A,Y,133021,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Soldiers Meadow,Soldiers Meadow,Soldiers Meadow Reservoir,Soldiers Meadow Dam,,,FALSE,386,Reservoirs,Soldiers Meadow Reservoir,Soldiers Meadow,Reservoir,Soldiers Meadow Dam,556,Soldiers Meadow,0336-Lewiston Orchards Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,2370,1922,7199,Soldiers Meadow Reservoir and Dam (SOL),Columbia-Pacific Northwest,Soldiers Meadow,Soldiers Meadow,Y,133227,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Thief Valley,Thief Valley,Thief Valley Reservoir,Thief Valley Dam,,,FALSE,417,Reservoirs,Thief Valley Reservoir,Thief Valley,Reservoir,Thief Valley Dam,599,Thief Valley,0115-Baker Project-Lower Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,13307,1932,3668,Thief Valley Reservoir and Dam (THF),Columbia-Pacific Northwest,Thief Valley,Thief Valley,Y,133472,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Unity,Unity,Unity Reservoir,Unity Dam,,,FALSE,431,Reservoirs,Unity Reservoir,Unity,Reservoir,Unity Dam,615,Unity,0216-Burnt River Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,25500,1938,3671,Unity Reservoir and Dam (UNY),Columbia-Pacific Northwest,Unity,Unity,Y,133626,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Walcott,Walcott,Lake Walcott,Minidoka Dam,,,TRUE,236,Reservoirs,Lake Walcott,Walcott,Reservoir,Minidoka Dam,382,Minidoka,0017-Minidoka Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,210200,1906,7191,"Lake Walcott, Minidoka Dam, and Minidoka Powerplant (MIN)",Columbia-Pacific Northwest,Walcott,Minidoka,Y,131804,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Warm Springs,Warm Springs,Warm Springs Reservoir,Warm Springs Dam,,,FALSE,442,Reservoirs,Warm Springs Reservoir,Warm Springs,Reservoir,Warm Springs Dam,629,Warm Springs,0126-Vale Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,169714,1919,3672,Warm Springs Reservoir and Dam (WAR),Columbia-Pacific Northwest,Warm Springs,Warm Springs,Y,133694,,,,,,,TRUE,TRUE,
-Include (Omit % Avg if needed),Include (Omit % Avg if needed),Group C/D,,Wickiup,Wickiup,Wickiup Reservoir,Wickiup Dam,,,TRUE,473,Reservoirs,Wickiup Reservoir,Wickiup,Reservoir,Wickiup Dam,668,Wickiup,0112-Deschutes Project,9-Columbia-Pacific Northwest,CPN,Instream Storage,200000,1949,7201,Wickiup Reservoir and Dam (WIC),Columbia-Pacific Northwest,Wickiup,Wickiup,Y,133726,,,,,,,TRUE,TRUE,
-Include,Include as Points Only,Group E1,Historical  and current storage data,Franklin D. Roosevelt,Franklin D. Roosevelt,Franklin D. Roosevelt Lake,Grand Coulee Dam,,,TRUE,132,Reservoirs,Franklin D. Roosevelt Lake,Franklin D. Roosevelt,Reservoir,Grand Coulee Dam,239,Grand Coulee,0222-Columbia Basin Project-Gravity Division,9-Columbia-Pacific Northwest,CPN,Instream Storage,9715346,1941,3659,Franklin D. Roosevelt Lake and Grand Coulee Dam,Columbia-Pacific Northwest,Franklin D. Roosevelt,Grand Coulee,N,#N/A,,,,,,,TRUE,TRUE,
-Include,Include as Points Only,Group E1,Historical and current storage data,Upper Klamath,Upper Klamath,Upper Klamath Lake,Link River Diversion Dam,,,TRUE,433,Reservoirs,Upper Klamath Lake,Upper Klamath,Reservoir,Link River Diversion Dam,329,Link River Diversion,0012-Klamath Project,10-California-Great Basin,CGB,Instream Storage,735000,1921,--,--,--,--,--,N,#N/A,,,,,,,TRUE,TRUE,
-Include,?,Group M/N,Capacity,Crescent,Crescent,--,--,,,TRUE,--,--,--,--,--,--,#N/A,#N/A,--,--,--,--,--,--,7173,Crescent Lake and Crescent Lake Dam (CRE),Columbia-Pacific Northwest,Crescent,Crescent Lake,Y,129879,,,,,,,--,--,
-Include,?,Group M/N,Capacity,Lucky Peak,Lucky Peak,--,--,,,TRUE,--,--,--,--,--,--,#N/A,#N/A,--,--,--,--,--,--,7189,Lucky Peak Lake and Dam (LUC),Columbia-Pacific Northwest,Lucky Peak,Lucky Peak,Y,131596,,,,,,,--,--,
+﻿Name,Post-Review Decision,Source for Storage Data,RISE Location ID,Source for Capacity,Data Source Notes ,Actions to Allow Inclusion,Total Capacity,Preferred Label for Map and Table,Preferred Label for PopUp and Modal
+Abiquiu,Include if possible,USACE https://water.usace.army.mil/overview/spa/locations/abiquiu,3205,USACE https://w3.spa.usace.army.mil/wc/PertinentData/ Top of Reservoir Volume in Acre-Feet,"Daily data available in HDB and capacity data available here: https://w3.spa.usace.army.mil/wc/PertinentData/, https://water.usace.army.mil/overview/spa/locations/abiquiu",Use USACE data,"1,662,770",Abiquiu,Abiquiu Reservoir (Abiquiu Dam)
+Agate,Include (Omit % Avg if needed),RISE,7166,USBR Enterprise Asset Registry,,,4780,Agate,Agate Reservoir (Agate Dam)
+Alcova,Include,RISE,259,USBR Enterprise Asset Registry,,,184405,Alcova,Alcova Reservoir (Alcova Dam)
+Alfalfa Ditch Diversion Dam,Do Not Include,,--,,,,,,
+Alice,Include,RISE,266,USBR Enterprise Asset Registry,,,11034,Lake Alice,Lake Alice (Lake Alice Dams)
+Alice 2,Include,RISE,394,USBR Enterprise Asset Registry,,,1166,Little Lake Alice,Little Lake Alice (Little Lake Alice Dam)
+Almena Diversion,Do Not Include,,--,,"GP Hydromet - ALKS (no storage, gage height only)",,,,
+Altus,Include if possible,RISE (Pending),3640,USBR Enterprise Asset Registry,GP Hydromet - ALTUS (has storage),Add Storage Data to RISE,147925,Altus,Lake Altus (Altus Dam)
+American Falls,Include (Omit % Avg if needed),RISE,7167,USBR Enterprise Asset Registry,,,1672590,American Falls,American Falls Reservoir (American Falls Dam)
+Anchor,Include,RISE,262,USBR Enterprise Asset Registry,,,17228,Anchor,Anchor Reservoir (Anchor Dam)
+Anderson Ranch,Include (Omit % Avg if needed),RISE,3641,USBR Enterprise Asset Registry,,,474942,Anderson Ranch,Anderson Ranch Reservoir (Anderson Ranch Dam)
+Anderson-Rose Diversion,Do Not Include,,--,,,,,,
+Angostura,Include,RISE,257,USBR Enterprise Asset Registry,,,123048,Angostura,Angostura Reservoir (Angostura Dam)
+Angostura Diversion,Do Not Include,,--,,,,,,
+Anita,Do Not Include,,--,,,,,,
+Apache,Do Not Include,,--,,,,,,
+Arrowhead,Do Not Include,,3691,,,,,,
+Arrowrock,Include (Omit % Avg if needed),RISE,3642,USBR Enterprise Asset Registry,,,272224,Arrowrock,Arrowrock Reservoir (Arrowrock Dam)
+Ashland Lateral Diversion,Do Not Include,,--,,,,,,
+Atkinson Diversion Dam,Do Not Include,,--,,,,,,
+Audobon,Do Not Include,,2,,,,,,
+Avalon,Include,RISE,267,USBR Enterprise Asset Registry,,,4466,Avalon,Avalon Reservoir (Avalon Dam)
+Banks,Include (Omit % Avg if needed),RISE,7264,USBR Enterprise Asset Registry,,,1275000,Banks Lake (Dry Falls Dam),Banks Lake (Dry Falls Dam)
+Barretts Diversion,Do Not Include,,--,,,,,,
+Bartlett,Do Not Include,,--,,,,,,
+Bartley Diversion,Do Not Include,,--,,"GP Hydromet - BANE (canal gage, no storage, gage height only)",,,,
+Beaver Creek Diversion,Do Not Include,,--,,,,,,
+Beaver Dam Creek Diversion,Do Not Include,,--,,,,,,
+Belle Fourche,Include,RISE,274,USBR Enterprise Asset Registry,,,172873,Belle Fourche,Belle Fourche Reservoir (Belle Fourche Dam)
+Belle Fourche Diversion,Do Not Include,,--,,,,,,
+Berryessa,Include,RISE,272,USBR Enterprise Asset Registry,,,1602278,Berryessa (Monticello Dam),Lake Berryessa (Monticello Dam)
+Beulah,Include (Omit % Avg if needed),RISE,3643,USBR Enterprise Asset Registry,,,59212,Beulah (Agency Valley Dam),Beulah Reservoir (Agency Valley Dam)
+Big Sandy,Include,RISE,277,USBR Enterprise Asset Registry,,,38100,Big Sandy,Big Sandy Reservoir (Big Sandy Dam)
+Big Thompson Diversion,Do Not Include,,--,,,,,,
+Bighorn,Include,RISE,275,USBR Enterprise Asset Registry,,,1263682,Bighorn (Yellowtail Dam),Bighorn Lake (Yellowtail Dam)
+Bighorn River and BIA Canal near St. Xavier,Do Not Include,,276,,,,,,
+Billy Clapp,Include (Omit % Avg if needed),RISE,7168,USBR Enterprise Asset Registry,,,64200,Billy Clapp (Pinto Dam),Billy Clapp Lake (Pinto Dam)
+Black Canyon,Include (Omit % Avg if needed),RISE,7175,USBR Enterprise Asset Registry,,,29822,Black Canyon (Black Canyon Diversion Dam),Black Canyon Reservoir (Black Canyon Diversion Dam)
+Blanco Diversion,Do Not Include,,--,,,,,,
+Blue Mesa,Include,RISE,1533,USBR Enterprise Asset Registry,,,938469,Blue Mesa,Blue Mesa Reservoir (Blue Mesa Dam)
+Boca,Include if possible,USGS Boca Res NR Truckee CA - USGS-10344490,--,USBR Enterprise Asset Registry,Boca Res NR Truckee CA - USGS-10344490 and https://www.troa.net/tis,Use USGS Data,41110,Boca,Boca Reservoir (Boca Dam)
+Boise River Diversion,Do Not Include,,--,,,,,,
+Bonny,Do Not Include,,3644,,"GP Hydromet - BONC (has storage). Was drained in 2010, so doesn't have current data",Add Storage Data to RISE? Don't include in Dashboard,,,
+Box Butte,Include (Omit % Avg),RISE,268,USBR Enterprise Asset Registry,GP Hydromet - BBNE,,29161,Box Butte,Box Butte Reservoir (Box Butte Dam)
+Boysen,Include,RISE,281,USBR Enterprise Asset Registry,,,892226,Boysen,Boysen Reservoir (Boysen Dam)
+Brantley,Include,RISE,282,USBR Enterprise Asset Registry,,,384035,Brantley,Brantley Reservoir (Brantley Dam)
+Brekken,Do Not Include,,--,,,,,,
+Bretch Diversion,Do Not Include,,--,,,,,,
+Broadhead Diversion,Do Not Include,,--,,,,,,
+Brown Foundation Incorporated,Do Not Include,,--,,,,,,
+Buckhorn,Do Not Include,,--,,,,,,
+Buffalo Bill,Include,RISE,269,USBR Enterprise Asset Registry,,,646565,Buffalo Bill,Buffalo Bill Reservoir (Buffalo Bill Dam)
+Bull,Include,RISE,278,USBR Enterprise Asset Registry,,,152459,Bull Lake,Bull Lake (Bull Lake Dam)
+Bully Creek,Include (Omit % Avg if needed),RISE,3646,USBR Enterprise Asset Registry,,,31600,Bully Creek,Bully Creek Reservoir (Bully Creek Dam)
+Bully Creek Diversion,Do Not Include,,--,,,,,,
+Bumping,Include (Omit % Avg if needed),RISE,3647,USBR Enterprise Asset Registry,,,35400,Bumping Lake,Bumping Lake (Bumping Lake Dam)
+C.C. Cragin,Do Not Include,,--,,,,,,
+Caballo,Include,RISE,286,USBR Enterprise Asset Registry,,,324509,Caballo,Caballo Reservoir (Caballo Dam)
+Cachuma,Include,RISE,292,USBR Enterprise Asset Registry,,,193305,Cachuma (Bradbury Dam),Lake Cachuma (Bradbury Dam)
+Cahuilla,Do Not Include,,--,,,,,,
+Calamus,Include (Omit % Avg),RISE,287,USBR Enterprise Asset Registry,GP Hydromet - CANE,,119469,Calamus (Virginia Smith Dam),Calamus Reservoir (Virginia Smith Dam)
+Cambridge Diversion,Do Not Include,,--,,"GP Hydromet - CDNE (canal gage, no storage, gage height only)",,,,
+Cameahwait,Do Not Include,,--,,,,,,
+Canyon,Do Not Include,,--,,,,,,
+Canyon Ferry,Include,RISE,295,USBR Enterprise Asset Registry,,,1993036,Canyon Ferry,Canyon Ferry Lake (Canyon Ferry Dam)
+Carpenteria,Do Not Include,,--,,,,,,
+Carson River Diversion,Do Not Include,,--,,,,,,
+Carter Creek Diversion,Do Not Include,,--,,,,,,
+Carter Lake,Include,RISE,288,USBR Enterprise Asset Registry,,,112230,Carter Lake,Carter Lake Reservoir (Carter Lake Dams)
+Cascade,Include (Omit % Avg if needed),RISE,3645,USBR Enterprise Asset Registry,,,693000,Cascade,Lake Cascade (Cascade Dam)
+Cascade Creek Diversion,Do Not Include,,--,,,,,,
+Casitas,Do Not Include,,--,,,,,,
+Causey,Include,RISE,289,USBR Enterprise Asset Registry,,,7870,Causey,Causey Reservoir (Causey Dam)
+Cawker City Dike,Do Not Include,,293,,"GP Hydromet - CCKS (no storage, forebay elevation only)",,,,
+Cedar Bluff,Do Not Include,,3648,,GP Hydromet - CBKS (could not find station on hydromet),,,,
+Chance,Do Not Include,,--,,,,,,
+Chapman Diversion,Do Not Include,,--,,,,,,
+Cheney,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,GP Hydromet - CHENEY (has storage),Add Storage Data to RISE,262736,Cheney,Cheney Reservoir (Cheney Dam)
+Cherry,Do Not Include,,--,,,,,,
+Cherry Creek,Do Not Include,,3679,,,,,,
+Choke Canyon,Include,RISE,291,USBR Enterprise Asset Registry,,,695271,Choke Canyon,Choke Canyon Reservoir (Choke Canyon Dam)
+Clark Canyon,Include,RISE,294,USBR Enterprise Asset Registry,,,251436,Clark Canyon,Clark Canyon Reservoir (Clark Canyon Dam)
+Cle Elum,Include (Omit % Avg if needed),RISE,7170,USBR Enterprise Asset Registry,,,705500,Cle Elum,Cle Elum Lake (Cle Elum Dam)
+Clear Lake,Include if possible,RISE (Pending),3702,USBR Enterprise Asset Registry,"storage: Hydromet data https://www.usbr.gov/pn/hydromet/klamath/kinstant_graph.html?cbtt=CLK&pcode=AF, instant only",Add Storage Data to RISE,507252,Clear Lake,Clear Lake Reservoir (Clear Lake Dam)
+Clear Lake (OR),Include (Omit % Avg if needed),RISE,7200,USBR Enterprise Asset Registry,,,13066,Clear Lake (Wasco Dam),Clear Lake (OR) (Wasco Dam)
+Clear Lake (WA),Do Not Include,,--,,"No storage data collected, elevation only",,,,
+Clementine,Do Not Include,,3239,,,,,,
+Coal Creek Montrose and Delta Diversion,Do Not Include,,--,,,,,,
+Coal Mine,Do Not Include,,--,,,,,,
+Cochiti,Include if possible,USACE https://water.usace.army.mil/overview/spa/locations/cochiti,305,USACE https://w3.spa.usace.army.mil/wc/PertinentData/ Top of Dam Volume in Acre-Feet,"Daily data available in HDB and capacity data available here: https://w3.spa.usace.army.mil/wc/PertinentData/, https://water.usace.army.mil/overview/spa/locations/cochiti",Use USACE data,"766,819",Cochiti,Cochiti Lake (Cochiti Dam)
+Cold Springs,Include (Omit % Avg if needed),RISE,7171,USBR Enterprise Asset Registry,,,39260,Cold Springs,Cold Springs Reservoir (Cold Springs Dam)
+Coleman Diversion,Do Not Include,,--,,,,,,
+Como,Include (Omit % Avg if needed),RISE,3653,USBR Enterprise Asset Registry,,,45326,Como,Lake Como (Como Dam)
+Conconully Lake,Include (Omit % Avg if needed),RISE,7169,USBR Enterprise Asset Registry,,,15700,Conconully Reservoir (Salmon Lake Dam),Conconully Lake (Salmon Lake Dam)
+Conconully Reservoir,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,Storage: https://www.usbr.gov/pn-bin/daily.pl?station=ccr&format=html&year=2025&month=12&day=29&year=2026&month=1&day=27&pcode=af,Add Storage Data to RISE,13000,Conconully (Conconully Dam),Conconully Reservoir (Conconully Dam)
+Conde Creek Diversion,Do Not Include,,--,,,,,,
+Contra Loma,Do Not Include,,--,,,,,,
+Corbett Diversion Dam,Do Not Include,,--,,,,,,
+Crane Prairie,Include (Omit % Avg if needed),RISE,7172,USBR Enterprise Asset Registry,,,59724,Crane Prairie,Crane Prairie Reservoir (Crane Prairie Dam)
+Crawford,Include,RISE,3683,USBR Enterprise Asset Registry,,,14395,Crawford,Crawford Reservoir (Crawford Dam)
+Crescent,Include if possible,RISE,7173,TBD,"Active Storage of 86900, Storage data will be in RISE",Get capacity,--,Crescent Lake,Crescent Lake (Crescent Lake Dam)
+Crystal,Include,RISE,1534,USBR Enterprise Asset Registry,,,25273,Crystal,Crystal Reservoir (Crystal Dam)
+Culbertson Diversion,Do Not Include,,--,,"GP Hydromet - CUNE (canal gage, no storage, gage height only)",,,,
+Currant Creek,Include,RISE,310,USBR Enterprise Asset Registry,,,15671,Currant Creek,Currant Creek Reservoir (Currant Creek Dam)
+Daley Creek Diversion,Do Not Include,,--,,,,,,
+Davis Creek,Include (Omit % Avg),RISE,311,USBR Enterprise Asset Registry,GP Hydromet - DANE,,31158,Davis Creek,Davis Creek Reservoir (Davis Creek Dam)
+Dead Indian Creek Diversion,Do Not Include,,--,,,,,,
+Deadwood,Include (Omit % Avg if needed),RISE,3649,USBR Enterprise Asset Registry,,,162000,Deadwood,Deadwood Reservoir (Deadwood Dam)
+Deaver,Do Not Include,,--,,,,,,
+Deer Creek,Include,RISE,314,USBR Enterprise Asset Registry,,,153445,Deer Creek,Deer Creek Reservoir (Deer Creek Dam)
+Deerfield,Include,RISE,315,USBR Enterprise Asset Registry,,,15654,Deerfield,Deerfield Lake (Deerfield Dam)
+Derby Diversion,Do Not Include,,--,,,,,,
+Dille Diversion,Do Not Include,,--,,,,,,
+Diversion,Do Not Include,,483,,,,,,
+Diversion Canal Headworks,Do Not Include,,--,,,,,,
+Dodson Diversion,Do Not Include,,--,,,,,,
+Dry Creek Diversion Dam,Do Not Include,,--,,,,,,
+Dry Spotted Tail Diversion,Do Not Include,,--,,,,,,
+Duchesne Diversion,Do Not Include,,--,,,,,,
+Dunlap Diversion,Do Not Include,,--,,"GP Hydromet - DUNE (canal gage, no storage, gage height only)",,,,
+East Canal Diversion,Do Not Include,,--,,,,,,
+East Canyon,Include,RISE,319,USBR Enterprise Asset Registry,,,51200,East Canyon,East Canyon Reservoir (East Canyon Dam)
+East Fork Diversion,Do Not Include,,--,,,,,,
+East Park Lake,Do Not Include,,--,,,,,,
+East Park Reservoir,Do Not Include,,--,,,,,,
+East Portal,Do Not Include,,--,,,,,,
+Easton,Do Not Include,,--,,,,,,
+Echo,Include,RISE,320,USBR Enterprise Asset Registry,,,73940,Echo,Echo Reservoir (Echo Dam)
+Eden,Include,RISE,321,USBR Enterprise Asset Registry,,,14421,Eden (Eden Dikes),Eden Reservoir (Eden Dikes)
+Edward Arthur Patterson,Include,RISE,318,USBR Enterprise Asset Registry,,,8479,Edward Arthur Patterson (Dickinson Dam),Edward Arthur Patterson Lake (Dickinson Dam)
+El Vado,Include,RISE,324,USBR Enterprise Asset Registry,,,214091,El Vado,El Vado Reservoir (El Vado Dam)
+Elephant Butte,Include,RISE,323,USBR Enterprise Asset Registry,,,2357104,Elephant Butte,Elephant Butte Reservoir (Elephant Butte Dam)
+Elwell,Include,RISE,396,USBR Enterprise Asset Registry,,,1328723,Elwell (Tiber Dam),Lake Elwell (Tiber Dam)
+Emigrant,Include (Omit % Avg if needed),RISE,7174,USBR Enterprise Asset Registry,,,40500,Emigrant,Emigrant Reservoir (Emigrant Dam)
+Enders,Include if possible,RISE (Pending),3656,USBR Enterprise Asset Registry,GP Hydromet - EDNE (has storage),Add Storage Data to RISE,72958,Enders,Enders Reservoir (Enders Dam)
+Estes,Include (Omit % Avg),RISE,429,USBR Enterprise Asset Registry,https://www.usbr.gov/gp-bin/hydromet_dayfiles.pl,,2783,Estes (Olympus Dam),Lake Estes (Olympus Dam)
+Ewauna,Do Not Include,,--,,,,,,
+Feed Canal Diversion,Do Not Include,,--,,,,,,
+Fire Mountain Diversion,Do Not Include,,--,,,,,,
+Fish,Include (Omit % Avg if needed),RISE,7176,USBR Enterprise Asset Registry,,,7836,Fish Lake,Fish Lake (Fish Lake Dam)
+Flaming Gorge,Include,RISE,1535,USBR Enterprise Asset Registry,,,3791700,Flaming Gorge,Flaming Gorge Reservoir (Flaming Gorge Dam)
+Flatiron,Include (Omit % Avg),RISE,331,USBR Enterprise Asset Registry,,,730,Flatiron,Flatiron Reservoir (Flatiron Dam)
+Florida Farmers Diversion,Do Not Include,,--,,,,,,
+Folsom,Include,RISE,334,USBR Enterprise Asset Registry,,,977000,Folsom,Folsom Lake (Folsom Dam)
+Fontenelle,Include,RISE,1536,USBR Enterprise Asset Registry,,,334459,Fontenelle,Fontenelle Reservoir (Fontenelle Dam)
+Fort Cobb,Include if possible,RISE (Pending),3657,USBR Enterprise Asset Registry,GP Hydromet - COBB (has storage),Add Storage Data to RISE,133451,Fort Cobb,Fort Cobb Reservoir (Fort Cobb Dam)
+Fort Peck,Include if possible,USACE https://water.sec.usace.army.mil/overview/nwdm/locations/ftpk,6885,USACE https://water.usace.army.mil/cda/documents/wc/2506/FortPeckWCM_Final_Dec2018_Redacted.pdf Table IV-1,https://water.sec.usace.army.mil/overview/nwdm/locations/ftpk,Use USACE Data,"18,463,000",Fort Peck,#NAME?
+Fort Shaw Diversion,Do Not Include,USACE https://water.usace.army.mil/overview/nww/locations/luc,--,,,,,,
+Fort Smith Sewage Disposal Ponds,Do Not Include,,--,,,,,,
+Fort Sumner Diversion,Do Not Include,,--,,,,,,
+Fort Thornburgh Diversion,Do Not Include,,--,,,,,,
+Foss,Include if possible,RISE (Pending),3658,USBR Enterprise Asset Registry,GP Hydromet - FOSS (has storage),Add Storage Data to RISE,349303,Foss,Foss Reservoir (Foss Dam)
+Fourmile,Include (Omit % Avg if needed),RISE,7177,USBR Enterprise Asset Registry,,,15600,Fourmile Lake,Fourmile Lake (Fourmile Lake Dam)
+Franchi,Do Not Include,,--,,,,,,
+Frank Chee Willetto,Do Not Include,,--,,,,,,
+Franklin D. Roosevelt,Include if possible,USACE https://water.usace.army.mil/overview/nwdp/locations/gcl,3659,USBR Enterprise Asset Registry,Storage: https://water.usace.army.mil/overview/nwdp/locations/gcl,Use USACE Data,9715346,Franklin D. Roosevelt (Grand Coulee Dam),Franklin D. Roosevelt Lake (Grand Coulee Dam)
+French Canyon,Do Not Include,,--,,,,,,
+Frenchtown Diversion,Do Not Include,,--,,,,,,
+Fresno,Include,RISE,337,USBR Enterprise Asset Registry,,,91746,Fresno,Fresno Reservoir (Fresno Dam)
+Fruitgrowers,Include,RISE,338,USBR Enterprise Asset Registry,,,4030,Fruitgrowers,Fruitgrowers Reservoir (Fruitgrowers Dam)
+Fryingpan Diversion,Do Not Include,,--,,,,,,
+Funks,Do Not Include,,--,,,,,,
+Garnet Diversion,Do Not Include,,--,,,,,,
+Gerber,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,storage: Hydromet data https://www.usbr.gov/pn/hydromet/klamath/kinstant_graph.html?cbtt=GER&pcode=AF,Add Storage Data to RISE,94300,Gerber,Gerber Reservoir (Gerber Dam)
+Gibson,Include,RISE,342,USBR Enterprise Asset Registry,,,98688,Gibson,Gibson Reservoir (Gibson Dam)
+Glen Anne,Do Not Include,,--,,,,,,
+Glendo,Include,RISE,345,USBR Enterprise Asset Registry,,,763039,Glendo,Glendo Reservoir (Glendo Dam)
+Gracie Creek,Do Not Include,,--,,,,,,
+Granby,Include,RISE,351,USBR Enterprise Asset Registry,,,539758,Granby,Lake Granby (Granby Dam)
+Grand,Do Not Include,,344,,,,,,
+Grand Valley Diversion,Do Not Include,,--,,,,,,
+Granite Diversion,Do Not Include,,--,,,,,,
+Granite Reef Diversion,Do Not Include,,--,,,,,,
+Grassy,Include (Omit % Avg if needed),RISE,7178,USBR Enterprise Asset Registry,,,15452,Grassy Lake,Grassy Lake (Grassy Lake Dam)
+Gray Reef,Include if possible,RISE (Pending),3,USBR Enterprise Asset Registry,Storage: ? MB -Hydromet - GRAR,Fix RISE data feed?,1800,Gray Reef,Gray Reef Reservoir (Gray Reef Dam)
+Green Mountain,Include,RISE,353,USBR Enterprise Asset Registry,,,153639,Green Mountain,Green Mountain Reservoir (Green Mountain Dam)
+Guernsey,Include (Omit % Avg),RISE,357,USBR Enterprise Asset Registry,MB -Hydromet GUER,,45612,Guernsey,Guernsey Reservoir (Guernsey Dam)
+Guide Rock Diversion,Do Not Include,,--,,"GP Hydromet - GDSNE (channel gage, no storage, gage height only)",,,,
+Gunnison Diversion,Do Not Include,,--,,,,,,
+Hades Diversion,Do Not Include,,--,,,,,,
+Halfmoon Diversion,Do Not Include,,--,,,,,,
+Hammond Diversion,Do Not Include,,--,,,,,,
+Harmon,Do Not Include,,--,,,,,,
+Harper Diversion,Do Not Include,,--,,,,,,
+Harry Strunk,Include if possible,RISE (Pending),3650,USBR Enterprise Asset Registry,GP Hydromet - HSNE (has storage),Add Storage Data to RISE,87361,Harry Strunk (Medicine Creek Dam),Harry Strunk Lake (Medicine Creek Dam)
+Havasu,Include,RISE,3515,USBR Enterprise Asset Registry,,,590262,Havasu (Parker Dam),Lake Havasu (Parker Dam)
+Haystack,Include (Omit % Avg if needed),RISE,7179,USBR Enterprise Asset Registry,,,5650,Haystack,Haystack Reservoir (Haystack Dam)
+Heckers,Do Not Include,,--,,,,,,
+Helena Valley,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,GP Hydromet - HVT (has storage),Add Storage Data to RISE,10451,Helena Valley,Helena Valley Reservoir (Helena Valley Dam)
+Henry Hagg,Include (Omit % Avg if needed),RISE,3651,USBR Enterprise Asset Registry,,,62216,Henry Hagg (Scoggins Dam),Henry Hagg Lake (Scoggins Dam)
+Henrys,Do Not Include,,7180,,,,,,
+Heron,Include,RISE,365,USBR Enterprise Asset Registry,,,428360,Heron,Heron Reservoir (Heron Dam)
+Hoffer,Do Not Include,,--,,,,,,
+Holmes,Do Not Include,,--,,,,,,
+Horseshoe,Do Not Include,,--,,,,,,
+Horsetooth,Include,RISE,369,USBR Enterprise Asset Registry,,,156735,Horsetooth,Horsetooth Reservoir (Horsetooth Dam)
+Howard Prairie,Include (Omit % Avg if needed),RISE,7182,USBR Enterprise Asset Registry,,,62100,Howard Prairie,Howard Prairie Reservoir (Howard Prairie Dam)
+Hubbard,Do Not Include,,--,,,,,,
+Hugh Butler,Include if possible,RISE (Pending),3652,USBR Enterprise Asset Registry,GP Hydromet - HBNE (has storage),Add Storage Data to RISE,85070,Hugh Butler (Red Willow Dam),Hugh Butler Lake (Red Willow Dam)
+Hungry Horse,Include (Omit % Avg if needed),RISE,7181,USBR Enterprise Asset Registry,,,3467179,Hungry Horse,Hungry Horse Reservoir (Hungry Horse Dam)
+Hunter Creek Diversion,Do Not Include,,--,,,,,,
+Huntington North,Do Not Include,,370,,,,,,
+Hyatt,Include (Omit % Avg if needed),RISE,7183,USBR Enterprise Asset Registry,,,16200,Hyatt,Hyatt Reservoir (Hyatt Dam)
+Hyrum,Include,RISE,372,USBR Enterprise Asset Registry,,,17746,Hyrum,Hyrum Reservoir (Hyrum Dam)
+Imperial,Do Not Include,,7,,,,,,
+Ironstone Diversion,Do Not Include,,--,,,,,,
+Isabel,Do Not Include,,3708,,,,,,
+Island Park,Include (Omit % Avg if needed),RISE,7184,USBR Enterprise Asset Registry,,,135585,Island Park,Island Park Reservoir (Island Park Dam)
+Isleta Diversion,Do Not Include,,--,,,,,,
+Ivanhoe Diversion,Do Not Include,,--,,,,,,
+Jackson,Include (Omit % Avg if needed),RISE,7185,USBR Enterprise Asset Registry,,,847000,Jackson Lake,Jackson Lake (Jackson Lake Dam)
+Jackson Gulch,Include,RISE,378,USBR Enterprise Asset Registry,,,9980,Jackson Gulch,Jackson Gulch Reservoir (Jackson Gulch Dam)
+James Diversion,Do Not Include,,--,,,,,,
+Jamestown,Include,RISE,379,USBR Enterprise Asset Registry,,,220990,Jamestown,Jamestown Reservoir (Jamestown Dam)
+Jemez Canyon,Do Not Include,,381,,,,,,
+Joes Valley,Do Not Include,,383,,,,,,
+Jordanelle,Include (Omit % Avg),RISE,384,USBR Enterprise Asset Registry,,,361500,Jordanelle,Jordanelle Reservoir (Jordanelle Dam)
+Kachess,Include (Omit % Avg if needed),RISE,7186,USBR Enterprise Asset Registry,,,239000,Kachess,Kachess Lake (Kachess Dam)
+Keechelus,Include (Omit % Avg if needed),RISE,7187,USBR Enterprise Asset Registry,,,158000,Keechelus,Keechelus Lake (Keechelus Dam)
+Keene Creek,Do Not Include,,3673,,,,,,
+Keith Sebelius,Include,RISE,390,USBR Enterprise Asset Registry,GP Hydromet - KSKS,,133740,Keith Sebelius (Norton Dam),Keith Sebelius Lake (Norton Dam)
+Kent Diversion Dam,Do Not Include,,--,,"GP Hydromet - KDNE (canal gage, no storage, gage height only)",,,,
+Keswick,Include,RISE,387,USBR Enterprise Asset Registry,,,23772,Keswick,Keswick Reservoir (Keswick Dam)
+Keyhole,Include,RISE,388,USBR Enterprise Asset Registry,,,329134,Keyhole,Keyhole Reservoir (Keyhole Dam)
+Kirwin,Include,RISE,391,USBR Enterprise Asset Registry,GP Hydromet - KWKS,,313290,Kirwin,Kirwin Reservoir (Kirwin Dam)
+Knight Diversion,Do Not Include,,--,,,,,,
+Kortes,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,MB Hydromet - KORR (has storage),Add Storage Data to RISE,4739,Kortes,Kortes Reservoir (Kortes Dam)
+Laguna Diversion,Do Not Include,,--,,,,,,
+Lahontan,Include if possible,"USGS Lahontan Res NR Fallon, NV - USGS-10312100",3703,USBR Enterprise Asset Registry,"Lahontan Res NR Fallon, NV - USGS-10312100; https://www.troa.net/tis/",Use USGS Data,319800,Lahontan,Lahontan Reservoir (Lahontan Dam)
+Lake Frances,Do Not Include,,5,,,,,,
+Lake Waha Feeder Canal Diversion,Do Not Include,,--,,,,,,
+Lauro,Do Not Include,,--,,,,,,
+Leasburg Diversion,Do Not Include,,--,,,,,,
+Lemon,Include,RISE,395,USBR Enterprise Asset Registry,,,40146,Lemon,Lemon Reservoir (Lemon Dam)
+Leon Creek Diversion,Do Not Include,,--,,,,,,
+Lewiston,Include,RISE,397,USBR Enterprise Asset Registry,,,14660,Lewiston,Lewiston Lake (Lewiston Dam)
+Lilly Pad Diversion,Do Not Include,,--,,,,,,
+Lima,Do Not Include,,398,,,,,,
+Little Beaver Creek Diversion,Do Not Include,,--,,,,,,
+Little Hell Creek Diversion,Do Not Include,,--,,,,,,
+Little Oso Diversion,Do Not Include,,--,,,,,,
+Little Panoche,Do Not Include,,--,,,,,,
+Little Robber,Do Not Include,,3709,,,,,,
+Little Sandy Diversion,Do Not Include,,--,,,,,,
+Little Wood River,Include (Omit % Avg if needed),RISE,7202,USBR Enterprise Asset Registry,,,30000,Little Wood River,Little Wood River Reservoir (Little Wood River Dam)
+Livingston,Do Not Include,,3654,,,,,,
+Los Banos,Do Not Include,,--,,,,,,
+Lost,Include (Omit % Avg),RISE,3209,USBR Enterprise Asset Registry,,,1155,Lost Lake,Lost Lake (Lost Lake Dam)
+Lost Creek,Include,RISE,400,USBR Enterprise Asset Registry,,,22510,Lost Creek,Lost Creek Reservoir (Lost Creek Dam)
+Lost River,Do Not Include,,--,,,,,,
+Loutzenhizer Diversion,Do Not Include,,--,,,,,,
+Lovewell,Include,RISE,404,USBR Enterprise Asset Registry,GP Hydromet - LVKS,,86131,Lovewell,Lovewell Reservoir (Lovewell Dam)
+Lowell,Include (Omit % Avg if needed),RISE,7188,USBR Enterprise Asset Registry,,,173043,Lowell (Deer Flat Dam),Lake Lowell (Deer Flat Dam)
+Lower Yellowstone Diversion,Do Not Include,,--,,,,,,
+Lucky Peak,Include if possible,USACE https://water.usace.army.mil/overview/nww/locations/luc,7189,USACE https://water.usace.army.mil/cda/documents/wc/3412/Boise%20WCM%202025%20Redacted.pdf Table 2-15,https://water.usace.army.mil/overview/nww/locations/luc,Use USACE Data,"307,043",Lucky Peak,Lucky Peak Reservoir (Lucky Peak Dam)
+Madera Canal Equalization,Do Not Include,,--,,,,,,
+Madera Diversion,Do Not Include,,--,,,,,,
+Malone Diversion,Do Not Include,,--,,,,,,
+Mancos Diversion,Do Not Include,,--,,,,,,
+Mann,Include (Omit % Avg if needed),RISE,7198,USBR Enterprise Asset Registry,,,2440,Mann (Reservoir A Dam),Mann Lake (Reservoir A Dam)
+Mann Creek,Include (Omit % Avg if needed),RISE,3663,USBR Enterprise Asset Registry,,,12536,Mann Creek,Mann Creek Reservoir (Mann Creek Dam)
+Marble Bluff,Do Not Include,,--,,,,,,
+Martinez,Do Not Include,,--,,,,,,
+Marys,Include,RISE,1,USBR Enterprise Asset Registry,https://www.usbr.gov/gp-bin/hydromet_dayfiles.pl,,927,Marys Lake (Marys Lake Dikes),Marys Lake (Marys Lake Dikes)
+Mason,Include (Omit % Avg if needed),RISE,7195,USBR Enterprise Asset Registry,,,95500,Mason,Mason Reservoir (Mason Dam)
+Maxwell Canal Diversion,Do Not Include,,--,,,,,,
+McGee Creek,Include,RISE,408,USBR Enterprise Asset Registry,,,199276,McGee Creek,McGee Creek Reservoir (McGee Creek Dam)
+McKay,Include (Omit % Avg if needed),RISE,3664,USBR Enterprise Asset Registry,,,71534,McKay,McKay Reservoir (McKay Dam)
+McPhee,Include,RISE,410,USBR Enterprise Asset Registry,,,381200,McPhee,McPhee Reservoir (McPhee Dam)
+Mead,Include,RISE,3514,USBR Enterprise Asset Registry,,,30167000,Mead (Hoover Dam),Lake Mead (Hoover Dam)
+Meeks Cabin,Include,RISE,411,USBR Enterprise Asset Registry,,,32470,Meeks Cabin,Meeks Cabin Reservoir (Meeks Cabin Dam)
+Meredith,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,GP Hydromet - SANFORD (has storage),Add Storage Data to RISE,1358594,Meredith (Sanford Dam),Lake Meredith (Sanford Dam)
+Merritt,Include (Omit % Avg),RISE,418,USBR Enterprise Asset Registry,GP Hydromet - MRNE,,66726,Merritt,Merritt Reservoir (Merritt Dam)
+Mesilla Diversion,Do Not Include,,--,,,,,,
+Middle Cottonwood,Do Not Include,,--,,,,,,
+Middle Cunningham Creek Diversion,Do Not Include,,--,,,,,,
+Midway Creek Diversion,Do Not Include,,--,,,,,,
+Miller Creek Diversion,Do Not Include,,--,,,,,,
+Millerton,Include,RISE,413,USBR Enterprise Asset Registry,,,520500,Millerton (Friant Dam),Millerton Lake (Friant Dam)
+Milner,Do Not Include,,7190,,,,,,
+Minatare,Include,RISE,399,USBR Enterprise Asset Registry,,,58795,Minatare,Lake Minatare (Minatare Dam)
+Mohave,Include,RISE,3513,USBR Enterprise Asset Registry,,,1887167,Mohave (Davis Dam),Lake Mohave (Davis Dam)
+Molina Equalizing,Do Not Include,,--,,,,,,
+Montrose & Delta Diversion,Do Not Include,,--,,,,,,
+Moon,Include,RISE,416,USBR Enterprise Asset Registry,,,53633,Moon Lake,Moon Lake (Moon Lake Dam)
+Mormon Creek Diversion,Do Not Include,,--,,,,,,
+Morrow Point,Include,RISE,417,USBR Enterprise Asset Registry,,,117190,Morrow Point,Morrow Point Reservoir (Morrow Point Dam)
+Moses,Do Not Include,,--,,,,,,
+Mt. Elbert Forebay,Include (Omit % Avg),RISE,419,USBR Enterprise Asset Registry,,,11143,Mt. Elbert Forebay,Mt. Elbert Forebay (Mt. Elbert Forebay Dam)
+Nambe Falls,Include,RISE,3511,USBR Enterprise Asset Registry,,,1729,Nambe Falls,Nambe Falls Reservoir (Nambe Falls Dam)
+Nasworthy,Include if possible,RISE,421,TBD,storage data in RISE. Need capacity,Get capacity,--,Nasworthy,Lake Nasworthy (Nasworthy Dam)
+Natoma,Include,RISE,422,USBR Enterprise Asset Registry,,,8760,Natoma (Nimbus Dam),Lake Natoma (Nimbus Dam)
+Navajo,Include,RISE,423,USBR Enterprise Asset Registry,,,1713900,Navajo,Navajo Reservoir (Navajo Dam)
+Nelson,Include,RISE,424,USBR Enterprise Asset Registry,,,78950,Nelson (Nelson Dikes),Nelson Reservoir (Nelson Dikes)
+New Johns,Do Not Include,,--,,,,,,
+New Melones,Include,RISE,3204,USBR Enterprise Asset Registry,,,2400000,New Melones,New Melones Lake (New Melones Dam)
+Newton,Include,RISE,425,USBR Enterprise Asset Registry,,,5594,Newton,Newton Reservoir (Newton Dam)
+Nighthorse,Include (Omit % Avg),RISE,392,USBR Enterprise Asset Registry,,,123541,Nighthorse (Ridges Basin Dam),Lake Nighthorse (Ridges Basin Dam)
+No Name Creek Diversion,Do Not Include,,--,,,,,,
+North Cunningham Creek Diversion,Do Not Include,,--,,,,,,
+North Fork Diversion,Do Not Include,,--,,,,,,
+North Fork Salmon Creek Diversion,Do Not Include,,--,,,,,,
+Northside Diversion,Do Not Include,,--,,,,,,
+Oak Street Diversion,Do Not Include,,--,,,,,,
+Ochoco,Include (Omit % Avg if needed),RISE,3665,USBR Enterprise Asset Registry,,,44248,Ochoco,Ochoco Reservoir (Ochoco Dam)
+Of The Arbuckles,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,GP Hydromet - ARBUCK (has storage),Add Storage Data to RISE,108596,Lake Of The Arbuckles (Arbuckle Dam),Lake Of The Arbuckles (Arbuckle Dam)
+Ogden Valley Diversion,Do Not Include,,--,,,,,,
+Ogden-Brigham Equalizing Reservoir 2,Do Not Include,,--,,,,,,
+Ogden-Brigham Wasteway Reservoir 2,Do Not Include,,--,,,,,,
+Ogden-Brigham Wasteway Reservoir 3,Do Not Include,,--,,,,,,
+Ogden-Brigham Wasteway Reservoir 4,Do Not Include,,--,,,,,,
+Ogden-Brigham Wasteway Reservoir 5,Do Not Include,,--,,,,,,
+Ogden-Brigham Wasteway Reservoir 6,Do Not Include,,--,,,,,,
+Old River,Do Not Include,,--,,,,,,
+Oles Pond,Do Not Include,,--,,,,,,
+Olmsted Diversion,Do Not Include,,--,,,,,,
+OMID Regulating,Do Not Include,,--,,,,,,
+O'Neill Forebay,Do Not Include,,--,,,,,,
+Oroville,Do Not Include,,3200,,,,,,
+Ortega,Do Not Include,,--,,,,,,
+Oso Diversion,Do Not Include,,--,,,,,,
+Owyhee,Include (Omit % Avg if needed),RISE,7192,USBR Enterprise Asset Registry,,,1120000,Owyhee,Lake Owyhee (Owyhee Dam)
+Pactola,Include,RISE,444,USBR Enterprise Asset Registry,,,99029,Pactola,Pactola Reservoir (Pactola Dam)
+Palisades,Include (Omit % Avg if needed),RISE,7193,USBR Enterprise Asset Registry,,,1402000,Palisades,Palisades Reservoir (Palisades Dam)
+Paonia,Include,RISE,431,USBR Enterprise Asset Registry,,,15522,Paonia,Paonia Reservoir (Paonia Dam)
+Paradise Diversion,Do Not Include,,--,,,,,,
+Park Creek Diversion,Do Not Include,,--,,,,,,
+Pathfinder,Include,RISE,433,USBR Enterprise Asset Registry,,,1070185,Pathfinder,Pathfinder Reservoir (Pathfinder Dam)
+Payette,Do Not Include,,7194,,,,,,
+Percha Arroyo Diversion,Do Not Include,,--,,,,,,
+Percha Diversion,Do Not Include,,--,,,,,,
+Phoenix Canal Diversion,Do Not Include,,--,,,,,,
+Pilot Butte,Include,RISE,435,USBR Enterprise Asset Registry,,,33721,Pilot Butte,Pilot Butte Reservoir (Pilot Butte Dam)
+Pineview,Include,RISE,437,USBR Enterprise Asset Registry,,,110150,Pineview,Pineview Reservoir (Pineview Dam)
+Pinewood,Include,RISE,438,USBR Enterprise Asset Registry,,,2104,Pinewood (Rattlesnake Dam),Pinewood Lake (Rattlesnake Dam)
+Pishkun,Include,RISE,443,USBR Enterprise Asset Registry,,,46694,Pishkun (Pishkun Dikes),Pishkun Reservoir (Pishkun Dikes)
+Platoro,Include (Omit % Avg),RISE,3512,USBR Enterprise Asset Registry,,,59571,Platoro,Platoro Reservoir (Platoro Dam)
+Pleasant,Do Not Include,,--,,,,,,
+Pole Hill Afterbay,Do Not Include,,--,,,,,,
+Pole Hill Creek Diversion,Do Not Include,,--,,,,,,
+Potholes,Include (Omit % Avg if needed),RISE,7265,USBR Enterprise Asset Registry,,,511700,Potholes (O'Sullivan Dam),Potholes Reservoir (O'Sullivan Dam)
+Powell,Include,RISE,393,USBR Enterprise Asset Registry,,,26215000,Powell (Glen Canyon Dam),Lake Powell (Glen Canyon Dam)
+Power Canal Diversion,Do Not Include,,--,,,,,,
+Prineville,Include (Omit % Avg if needed),RISE,3666,USBR Enterprise Asset Registry,,,150216,Prineville (Arthur R. Bowman Dam),Prineville Reservoir (Arthur R. Bowman Dam)
+Prosser Creek,Include if possible,USGS Prosser C Res NR Truckee CA - USGS-10340300,--,USBR Enterprise Asset Registry,Prosser C Res NR Truckee CA - USGS-10340300;  https://www.troa.net/tis/,Use USGS Data,29840,Prosser Creek,Prosser Creek Reservoir (Prosser Creek Dam)
+Prosser Diversion,Do Not Include,,--,,,,,,
+Pueblo,Include,RISE,445,USBR Enterprise Asset Registry,,,338374,Pueblo,Pueblo Reservoir (Pueblo Dam)
+Putah Diversion,Do Not Include,,--,,,,,,
+Rainbow Diversion,Do Not Include,,--,,,,,,
+Ralston,Do Not Include,,--,,,,,,
+Reach 11 Detention Dike,Do Not Include,,--,,,,,,
+Red Fleet,Include,RISE,447,USBR Enterprise Asset Registry,,,26000,Red Fleet,Red Fleet Reservoir (Red Fleet Dam)
+Red Willow Creek Diversion,Do Not Include,,--,,"GP Hydromet - RWNE (canal gage, no storage, gage height only)",,,,
+Ridgway,Include,RISE,448,USBR Enterprise Asset Registry,,,84410,Ridgway,Ridgway Reservoir (Ridgway Dam)
+Rifle Gap,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,https://www.usbr.gov/uc/water/hydrodata/reservoir_data/961/dashboard.html#storage/,Add Storage Data to RISE,13602,Rifle Gap,Rifle Gap Reservoir (Rifle Gap Dam)
+Rimrock,Include (Omit % Avg if needed),RISE,7196,USBR Enterprise Asset Registry,,,198000,Rimrock (Tieton Dam),Rimrock Lake (Tieton Dam)
+Ririe,Include (Omit % Avg if needed),RISE,7197,USBR Enterprise Asset Registry,,,100500,Ririe,Ririe Reservoir (Ririe Dam)
+Robles-Casitas Diversion,Do Not Include,,--,,,,,,
+Rockport,Include,RISE,453,USBR Enterprise Asset Registry,,,62120,Rockport (Wanship Dam),Rockport Lake (Wanship Dam)
+Roza Diversion,Do Not Include,,--,,,,,,
+Rubber Detention Dam,Do Not Include,,--,,,,,,
+Ruedi,Include,RISE,456,USBR Enterprise Asset Registry,,,102373,Ruedi,Ruedi Reservoir (Ruedi Dam)
+S Line,Do Not Include,,--,,,,,,
+Sagouspe,Do Not Include,,--,,,,,,
+Saguaro,Do Not Include,,--,,,,,,
+Saint Marys Diversion,Do Not Include,,--,,,,,,
+Salmon Creek Diversion,Do Not Include,,--,,,,,,
+Salton Sea,Do Not Include,,3711,,,,,,
+San Acacia Dam,Do Not Include,,--,,,,,,
+San Justo,Do Not Include,,--,,,,,,
+San Luis,Do Not Include,,3730,,,,,,
+Sand Coulee Protective Dike,Do Not Include,,--,,,,,,
+Sand Mesa 1,Do Not Include,,--,,,,,,
+Sand Mesa 2,Do Not Include,,--,,,,,,
+Santa Rosa,Include if possible,USACE https://water.usace.army.mil/overview/spa/locations/santa%20rosa,458,USACE https://w3.spa.usace.army.mil/wc/PertinentData/ Top of Dam Volume in Acre-Feet,"Daily data available in HDB and capacity data available here: https://w3.spa.usace.army.mil/wc/PertinentData/, https://water.usace.army.mil/overview/spa/locations/santa%20rosa",Use USACE data,"801,174",Santa Rosa,Santa Rosa Lake (Santa Rosa Dam)
+Sawyer Diversion,Do Not Include,,--,,,,,,
+Scofield,Include,RISE,466,USBR Enterprise Asset Registry,,,73600,Scofield,Scofield Reservoir (Scofield Dam)
+Scooteney,Include (Omit % Avg if needed),RISE,7266,USBR Enterprise Asset Registry,,,15250,Scooteney (Scooteney Dikes),Scooteney Reservoir (Scooteney Dikes)
+Selig Diversion,Do Not Include,,--,,,,,,
+Seminoe,Include,RISE,467,USBR Enterprise Asset Registry,,,1017273,Seminoe,Seminoe Reservoir (Seminoe Dam)
+Senator Wash,Do Not Include,,--,,,,,,
+Shadehill,Include,RISE,476,USBR Enterprise Asset Registry,,,350176,Shadehill,Shadehill Reservoir (Shadehill Dam)
+Shadow Mountain,Include,RISE,473,USBR Enterprise Asset Registry,,,18369,Shadow Mountain,Shadow Mountain Lake (Shadow Mountain Dam)
+Shasta,Include,RISE,471,USBR Enterprise Asset Registry,,,4552090,Shasta,Shasta Lake (Shasta Dam)
+Sheckler,Do Not Include,,--,,,,,,
+Sherburne,Include,RISE,475,USBR Enterprise Asset Registry,,,66147,Sherburne (Lake Sherburne Dam),Lake Sherburne (Lake Sherburne Dam)
+Sheridan County State Lake,Do Not Include,,3712,,,,,,
+Silt Diversion Dam,Do Not Include,,--,,,,,,
+Silver Jack,Include,RISE,477,USBR Enterprise Asset Registry,,,13520,Silver Jack,Silver Jack Reservoir (Silver Jack Dam)
+Slaterville Diversion,Do Not Include,,--,,,,,,
+Smith Fork Diversion Dam,Do Not Include,,--,,,,,,
+Snyder,Do Not Include,,--,,,,,,
+Soda,Do Not Include,,--,,,,,,
+Soda Creek Diversion,Do Not Include,,--,,,,,,
+Soldiers Meadow,Include (Omit % Avg if needed),RISE,7199,USBR Enterprise Asset Registry,,,2370,Soldiers Meadow,Soldiers Meadow Reservoir (Soldiers Meadow Dam)
+South Cunningham Creek Diversion,Do Not Include,,--,,,,,,
+South Fork Diversion,Do Not Include,,--,,,,,,
+South Fork Little Butte Diversion,Do Not Include,,--,,,,,,
+South Ogden Equalizing Reservoir 13,Do Not Include,,--,,,,,,
+South Ogden Equalizing Reservoir 17,Do Not Include,,--,,,,,,
+South Ogden Equalizing Reservoir 20,Do Not Include,,--,,,,,,
+South Ogden Equalizing Reservoir 25,Do Not Include,,--,,,,,,
+South Ogden Equalizing Reservoir 25A,Do Not Include,,--,,,,,,
+South Ogden Equalizing Reservoir 25B,Do Not Include,,--,,,,,,
+South Ogden Equalizing Reservoir 8,Do Not Include,,--,,,,,,
+South Ogden Equalizing Reservoir P,Do Not Include,,--,,,,,,
+Spanish Fork Diversion,Do Not Include,,--,,,,,,
+Spectacle,Do Not Include,,--,,,,,,
+Spring Creek,Include,RISE,6,USBR Enterprise Asset Registry,,,5874,Spring Creek (Spring Creek Debris Dam),Spring Creek Reservoir (Spring Creek Debris Dam)
+Stampede,Include if possible,USGS STAMPEDE RES NR BOCA CA - USGS-10344300 ,--,USBR Enterprise Asset Registry,USGS 10344300 STAMPEDE RES NR BOCA CA,Use USGS Data,226500,Stampede,Stampede Reservoir (Stampede Dam)
+Starvation,Include,RISE,484,USBR Enterprise Asset Registry,,,164118,Starvation,Starvation Reservoir (Starvation Dam)
+Stateline,Include,RISE,485,USBR Enterprise Asset Registry,,,14000,Stateline,Stateline Reservoir (Stateline Dam)
+Steinaker,Include,RISE,486,USBR Enterprise Asset Registry,,,40043,Steinaker,Steinaker Reservoir (Steinaker Dam)
+Stoddard Diversion,Do Not Include,,--,,,,,,
+Stony Gorge,Do Not Include,,--,,,,,,
+Strawberry,Include,RISE,488,USBR Enterprise Asset Registry,,,1106500,Strawberry (Soldier Creek Dam),Strawberry Reservoir (Soldier Creek Dam)
+Sumner,Include,RISE,489,USBR Enterprise Asset Registry,,,124119,Sumner,Sumner Lake (Sumner Dam)
+Sunnyside Diversion,Do Not Include,,--,,,,,,
+Swanson,Include if possible,RISE (Pending),3667,USBR Enterprise Asset Registry,GP Hydromet - TRNE (has storage),Add Storage Data to RISE,244362,Swanson (Trenton Dam),Swanson Lake (Trenton Dam)
+Sweetwater Diversion,Do Not Include,,--,,,,,,
+Swift Dam and,Do Not Include,,490,,,,,,
+Tahoe,Include if possible,TROA? USGS?,--,USBR Enterprise Asset Registry,https://www.troa.net/tis/ https://nevada.usgs.gov/tahoe/LakeElevation.html,Use TROA data?,744000,Tahoe (Lake Tahoe Dam),Lake Tahoe Reservoir (Lake Tahoe Dam)
+Taylor Park,Include,RISE,491,USBR Enterprise Asset Registry,,,106225,Taylor Park,Taylor Park Reservoir (Taylor Park Dam)
+Terminal,Do Not Include,,--,,,,,,
+Texana,Do Not Include,,3660,,,,,,
+Theodore Roosevelt,Do Not Include,,3713,,,,,,
+Thief Valley,Include (Omit % Avg if needed),RISE,3668,USBR Enterprise Asset Registry,,,13307,Thief Valley,Thief Valley Reservoir (Thief Valley Dam)
+Three Mile Falls Diversion,Do Not Include,,--,,,,,,
+Thunderbird,Include if possible,RISE (Pending),3674,USBR Enterprise Asset Registry,GP Hydromet - NORMAN (has storage),Add Storage Data to RISE,172718,Thunderbird (Norman Dam),Lake Thunderbird (Norman Dam)
+Tieton Diversion,Do Not Include,,--,,,,,,
+Timpanogos Diversion,Do Not Include,,--,,,,,,
+Toats Coulee Creek Diversion,Do Not Include,,--,,,,,,
+Tom Steed,Include,RISE,3670,USBR Enterprise Asset Registry,,,119051,Tom Steed (Mountain Park Dam),Tom Steed Reservoir (Mountain Park Dam)
+Trail Lake (WA),Do Not Include,,--,,,,,,
+Trial,Include (Omit % Avg),RISE,3208,USBR Enterprise Asset Registry,,,1928,Trial (Trial Lake Dam),Trial Lake (Trial Lake Dam)
+Trinity,Include,RISE,3203,USBR Enterprise Asset Registry,,,2447650,Trinity,Trinity Lake (Trinity Dam)
+Tschida,Include,RISE,402,USBR Enterprise Asset Registry,,,212696,Tschida (Heart Butte Dam),Lake Tschida (Heart Butte Dam)
+Tub Springs Creek Diversion,Do Not Include,,--,,,,,,
+Turquoise,Include,RISE,498,USBR Enterprise Asset Registry,,,129398,Turquoise (Sugar Loaf Dam),Turquoise Lake (Sugar Loaf Dam)
+Twin Buttes,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,GP Hydromet - TRGT (has storage),Add Storage Data to RISE,641234,Twin Buttes,Twin Buttes Reservoir (Twin Buttes Dam)
+Twin Lakes,Include,RISE,499,USBR Enterprise Asset Registry,,,141000,Twin Lakes,Twin Lakes (Twin Lakes Dam)
+Twitchell,Do Not Include,,--,,,,,,
+Unity,Include (Omit % Avg if needed),RISE,3671,USBR Enterprise Asset Registry,,,25500,Unity,Unity Reservoir (Unity Dam)
+Upper Cottonwood,Do Not Include,,--,,,,,,
+Upper Klamath,Include if possible,USGS Elevation https://waterdata.usgs.gov/monitoring-location/USGS-11507001,--,USBR Enterprise Asset Registry,Storage: USGS?USGS Elevation: https://waterdata.usgs.gov/monitoring-location/USGS-11507001,"Use USGS Data, calculate storage from elevation",735000,Upper Klamath (Link River Diversion Dam),Upper Klamath Lake (Link River Diversion Dam)
+Upper Slaven Diversion,Do Not Include,,--,,,,,,
+Upper Stillwater,Include,RISE,500,USBR Enterprise Asset Registry,,,32009,Upper Stillwater,Upper Stillwater Reservoir (Upper Stillwater Dam)
+Utah,Include if possible,RISE (Pending),3206,TBD,"https://www.usbr.gov/uc/water/hydrodata/reservoir_data/3606/dashboard.html Daily storage data available in HDB, capacity data ? ",Add Storage Data to RISE,--,Utah Lake,Utah Lake
+Ute,Do Not Include,,3714,,,,,,
+Vallecito,Include,RISE,501,USBR Enterprise Asset Registry,,,129700,Vallecito,Vallecito Reservoir (Vallecito Dam)
+Vandalia Diversion,Do Not Include,,--,,,,,,
+Vat Diversion,Do Not Include,,--,,,,,,
+Vega,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,https://www.usbr.gov/uc/water/hydrodata/reservoir_data/924/dashboard.html,Add Storage Data to RISE,33800,Vega,Vega Reservoir (Vega Dam)
+Waconda,Include,RISE,504,USBR Enterprise Asset Registry,GP Hydromet - WAKS,,942408,Waconda (Glen Elder Dam),Waconda Lake (Glen Elder Dam)
+Waha,Do Not Include,,3661,,,,,,
+Walcott,Include (Omit % Avg if needed),RISE,7191,USBR Enterprise Asset Registry,,,210200,Walcott (Minidoka Dam),Lake Walcott (Minidoka Dam)
+Wapato Lake Diversion,Do Not Include,,--,,,,,,
+Wapatox Diversion,Do Not Include,,--,,,,,,
+Warm Springs,Include (Omit % Avg if needed),RISE,3672,USBR Enterprise Asset Registry,,,169714,Warm Springs,Warm Springs Reservoir (Warm Springs Dam)
+Warren H. Brock,Do Not Include,,--,,,,,,
+Wasatch Diversion,Do Not Include,,--,,,,,,
+Washington,Include (Omit % Avg),RISE,3207,USBR Enterprise Asset Registry,,,3055,Washington (Washington Lake Dam),Washington Lake (Washington Lake Dam)
+Water Hollow Diversion,Do Not Include,,--,,,,,,
+Webb Creek Diversion,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 1.9,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 17.2,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 17.8,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 18 Lower,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 18 Upper,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 18.5,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 18.8,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 18.9,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 19.5 Lower,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 19.5 Upper,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 2.6,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 4.3,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir 5.0,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir Combe,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir East Sand Ridge,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir Farmington,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir P3.7,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir Uintah Bench Lower,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir Uintah Bench Upper,Do Not Include,,--,,,,,,
+Weber Basin Equalizing Reservoir West Sand Ridge,Do Not Include,,--,,,,,,
+Weber Provo Diversion,Do Not Include,,--,,,,,,
+Webster,Include,RISE,506,USBR Enterprise Asset Registry,GP Hydromet - WBKS,,259510,Webster,Webster Reservoir (Webster Dam)
+West Park,Do Not Include,,--,,,,,,
+Whalen Diversion,Do Not Include,,--,,,,,,
+Whatcom,Do Not Include,,3662,,,,,,
+Whiskeytown,Include,RISE,509,USBR Enterprise Asset Registry,,,241096,Whiskeytown,Whiskeytown Lake (Whiskeytown Dam)
+Wickiup,Include (Omit % Avg if needed),RISE,7201,USBR Enterprise Asset Registry,,,200000,Wickiup,Wickiup Reservoir (Wickiup Dam)
+Willard Bay,Include,RISE,512,USBR Enterprise Asset Registry,,,247302,Willard Bay (Arthur V. Watkins Dam),Willard Bay Reservoir (Arthur V. Watkins Dam)
+Willow Creek Forebay,Do Not Include,,--,,,,,,
+Willow Creek Reservoir CO,Include,RISE,515,USBR Enterprise Asset Registry,,,10553,Willow Creek Reservoir (CO),Willow Creek Reservoir (CO) (Willow Creek Dam)
+Willow Creek Reservoir MT,Include,RISE,508,USBR Enterprise Asset Registry,,,31848,Willow Creek Reservoir (MT),Willow Creek Reservoir (MT) (Willow Creek Dam)
+Willwood Diversion,Do Not Include,,--,,,,,,
+Win Diversion,Do Not Include,,--,,,,,,
+Wind River Diversion,Do Not Include,,--,,,,,,
+Winters Creek,Do Not Include,,507,,,,,,
+Woodston Diversion,Do Not Include,,--,,,,,,
+Yellowstone River Diversion,Do Not Include,,--,,,,,,
+Yellowtail Afterbay,Do Not Include,,6882,,,,,,
+Zuni Salt,Do Not Include,,3735,,,,,,

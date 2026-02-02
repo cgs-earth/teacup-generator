@@ -1,0 +1,56 @@
+name,decision,location_id
+Avalon,Include,267
+Brantley,Include,282
+Sumner,Include,489
+Agate,Include (Omit % Avg if needed),7166
+American Falls,Include (Omit % Avg if needed),7167
+Anderson Ranch,Include (Omit % Avg if needed),3641
+Arrowrock,Include (Omit % Avg if needed),3642
+Banks,Include (Omit % Avg if needed),7264
+Beulah,Include (Omit % Avg if needed),3643
+Billy Clapp,Include (Omit % Avg if needed),7168
+Black Canyon,Include (Omit % Avg if needed),7175
+Bully Creek,Include (Omit % Avg if needed),3646
+Bumping,Include (Omit % Avg if needed),3647
+Cascade,Include (Omit % Avg if needed),3645
+Cle Elum,Include (Omit % Avg if needed),7170
+Clear Lake (OR),Include (Omit % Avg if needed),7200
+Cold Springs,Include (Omit % Avg if needed),7171
+Como,Include (Omit % Avg if needed),3653
+Conconully Lake,Include (Omit % Avg if needed),7169
+Crane Prairie,Include (Omit % Avg if needed),7172
+Deadwood,Include (Omit % Avg if needed),3649
+Emigrant,Include (Omit % Avg if needed),7174
+Fish,Include (Omit % Avg if needed),7176
+Fourmile,Include (Omit % Avg if needed),7177
+Grassy,Include (Omit % Avg if needed),7178
+Haystack,Include (Omit % Avg if needed),7179
+Henry Hagg,Include (Omit % Avg if needed),3651
+Howard Prairie,Include (Omit % Avg if needed),7182
+Hungry Horse,Include (Omit % Avg if needed),7181
+Hyatt,Include (Omit % Avg if needed),7183
+Island Park,Include (Omit % Avg if needed),7184
+Jackson,Include (Omit % Avg if needed),7185
+Kachess,Include (Omit % Avg if needed),7186
+Keechelus,Include (Omit % Avg if needed),7187
+Little Wood River,Include (Omit % Avg if needed),7202
+Lowell,Include (Omit % Avg if needed),7188
+Mann,Include (Omit % Avg if needed),7198
+Mann Creek,Include (Omit % Avg if needed),3663
+Mason,Include (Omit % Avg if needed),7195
+McKay,Include (Omit % Avg if needed),3664
+Ochoco,Include (Omit % Avg if needed),3665
+Owyhee,Include (Omit % Avg if needed),7192
+Palisades,Include (Omit % Avg if needed),7193
+Potholes,Include (Omit % Avg if needed),7265
+Prineville,Include (Omit % Avg if needed),3666
+Rimrock,Include (Omit % Avg if needed),7196
+Ririe,Include (Omit % Avg if needed),7197
+Scooteney,Include (Omit % Avg if needed),7266
+Soldiers Meadow,Include (Omit % Avg if needed),7199
+Thief Valley,Include (Omit % Avg if needed),3668
+Unity,Include (Omit % Avg if needed),3671
+Walcott,Include (Omit % Avg if needed),7191
+Warm Springs,Include (Omit % Avg if needed),3672
+Wickiup,Include (Omit % Avg if needed),7201
+Crescent,Include if possible,7173
