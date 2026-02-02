@@ -14,7 +14,8 @@ LOCATION_ID <- "489"
 # Fetch one year of data
 fetch_year <- function(location_id, year) {
   start_date <- paste0(year, "-01-01")
-  end_date <- paste0(year, "-12-31")
+  # API requires day after intended end date to include the end date in results
+  end_date <- paste0(year + 1, "-01-01")
 
   url <- paste0(
     WWDH_API_BASE,

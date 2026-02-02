@@ -107,12 +107,15 @@ message(sprintf("  - USGS: %d locations (not yet implemented)", nrow(usgs_locati
 #'
 fetch_rise_historical <- function(location_id, start_date = START_DATE, end_date = END_DATE, max_retries = 5) {
 
+  # API requires day after intended end date to include the end date in results
+  api_end_date <- as.Date(end_date) + 1
+
   url <- paste0(
     WWDH_API_BASE,
     "/collections/rise-edr/locations/", location_id,
     "?parameter-name=Storage",
     "&limit=20000",
-    "&datetime=", start_date, "/", end_date,
+    "&datetime=", start_date, "/", api_end_date,
     "&f=csv"
   )
 

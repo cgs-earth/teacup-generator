@@ -104,7 +104,8 @@ fetch_current_value <- function(location_id, target_date, lookback_days = LOOKBA
   for (days_back in 0:lookback_days) {
     query_date <- target_date - days_back
     start_date <- query_date
-    end_date <- query_date
+    # API requires day after intended end date to include the end date in results
+    end_date <- query_date + 1
 
     url <- paste0(
       WWDH_API_BASE,
