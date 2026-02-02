@@ -161,6 +161,17 @@ fetch_rise_historical <- function(location_id, start_date = START_DATE, end_date
         ) |>
         filter(!is.na(value))
 
+      # Remove duplicate days - keep only the first instance of each day
+      rows_before <- nrow(data)
+      data <- data |>
+        arrange(date) |>
+        distinct(date, .keep_all = TRUE)
+      rows_after <- nrow(data)
+
+      if (rows_before != rows_after) {
+        message(sprintf("    Removed %d duplicate days (kept first instance)", rows_before - rows_after))
+      }
+
       return(data)
 
     }, error = function(e) {

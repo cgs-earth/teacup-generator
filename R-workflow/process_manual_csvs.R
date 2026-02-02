@@ -14,6 +14,10 @@ library(arrow)
 
 OUTPUT_DIR <- "output"
 
+# Historical date range (30 water years) - same as setup_historical_baseline.R
+START_DATE <- as.Date("1990-10-01")
+END_DATE <- as.Date("2020-09-30")
+
 # Location IDs to process (the 3 "Include" failures)
 location_ids <- c("267", "282", "489")
 
@@ -50,7 +54,7 @@ for (loc_id in location_ids) {
 
   message(sprintf("  Found %d rows", nrow(data)))
 
-  # Standardize columns
+  # Standardize columns and filter to historical date range
   data <- data |>
     transmute(
       location_id = loc_id,
@@ -58,7 +62,21 @@ for (loc_id in location_ids) {
       value = value,
       unit = unit
     ) |>
-    filter(!is.na(value))
+    filter(!is.na(value)) |>
+    filter(date >= START_DATE & date <= END_DATE)
+
+  message(sprintf("  After date filter (%s to %s): %d rows", START_DATE, END_DATE, nrow(data)))
+
+  # Remove duplicate days - keep only the first instance of each day
+  rows_before <- nrow(data)
+  data <- data |>
+    arrange(date) |>
+    distinct(location_id, date, .keep_all = TRUE)
+  rows_after <- nrow(data)
+
+  if (rows_before != rows_after) {
+    message(sprintf("  Removed %d duplicate days (kept first instance)", rows_before - rows_after))
+  }
 
   all_data[[loc_id]] <- data
 
