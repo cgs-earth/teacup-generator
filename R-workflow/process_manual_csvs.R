@@ -3,8 +3,8 @@
 # Process manually downloaded CSV files for failed locations
 # and add them to the historical baseline.
 #
-# Place CSV files named {location_id}.csv in the R-workflow directory
-# e.g., 267.csv, 282.csv, 489.csv
+# Place CSV files named {location_id}.csv in the data/manual/ directory
+# e.g., data/manual/267.csv, data/manual/282.csv, data/manual/489.csv
 ################################################################################
 
 library(dplyr)
@@ -12,6 +12,7 @@ library(readr)
 library(lubridate)
 library(arrow)
 
+MANUAL_DATA_DIR <- "data/manual"
 OUTPUT_DIR <- "output"
 
 # Historical date range (30 water years) - same as setup_historical_baseline.R
@@ -36,7 +37,7 @@ all_data <- list()
 all_stats <- list()
 
 for (loc_id in location_ids) {
-  csv_file <- paste0(loc_id, ".csv")
+  csv_file <- file.path(MANUAL_DATA_DIR, paste0(loc_id, ".csv"))
 
   if (!file.exists(csv_file)) {
     message(sprintf("Skipping %s (%s) - file not found", loc_id, location_names[loc_id]))

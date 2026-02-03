@@ -25,7 +25,7 @@ failed_names <- readLines(failed_file)
 message(sprintf("Found %d failed locations\n", length(failed_names)))
 
 # Load location metadata
-locations_raw <- read_csv("config/locations.csv", show_col_types = FALSE)
+locations_raw <- read_csv("config/locations.csv", show_col_types = FALSE)  # User-curated input file
 
 locations <- locations_raw |>
   filter(`Post-Review Decision` != "Do Not Include") |>

@@ -16,6 +16,7 @@ library(readr)
 library(lubridate)
 library(arrow)
 library(stringr)
+library(sf)
 
 ################################################################################
 # CONFIGURATION
@@ -64,25 +65,34 @@ message(sprintf("Loaded historical statistics: %d rows for %d locations",
 # LOAD LOCATION METADATA
 ################################################################################
 
-locations_file <- file.path(CONFIG_DIR, "locations.csv")
-locations_raw <- read_csv(locations_file, show_col_types = FALSE)
+locations_file <- file.path(CONFIG_DIR, "locations.geojson")
+locations_sf <- st_read(locations_file, quiet = TRUE)
 
-# Filter to included locations and extract metadata
-locations <- locations_raw |>
-  filter(`Post-Review Decision` != "Do Not Include") |>
+# Extract location metadata from geojson
+locations <- locations_sf |>
+  st_drop_geometry() |>
   transmute(
     name = Name,
-    decision = `Post-Review Decision`,
-    source = `Source for Storage Data`,
-    location_id = `RISE Location ID`,
-    capacity = as.numeric(str_remove_all(`Total Capacity`, ",")),
-    label_map = `Preferred Label for Map and Table`,
-    label_popup = `Preferred Label for PopUp and Modal`
-  ) |>
-  # Only process RISE locations for now
-  filter(source == "RISE", !is.na(location_id), location_id != "--")
+    location_id = Identifier,
+    capacity = as.numeric(str_remove_all(`Total.Capacity`, ",")),
+    label_map = `Preferred.Label.for.Map.and.Table`,
+    label_popup = `Preferred.Label.for.PopUp.and.Modal`,
+    state = state,
+    doi_region = doiRegion,
+    huc6 = huc6,
+    longitude = Longitude,
+    latitude = Latitude
+  )
 
-message(sprintf("Processing %d RISE locations", nrow(locations)))
+message(sprintf("Loaded %d locations from geojson", nrow(locations)))
+
+# Only process locations that have historical statistics
+# (Skip locations that failed to fetch historical data)
+locations_with_stats <- unique(historical_stats$location_id)
+locations <- locations |>
+  filter(location_id %in% locations_with_stats)
+
+message(sprintf("Processing %d locations with historical statistics", nrow(locations)))
 
 ################################################################################
 # DATA FETCHING FUNCTION
@@ -225,6 +235,14 @@ output_data <- current_data |>
     # Format dates
     data_date_fmt = format(data_date, "%m/%d/%Y"),
     date_queried = format(Sys.Date(), "%m/%d/%Y")
+  ) |>
+  # Ensure we have all the location columns
+  mutate(
+    state = state,
+    doi_region = doi_region,
+    huc6 = huc6,
+    longitude = longitude,
+    latitude = latitude
   )
 
 ################################################################################
@@ -247,11 +265,11 @@ message("\n=== Generating output CSV ===\n")
 output_csv <- output_data |>
   transmute(
     SiteName = label_popup,
-    Lat = NA_real_,           # Would need to add to locations.csv
-    Lon = NA_real_,           # Would need to add to locations.csv
-    State = NA_character_,    # Would need to add to locations.csv
-    DoiRegion = NA_character_, # Would need to add to locations.csv
-    Huc8 = NA_character_,     # Would need to add to locations.csv
+    Lat = latitude,
+    Lon = longitude,
+    State = state,
+    DoiRegion = doi_region,
+    Huc6 = huc6,
     DataUnits = coalesce(data_unit, unit),
     DataValue = data_value,
     DataDate = data_date_fmt,
