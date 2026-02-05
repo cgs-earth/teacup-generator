@@ -1,10 +1,16 @@
 # rezviz_data_generator.R
 #
 # DAILY SCRIPT: Query current reservoir conditions, combine with historical
-# statistics, generate output CSV for teacup visualization.
+# statistics, generate output CSV for teacup visualization, and upload to
+# HydroShare.
 #
 # Designed to run daily via cron/scheduler.
 # Depends on historical_statistics.parquet created by setup_historical_baseline.R
+#
+# HydroShare credentials loaded from .env file in the working directory.
+# Expected .env format:
+#   HYDROSHARE_USERNAME=user@example.com
+#   HYDROSHARE_PASSWORD=yourpassword
 #
 # Author: Kyle Onda, CGS
 # Created: 2026-01-28
@@ -18,12 +24,21 @@ library(arrow)
 library(stringr)
 library(sf)
 
+# Load .env file if present
+if (file.exists(".env")) {
+  readRenviron(".env")
+}
+
 ################################################################################
 # CONFIGURATION
 ################################################################################
 
 # API base URL for RISE data via WWDH
 WWDH_API_BASE <- "https://api.wwdh.internetofwater.app"
+
+# HydroShare
+HYDROSHARE_RESOURCE_ID <- "22b2f10103e5426a837defc00927afbd"
+HYDROSHARE_BASE_URL <- "https://www.hydroshare.org"
 
 # Paths
 OUTPUT_DIR <- "output"
@@ -40,7 +55,7 @@ if (length(args) > 0) {
 # How many days to look back if no data on target date
 LOOKBACK_DAYS <- 7
 
-# Historical statistics period description
+# Historical statistics period (numeric value matching .NET output)
 STATS_PERIOD <- "10/1/1990 - 9/30/2020"
 
 message(sprintf("=== Reservoir Data Generator ==="))
@@ -68,7 +83,7 @@ message(sprintf("Loaded historical statistics: %d rows for %d locations",
 locations_file <- file.path(CONFIG_DIR, "locations.geojson")
 locations_sf <- st_read(locations_file, quiet = TRUE)
 
-# Extract location metadata from geojson
+# Extract location metadata from geojson - ALL locations
 locations <- locations_sf |>
   st_drop_geometry() |>
   transmute(
@@ -86,13 +101,12 @@ locations <- locations_sf |>
 
 message(sprintf("Loaded %d locations from geojson", nrow(locations)))
 
-# Only process locations that have historical statistics
-# (Skip locations that failed to fetch historical data)
+# Track which locations have historical statistics (for logging)
 locations_with_stats <- unique(historical_stats$location_id)
-locations <- locations |>
-  filter(location_id %in% locations_with_stats)
-
-message(sprintf("Processing %d locations with historical statistics", nrow(locations)))
+n_with_stats <- sum(locations$location_id %in% locations_with_stats)
+message(sprintf("  %d locations have historical statistics", n_with_stats))
+message(sprintf("  %d locations will have NA for historical metrics",
+                nrow(locations) - n_with_stats))
 
 ################################################################################
 # DATA FETCHING FUNCTION
@@ -181,7 +195,7 @@ for (i in seq_len(nrow(locations))) {
       location_id = location_id,
       name = location_name,
       data_value = NA_real_,
-      data_date = NA,
+      data_date = as.Date(NA),
       data_unit = NA_character_
     )
     next
@@ -201,7 +215,6 @@ for (i in seq_len(nrow(locations))) {
   )
 
   # Rate limiting
-
   Sys.sleep(0.25)
 }
 
@@ -224,25 +237,18 @@ todays_stats <- historical_stats |>
   select(location_id, min, max, p10, p25, p50, p75, p90, mean, unit)
 
 # Join current data with location metadata and historical stats
+# Use left_join so ALL locations appear even without stats
 output_data <- current_data |>
   left_join(locations, by = c("location_id", "name")) |>
   left_join(todays_stats, by = "location_id", suffix = c("", "_hist")) |>
   mutate(
-    # Calculate derived values
+    # Calculate derived values (will be NA if stats or current value missing)
     pct_median = data_value / p50,
     pct_average = data_value / mean,
     pct_full = data_value / capacity,
     # Format dates
     data_date_fmt = format(data_date, "%m/%d/%Y"),
     date_queried = format(Sys.Date(), "%m/%d/%Y")
-  ) |>
-  # Ensure we have all the location columns
-  mutate(
-    state = state,
-    doi_region = doi_region,
-    huc6 = huc6,
-    longitude = longitude,
-    latitude = latitude
   )
 
 ################################################################################
@@ -250,17 +256,6 @@ output_data <- current_data |>
 ################################################################################
 
 message("\n=== Generating output CSV ===\n")
-
-# Format output matching the .NET program's format
-# Header: SiteName, Lat, Lon, State, DoiRegion, Huc8, DataUnits, DataValue,
-#         DataDate, DateQueried, DataDateMax, DataDateP90, DataDateP75,
-#         DataDateP50, DataDateP25, DataDateP10, DataDateMin, DataDateAvg,
-#         DataValuePctMdn, DataValuePctAvg, StatsPeriod, MaxCapacity, PctFull,
-#         TeacupUrl, DataUrl, Comment
-
-# Note: We don't have all the fields from the original .NET version
-# (State, DoiRegion, Huc8, TeacupUrl, DataUrl, Comment)
-# Those would need to be added to locations.csv or fetched from another source
 
 output_csv <- output_data |>
   transmute(
@@ -296,14 +291,75 @@ output_csv <- output_data |>
 output_filename <- sprintf("droughtData%s.csv", format(TARGET_DATE, "%Y%m%d"))
 output_path <- file.path(OUTPUT_DIR, output_filename)
 
-# Write CSV with space after comma (matching .NET format)
-# Note: Standard write_csv doesn't add space after comma, so we use a custom approach
+# Write CSV (standard comma-separated)
 write_csv(output_csv, output_path, na = "")
 
 message(sprintf("Output written to: %s", output_path))
 message(sprintf("  Total locations: %d", nrow(output_csv)))
 message(sprintf("  With data: %d", sum(!is.na(output_csv$DataValue))))
 message(sprintf("  Missing data: %d", sum(is.na(output_csv$DataValue))))
+message(sprintf("  With historical stats: %d", sum(!is.na(output_csv$DataDateP50))))
+message(sprintf("  Without historical stats: %d", sum(is.na(output_csv$DataDateP50))))
+
+################################################################################
+# UPLOAD TO HYDROSHARE
+################################################################################
+
+message("\n=== Uploading to HydroShare ===\n")
+
+hs_username <- Sys.getenv("HYDROSHARE_USERNAME", unset = "")
+hs_password <- Sys.getenv("HYDROSHARE_PASSWORD", unset = "")
+
+if (hs_username == "" || hs_password == "") {
+  message("WARNING: HYDROSHARE_USERNAME and/or HYDROSHARE_PASSWORD not set.")
+  message("Skipping HydroShare upload. Set environment variables to enable upload.")
+} else {
+
+  upload_to_hydroshare <- function(file_path, resource_id, username, password) {
+    filename <- basename(file_path)
+
+    # First, try to delete the existing file (if updating daily, old file may exist)
+    delete_url <- sprintf("%s/hsapi/resource/%s/files/%s/",
+                          HYDROSHARE_BASE_URL, resource_id, filename)
+
+    tryCatch({
+      request(delete_url) |>
+        req_auth_basic(username, password) |>
+        req_method("DELETE") |>
+        req_timeout(60) |>
+        req_perform()
+      message(sprintf("  Deleted existing file: %s", filename))
+    }, error = function(e) {
+      message(sprintf("  No existing file to delete (or delete failed): %s", filename))
+    })
+
+    # Upload the new file
+    upload_url <- sprintf("%s/hsapi/resource/%s/files/",
+                          HYDROSHARE_BASE_URL, resource_id)
+
+    response <- request(upload_url) |>
+      req_auth_basic(username, password) |>
+      req_body_multipart(file = curl::form_file(file_path)) |>
+      req_timeout(120) |>
+      req_perform()
+
+    status <- resp_status(response)
+    if (status >= 200 && status < 300) {
+      message(sprintf("  Successfully uploaded %s to HydroShare resource %s",
+                      filename, resource_id))
+    } else {
+      warning(sprintf("  Upload returned status %d", status))
+    }
+
+    return(status)
+  }
+
+  tryCatch({
+    upload_to_hydroshare(output_path, HYDROSHARE_RESOURCE_ID, hs_username, hs_password)
+  }, error = function(e) {
+    message(sprintf("ERROR uploading to HydroShare: %s", e$message))
+  })
+}
 
 ################################################################################
 # SUMMARY
@@ -315,5 +371,8 @@ message(sprintf("Locations processed: %d", nrow(output_csv)))
 message(sprintf("Locations with current data: %d (%.1f%%)",
                 sum(!is.na(output_csv$DataValue)),
                 100 * sum(!is.na(output_csv$DataValue)) / nrow(output_csv)))
+message(sprintf("Locations with historical stats: %d (%.1f%%)",
+                sum(!is.na(output_csv$DataDateP50)),
+                100 * sum(!is.na(output_csv$DataDateP50)) / nrow(output_csv)))
 message(sprintf("Output file: %s", output_path))
 message(sprintf("Completed at: %s", Sys.time()))
