@@ -47,8 +47,9 @@ HYDROSHARE_RESOURCE_ID <- "22b2f10103e5426a837defc00927afbd"
 HYDROSHARE_BASE_URL <- "https://www.hydroshare.org"
 
 # Paths
-OUTPUT_DIR <- "output"
-CONFIG_DIR <- "config"
+OUTPUT_DIR       <- "output"
+CONFIG_DIR       <- "config"
+HYDROSHARE_DIR   <- "hydroshare"
 
 # Target date (default: yesterday, can override via command line)
 args <- commandArgs(trailingOnly = TRUE)
@@ -581,9 +582,10 @@ output_csv <- output_data |>
     Comment        = NA_character_
   )
 
-# Generate filename
+# Generate filename and write to hydroshare directory (git-ignored, uploaded to HS)
 output_filename <- sprintf("droughtData%s.csv", format(TARGET_DATE, "%Y%m%d"))
-output_path     <- file.path(OUTPUT_DIR, output_filename)
+if (!dir.exists(HYDROSHARE_DIR)) dir.create(HYDROSHARE_DIR, recursive = TRUE)
+output_path <- file.path(HYDROSHARE_DIR, output_filename)
 
 # Write CSV (standard comma-separated)
 write_csv(output_csv, output_path, na = "")

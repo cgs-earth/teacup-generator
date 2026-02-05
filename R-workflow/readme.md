@@ -1,6 +1,6 @@
 # WWDH Reservoir Visualization Data Generator - R Implementation
 
-R workflow for generating reservoir conditions data for the WWDH Reservoir Dashboard teacup diagrams. Fetches data from RISE via the WWDH API, computes historical statistics, and generates daily output files.
+R workflow for generating reservoir conditions data for the WWDH Reservoir Dashboard teacup diagrams. Fetches current storage data from multiple sources (RISE, USACE, USGS, CDEC), computes historical statistics, generates daily output CSVs, and uploads to HydroShare.
 
 ## Directory Structure
 
@@ -26,13 +26,19 @@ R-workflow/
 │   ├── reservoirs_*.geojson    # Dummy data files for dashboard testing
 │   └── locations_map.html      # Interactive map of all locations
 │
-├── output/                     # Generated data
+├── output/                     # Generated data (git-tracked)
 │   ├── historical_baseline.parquet   # Raw historical observations
 │   ├── historical_statistics.parquet # Day-of-year statistics (primary)
 │   ├── historical_statistics.csv     # Day-of-year statistics (backup)
-│   ├── failed_locations.txt          # Locations that failed API fetch
-│   └── droughtDataYYYYMMDD.csv       # Daily output files
+│   └── failed_locations.txt          # Locations that failed API fetch
 │
+├── hydroshare/                 # HydroShare staging (git-ignored)
+│   ├── readme.md               # HydroShare resource description
+│   └── droughtDataYYYYMMDD.csv # Daily output CSV (uploaded to HydroShare)
+│
+├── Dockerfile                  # Docker build for daily production runs
+├── .dockerignore               # Docker build exclusions
+├── .env                        # HydroShare credentials (git-ignored)
 └── Scripts (see below)
 ```
 
@@ -95,7 +101,38 @@ Rscript rezviz_data_generator.R
 Rscript rezviz_data_generator.R 2025-01-15
 ```
 
-Output: `output/droughtDataYYYYMMDD.csv`
+Output: `hydroshare/droughtDataYYYYMMDD.csv` (also uploaded to HydroShare)
+
+### Docker
+
+The daily script is containerized for portable, reproducible runs. The image is based on `rocker/geospatial:4.4.2` and bundles all R dependencies, the location metadata, and historical statistics.
+
+**Build:**
+
+```bash
+cd R-workflow
+docker build -t rezviz .
+```
+
+**Run:**
+
+```bash
+# Yesterday's data (default)
+docker run --env-file .env rezviz
+
+# Arbitrary date
+docker run --env-file .env rezviz 2026-01-15
+
+# Keep the CSV locally via volume mount
+docker run --env-file .env -v $(pwd)/hydroshare:/app/hydroshare rezviz 2026-01-15
+```
+
+HydroShare credentials are passed at runtime via `--env-file .env` (never baked into the image). The `.env` file should contain:
+
+```
+HYDROSHARE_USERNAME=user@example.com
+HYDROSHARE_PASSWORD=yourpassword
+```
 
 ## Historical Statistics
 
@@ -107,6 +144,15 @@ For each calendar day, the following are computed:
 - Observation count
 
 ## API Notes
+
+### Data Sources
+
+| Source | API | Locations |
+|--------|-----|-----------|
+| **RISE** | [WWDH EDR API](https://api.wwdh.internetofwater.app/collections/rise-edr) | ~201 reservoirs |
+| **USACE** | [CDA Timeseries API](https://water.usace.army.mil) | Cochiti, Abiquiu, Santa Rosa, Grand Coulee, Fort Peck, Lucky Peak |
+| **USGS** | [NWIS Daily Values](https://waterservices.usgs.gov/nwis/dv/) | Lahontan, Boca, Prosser Creek, Stampede |
+| **CDEC** | [CDEC CSV Servlet](https://cdec.water.ca.gov) | Lake Tahoe |
 
 ### WWDH EDR API
 
@@ -144,6 +190,9 @@ The daily CSV contains columns compatible with the original .NET teacup generato
 | StatsPeriod | "10/1/1990 - 9/30/2020" |
 | MaxCapacity | Reservoir capacity |
 | PctFull | Current / capacity (decimal) |
+| TeacupUrl | URL to teacup graphic (reserved) |
+| DataUrl | Exact API URL used to fetch the current value |
+| Comment | Additional notes |
 
 ## Requirements
 
@@ -155,8 +204,11 @@ library(readr)      # CSV I/O
 library(lubridate)  # Date handling
 library(arrow)      # Parquet I/O
 library(stringr)    # String manipulation
-library(sf)         # Spatial data
+library(sf)         # Spatial data (requires GEOS, GDAL, PROJ)
+library(curl)       # Multipart file upload (HydroShare)
 ```
+
+Or use the provided Dockerfile which bundles all dependencies.
 
 ## Current Status
 
