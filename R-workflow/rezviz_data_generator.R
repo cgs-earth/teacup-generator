@@ -10,7 +10,7 @@
 # Fetches data from multiple sources:
 #   - RISE via WWDH EDR API (majority of locations)
 #   - USACE CDA API (Cochiti, Abiquiu, Santa Rosa, Grand Coulee, Fort Peck, Lucky Peak)
-#   - USGS NWIS (Lahontan, Boca, Prosser Creek, Stampede, Upper Klamath)
+#   - USGS Water Data OGC API (Lahontan, Boca, Prosser Creek, Stampede, Upper Klamath)
 #   - CDEC (Tahoe)
 #
 # HydroShare credentials loaded from .env file in the working directory.
@@ -29,6 +29,7 @@ library(lubridate)
 library(arrow)
 library(stringr)
 library(sf)
+library(jsonlite)
 
 # Load .env file if present
 if (file.exists(".env")) {
@@ -200,8 +201,9 @@ usace_lookup <- list(
 ################################################################################
 # USGS SITE NUMBER LOOKUP
 #
-# Maps location identifiers to USGS site numbers for NWIS daily values.
+# Maps location identifiers to USGS site numbers for OGC API daily values.
 # Parameter code 00054 = reservoir storage (acre-feet).
+# Uses the new USGS Water Data OGC API (replaces legacy NWIS web services).
 ################################################################################
 
 usgs_lookup <- list(
@@ -349,8 +351,9 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS)
   })
 }
 
-#' Fetch from USGS NWIS daily values API
+#' Fetch from USGS Water Data OGC API (daily values)
 #' Parameter 00054 = reservoir storage (acre-feet)
+#' Replaces legacy NWIS waterservices.usgs.gov (retiring Q1 2027)
 #' Returns list(value, date, unit, url)
 fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
   site_no <- usgs_lookup[[as.character(location_id)]]
@@ -362,7 +365,7 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
   end_date   <- target_date
 
   url <- sprintf(
-    "https://waterservices.usgs.gov/nwis/dv/?sites=%s&parameterCd=00054&startDT=%s&endDT=%s&format=rdb",
+    "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=00054&time=%s/%s&limit=50",
     site_no, start_date, end_date
   )
 
@@ -373,36 +376,19 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
       req_perform()
 
     body <- resp_body_string(response)
-    lines <- str_split(body, "\n")[[1]]
+    data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
 
-    # Skip comment lines (start with #) and the format spec line (starts with 5s)
-    data_start <- which(!str_starts(lines, "#") & nchar(trimws(lines)) > 0)
-    if (length(data_start) < 3) {
+    features <- data$features
+    if (length(features) == 0) {
       return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
     }
 
-    # First non-comment line is header, second is format spec, rest is data
-    header_line <- lines[data_start[1]]
-    data_lines  <- lines[data_start[3:length(data_start)]]
-    data_lines  <- data_lines[nchar(trimws(data_lines)) > 0]
-
-    if (length(data_lines) == 0) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
-
-    # Parse tab-delimited: agency, site_no, datetime, value, qualifier
-    parsed <- read_tsv(I(paste(c(header_line, data_lines), collapse = "\n")),
-                       show_col_types = FALSE, col_types = cols(.default = "c"))
-
-    # The value column name contains the parameter code pattern
-    value_col <- names(parsed)[str_detect(names(parsed), "00054") & !str_detect(names(parsed), "_cd")]
-    if (length(value_col) == 0) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
-
-    parsed <- parsed |>
-      mutate(date  = as.Date(datetime),
-             value = as.numeric(.data[[value_col[1]]])) |>
+    # Parse features into a tibble
+    parsed <- tibble(
+      date  = as.Date(sapply(features, function(f) f$properties$time)),
+      value = as.numeric(sapply(features, function(f) f$properties$value)),
+      unit  = sapply(features, function(f) f$properties$unit_of_measure)
+    ) |>
       filter(!is.na(value)) |>
       arrange(desc(date))
 
@@ -410,13 +396,18 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
       return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
     }
 
+    # Normalize unit string
+    unit_val <- tolower(parsed$unit[1])
+    if (unit_val == "acre-ft") unit_val <- "af"
+
     return(list(
       value = parsed$value[1],
       date  = parsed$date[1],
-      unit  = "af",
+      unit  = unit_val,
       url   = url
     ))
   }, error = function(e) {
+    message(sprintf("    USGS OGC API error: %s", conditionMessage(e)))
     return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
   })
 }
