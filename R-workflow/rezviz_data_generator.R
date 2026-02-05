@@ -83,6 +83,41 @@ message(sprintf("Loaded historical statistics: %d rows for %d locations",
                 nrow(historical_stats),
                 n_distinct(historical_stats$location_id)))
 
+# Filter out locations whose historical baseline does not adequately cover the
+# full 30-water-year period (Oct 1990 – Sep 2020).  We require at least 20
+# water years of observations; locations with fewer have a systematically
+# incomplete period of record and their percentiles/means are unreliable.
+MIN_WATER_YEARS <- 20
+
+baseline_file <- file.path(OUTPUT_DIR, "historical_baseline.parquet")
+if (file.exists(baseline_file)) {
+  baseline <- read_parquet(baseline_file)
+  wy_coverage <- baseline |>
+    mutate(water_year = ifelse(month(date) >= 10, year(date) + 1, year(date))) |>
+    group_by(location_id) |>
+    summarize(n_water_years = n_distinct(water_year), .groups = "drop")
+
+  inadequate <- wy_coverage |>
+    filter(n_water_years < MIN_WATER_YEARS) |>
+    pull(location_id)
+
+  if (length(inadequate) > 0) {
+    message(sprintf("  Excluding %d locations with < %d water years of baseline data:",
+                    length(inadequate), MIN_WATER_YEARS))
+    for (loc_id in inadequate) {
+      nwy <- wy_coverage$n_water_years[wy_coverage$location_id == loc_id]
+      message(sprintf("    %s (%d water years)", loc_id, nwy))
+    }
+    historical_stats <- historical_stats |>
+      filter(!location_id %in% inadequate)
+    message(sprintf("  Retained historical statistics for %d locations",
+                    n_distinct(historical_stats$location_id)))
+  }
+  rm(baseline, wy_coverage, inadequate)
+} else {
+  message("  WARNING: historical_baseline.parquet not found; cannot verify coverage.")
+}
+
 ################################################################################
 # LOAD LOCATION METADATA
 ################################################################################

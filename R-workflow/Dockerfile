@@ -27,6 +27,7 @@ WORKDIR /app
 COPY rezviz_data_generator.R .
 COPY config/locations.geojson config/
 COPY output/historical_statistics.parquet output/
+COPY output/historical_baseline.parquet output/
 
 # Create output directories
 RUN mkdir -p hydroshare

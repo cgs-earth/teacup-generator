@@ -17,5 +17,4 @@ output/droughtData*.csv
 output/failed_locations*
 output/include_failures_summary.csv
 output/manual_locations*
-output/historical_baseline.parquet
 output/historical_statistics.csv
