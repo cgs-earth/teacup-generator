@@ -2,7 +2,6 @@ Agate
 American Falls
 Anderson Ranch
 Arrowrock
-Avalon
 Banks
 Beulah
 Billy Clapp
@@ -53,3 +52,5 @@ Unity
 Walcott
 Warm Springs
 Wickiup
+Upper Klamath
+Tahoe

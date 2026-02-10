@@ -18,6 +18,7 @@ library(arrow)
 library(purrr)
 library(tidyr)
 library(stringr)
+library(jsonlite)
 
 ################################################################################
 # CONFIGURATION
@@ -33,6 +34,54 @@ WWDH_API_BASE <- "https://api.wwdh.internetofwater.app"
 # Output paths
 OUTPUT_DIR <- "output"
 dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
+
+################################################################################
+# USACE CDA TIMESERIES LOOKUP
+#
+# Maps geojson Identifier → USACE CDA API parameters (provider, ts_name).
+# Same lookup table as the daily script.
+################################################################################
+
+usace_lookup <- list(
+  "305"         = list(provider = "spa",
+                       ts_name  = "Cochiti.Stor.Inst.15Minutes.0.DCP-rev"),
+  "abiquiu"     = list(provider = "spa",
+                       ts_name  = "Abiquiu.Stor.Inst.15Minutes.0.DCP-rev"),
+  "Santa Rosa"  = list(provider = "spa",
+                       ts_name  = "Santa Rosa.Stor.Inst.15Minutes.0.DCP-rev"),
+  "gcl"         = list(provider = "nwdp",
+                       ts_name  = "GCL.Stor.Inst.1Hour.0.CBT-REV"),
+  "FTPK"        = list(provider = "nwdm",
+                       ts_name  = "FTPK.Stor.Inst.~1Day.0.Best-MRBWM"),
+  "luc"         = list(provider = "nww",
+                       ts_name  = "LUC.Stor-Total.Inst.0.0.USBR-COMPUTED-REV")
+)
+
+################################################################################
+# USGS SITE NUMBER LOOKUP
+#
+# Maps geojson Identifier → USGS site number for OGC API.
+# Parameter code 00054 = reservoir storage (acre-feet).
+################################################################################
+
+usgs_lookup <- list(
+  "10312100" = "10312100",   # Lahontan
+  "10344490" = "10344490",   # Boca
+  "10340300" = "10340300",   # Prosser Creek
+  "--"       = "10344300",   # Stampede (ID is "--" in geojson)
+  "11507001" = "11507001"    # Upper Klamath (may not have storage)
+)
+
+################################################################################
+# CDEC STATION LOOKUP
+#
+# Maps geojson Identifier → CDEC station code.
+# Sensor 15 = reservoir storage.
+################################################################################
+
+cdec_lookup <- list(
+  "THC" = "THC"   # Tahoe
+)
 
 ################################################################################
 # LOAD LOCATION METADATA
@@ -52,12 +101,8 @@ locations <- locations_raw |>
     name = Name,
     decision = `Post-Review Decision`,
     source = `Source for Storage Data`,
-    # Generalized location_id - interpretation depends on source_type:
-    #   - For RISE: this is the RISE location ID
-    #   - For USGS: extract site number from source URL
-    #   - For USACE: extract location identifier from source URL
-    #   - etc.
-    location_id = `RISE Location ID`,
+    # For RISE locations, this is the RISE Location ID used with the WWDH API
+    rise_location_id = `RISE Location ID`,
     capacity = as.numeric(str_remove_all(`Total Capacity`, ",")),
     label_map = `Preferred Label for Map and Table`,
     label_popup = `Preferred Label for PopUp and Modal`
@@ -69,6 +114,7 @@ locations <- locations_raw |>
       str_detect(source, "RISE \\(Pending\\)") ~ "RISE_PENDING",
       str_detect(source, "USACE") ~ "USACE",
       str_detect(source, "USGS") ~ "USGS",
+      str_detect(source, "CDEC|cdec") ~ "CDEC",
       str_detect(source, "TROA") ~ "TROA",
       TRUE ~ "OTHER"
     )
@@ -76,19 +122,52 @@ locations <- locations_raw |>
 
 message(sprintf("Loaded %d locations (excluding 'Do Not Include')", nrow(locations)))
 
-# Split locations by source type for processing
+# Also load the geojson to get Identifier values and authoritative source
+# classification for non-RISE sources. The geojson Identifier is the key used
+# by the USACE/USGS/CDEC lookup tables and the daily script.
+library(sf)
+locations_geojson <- st_read("config/locations.geojson", quiet = TRUE) |>
+  st_drop_geometry() |>
+  transmute(
+    name = Name,
+    geojson_id = Identifier,
+    geojson_source = `Source.for.Storage.Data`
+  ) |>
+  # Classify source type from the geojson source field (authoritative)
+  mutate(
+    geojson_source_type = case_when(
+      str_detect(tolower(geojson_source), "^rise")  ~ "RISE",
+      str_detect(tolower(geojson_source), "usace")  ~ "USACE",
+      str_detect(tolower(geojson_source), "usgs")   ~ "USGS",
+      str_detect(tolower(geojson_source), "cdec")   ~ "CDEC",
+      TRUE ~ "OTHER"
+    )
+  )
+
+# Split RISE locations (keyed by RISE Location ID from locations.csv)
 rise_locations <- locations |>
-  filter(source_type == "RISE", !is.na(location_id), location_id != "--")
+  filter(source_type == "RISE", !is.na(rise_location_id), rise_location_id != "--")
 
-usace_locations <- locations |>
-  filter(source_type == "USACE")
+# For non-RISE sources, use the geojson-based classification (more accurate
+# than the CSV, e.g. Tahoe is "TROA? USGS?" in CSV but "CDEC" in geojson).
+non_rise_geojson <- locations_geojson |>
+  filter(geojson_source_type %in% c("USACE", "USGS", "CDEC")) |>
+  # Join with locations.csv to get capacity and other metadata
+  left_join(
+    locations |> select(name, decision, capacity),
+    by = "name"
+  ) |>
+  # Only include locations not marked "Do Not Include" (already filtered in locations)
+  filter(!is.na(decision))
 
-usgs_locations <- locations |>
-  filter(source_type == "USGS")
+usace_locations <- non_rise_geojson |> filter(geojson_source_type == "USACE")
+usgs_locations  <- non_rise_geojson |> filter(geojson_source_type == "USGS")
+cdec_locations  <- non_rise_geojson |> filter(geojson_source_type == "CDEC")
 
 message(sprintf("  - RISE: %d locations", nrow(rise_locations)))
-message(sprintf("  - USACE: %d locations (not yet implemented)", nrow(usace_locations)))
-message(sprintf("  - USGS: %d locations (not yet implemented)", nrow(usgs_locations)))
+message(sprintf("  - USACE: %d locations", nrow(usace_locations)))
+message(sprintf("  - USGS: %d locations", nrow(usgs_locations)))
+message(sprintf("  - CDEC: %d locations", nrow(cdec_locations)))
 
 ################################################################################
 # DATA FETCHING FUNCTIONS BY SOURCE
@@ -193,26 +272,252 @@ fetch_rise_historical <- function(location_id, start_date = START_DATE, end_date
   return(tibble(date = Date(), value = numeric(), unit = character()))
 }
 
-#' Fetch historical data from USACE
-#' @description Placeholder for USACE data fetching - TO BE IMPLEMENTED
-fetch_usace_historical <- function(location_info, start_date = START_DATE, end_date = END_DATE) {
-  # TODO: Implement USACE data fetching
-  # USACE provides data via: https://water.usace.army.mil/overview/{district}/locations/{location}
-  # Will need to parse the source URL from locations.csv to extract district and location
-  # NOTE: Preserve unit information - USACE may use different units than RISE
-  warning("USACE data fetching not yet implemented")
-  return(tibble(date = Date(), value = numeric(), unit = character()))
+#' Fetch historical storage data from USACE CDA timeseries API
+#'
+#' The CDA API returns sub-daily data (15-min or hourly depending on the
+#' time series). We aggregate to daily values by taking the last observation
+#' per date. The API can handle large date ranges, but we chunk by year to
+#' be safe with response sizes.
+#'
+#' CSV format: ## comment lines (including ##unit:), then datetime,value rows.
+#'
+#' @param location_id Geojson Identifier (used to look up USACE provider/ts_name)
+#' @param start_date Start date (YYYY-MM-DD)
+#' @param end_date End date (YYYY-MM-DD)
+#' @return tibble with columns: date, value, unit
+fetch_usace_historical <- function(location_id, start_date = START_DATE, end_date = END_DATE) {
+  lookup <- usace_lookup[[as.character(location_id)]]
+  if (is.null(lookup)) {
+    warning(sprintf("No USACE lookup entry for identifier '%s'", location_id))
+    return(tibble(date = Date(), value = numeric(), unit = character()))
+  }
+
+  message(sprintf("  Fetching USACE %s (provider: %s)...", lookup$ts_name, lookup$provider))
+
+  all_data <- list()
+  unit_val <- "ac-ft"
+  sd <- as.Date(start_date)
+  ed <- as.Date(end_date)
+
+  # Chunk by year to manage response sizes (sub-daily data is large)
+  chunk_start <- sd
+  while (chunk_start <= ed) {
+    chunk_end <- min(chunk_start + 365, ed)
+
+    begin_str <- paste0(format(chunk_start, "%Y-%m-%dT00:00:00"), ".000Z")
+    end_str   <- paste0(format(chunk_end + 1, "%Y-%m-%dT00:00:00"), ".000Z")
+
+    url <- sprintf(
+      "https://water.usace.army.mil/cda/reporting/providers/%s/timeseries?name=%s&begin=%s&end=%s&format=csv",
+      lookup$provider,
+      URLencode(lookup$ts_name, reserved = TRUE),
+      begin_str, end_str
+    )
+
+    tryCatch({
+      response <- request(url) |>
+        req_timeout(300) |>
+        req_retry(max_tries = 3, backoff = ~ 10) |>
+        req_perform()
+
+      body <- resp_body_string(response)
+
+      # Strip \r from \r\n line endings
+      body <- str_replace_all(body, "\r", "")
+      lines <- str_split(body, "\n")[[1]]
+
+      # Extract unit from ## comment lines
+      unit_line <- lines[str_starts(lines, "##unit:")]
+      if (length(unit_line) > 0) {
+        unit_val <- trimws(str_remove(unit_line[1], "##unit:"))
+      }
+
+      # Parse data lines (skip ## comments and empty lines)
+      data_lines <- lines[!str_starts(lines, "##") & nchar(trimws(lines)) > 0]
+
+      if (length(data_lines) > 0) {
+        chunk <- tibble(raw = data_lines) |>
+          mutate(
+            datetime = str_extract(raw, "^[^,]+"),
+            value    = as.numeric(str_extract(raw, "[^,]+$")),
+            date     = as.Date(str_sub(datetime, 1, 10))
+          ) |>
+          filter(!is.na(value), !is.na(date)) |>
+          select(date, value)
+
+        if (nrow(chunk) > 0) {
+          # Aggregate sub-daily to daily: take the last value per date
+          chunk <- chunk |>
+            group_by(date) |>
+            summarize(value = last(value), .groups = "drop")
+
+          all_data[[length(all_data) + 1]] <- chunk
+        }
+      }
+    }, error = function(e) {
+      message(sprintf("    USACE CDA error for %s-%s: %s",
+                      chunk_start, chunk_end, conditionMessage(e)))
+    })
+
+    chunk_start <- chunk_end + 1
+    Sys.sleep(1)  # Rate limiting - USACE can be slow
+  }
+
+  if (length(all_data) == 0) {
+    return(tibble(date = Date(), value = numeric(), unit = character()))
+  }
+
+  # Normalize unit
+  if (tolower(unit_val) == "ac-ft") unit_val <- "af"
+
+  result <- bind_rows(all_data) |>
+    mutate(unit = unit_val) |>
+    arrange(date) |>
+    distinct(date, .keep_all = TRUE)
+
+  return(result)
 }
 
-#' Fetch historical data from USGS NWIS
-#' @description Placeholder for USGS data fetching - TO BE IMPLEMENTED
-fetch_usgs_historical <- function(location_info, start_date = START_DATE, end_date = END_DATE) {
-  # TODO: Implement USGS data fetching
-  # USGS NWIS API: https://waterservices.usgs.gov/nwis/dv/
-  # Will need to extract site number from locations.csv source field
-  # NOTE: Preserve unit information - USGS may use different units than RISE
-  warning("USGS data fetching not yet implemented")
-  return(tibble(date = Date(), value = numeric(), unit = character()))
+#' Fetch historical daily storage data from USGS Water Data OGC API
+#'
+#' Uses the new OGC API (replaces legacy NWIS web services).
+#' Parameter code 00054 = reservoir storage (acre-feet).
+#' The API has a limit of 10,000 items per request, so we paginate by year
+#' to safely cover the full 30-year range.
+#'
+#' @param location_id Geojson Identifier (used to look up USGS site number)
+#' @param start_date Start date (YYYY-MM-DD)
+#' @param end_date End date (YYYY-MM-DD)
+#' @return tibble with columns: date, value, unit
+fetch_usgs_historical <- function(location_id, start_date = START_DATE, end_date = END_DATE) {
+  site_no <- usgs_lookup[[as.character(location_id)]]
+  if (is.null(site_no)) {
+    warning(sprintf("No USGS lookup entry for identifier '%s'", location_id))
+    return(tibble(date = Date(), value = numeric(), unit = character()))
+  }
+
+  message(sprintf("  Fetching USGS site %s (identifier: %s)...", site_no, location_id))
+
+  all_data <- list()
+  sd <- as.Date(start_date)
+  ed <- as.Date(end_date)
+
+  # Paginate by year to stay well under the 10,000 item limit
+  year_start <- sd
+  while (year_start <= ed) {
+    year_end <- min(year_start + 365, ed)
+
+    url <- sprintf(
+      "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=00054&time=%s/%s&limit=500",
+      site_no, year_start, year_end
+    )
+
+    tryCatch({
+      response <- request(url) |>
+        req_timeout(120) |>
+        req_retry(max_tries = 3, backoff = ~ 5) |>
+        req_perform()
+
+      body <- resp_body_string(response)
+      data <- fromJSON(body, simplifyVector = FALSE)
+      features <- data$features
+
+      if (length(features) > 0) {
+        chunk <- tibble(
+          date  = as.Date(sapply(features, function(f) f$properties$time)),
+          value = as.numeric(sapply(features, function(f) f$properties$value)),
+          unit  = sapply(features, function(f) f$properties$unit_of_measure)
+        ) |>
+          filter(!is.na(value))
+
+        if (nrow(chunk) > 0) {
+          # Normalize unit
+          chunk$unit <- tolower(chunk$unit)
+          chunk$unit[chunk$unit == "acre-ft"] <- "af"
+          all_data[[length(all_data) + 1]] <- chunk
+        }
+      }
+    }, error = function(e) {
+      message(sprintf("    USGS OGC API error for %s-%s: %s",
+                      year_start, year_end, conditionMessage(e)))
+    })
+
+    year_start <- year_end + 1
+    Sys.sleep(0.5)  # Rate limiting
+  }
+
+  if (length(all_data) == 0) {
+    return(tibble(date = Date(), value = numeric(), unit = character()))
+  }
+
+  result <- bind_rows(all_data) |>
+    arrange(date) |>
+    distinct(date, .keep_all = TRUE)
+
+  return(result)
+}
+
+#' Fetch historical daily storage data from CDEC
+#'
+#' CDEC CSVDataServlet with sensor 15 (reservoir storage), daily duration.
+#' Note: CDEC requires a User-Agent header to return data.
+#' Data availability varies — Tahoe storage only goes back to ~2023.
+#'
+#' @param location_id Geojson Identifier (used to look up CDEC station code)
+#' @param start_date Start date (YYYY-MM-DD)
+#' @param end_date End date (YYYY-MM-DD)
+#' @return tibble with columns: date, value, unit
+fetch_cdec_historical <- function(location_id, start_date = START_DATE, end_date = END_DATE) {
+  station <- cdec_lookup[[as.character(location_id)]]
+  if (is.null(station)) {
+    warning(sprintf("No CDEC lookup entry for identifier '%s'", location_id))
+    return(tibble(date = Date(), value = numeric(), unit = character()))
+  }
+
+  message(sprintf("  Fetching CDEC station %s (identifier: %s)...", station, location_id))
+
+  url <- sprintf(
+    "https://cdec.water.ca.gov/dynamicapp/req/CSVDataServlet?Stations=%s&SensorNums=15&dur_code=D&Start=%s&End=%s",
+    station, start_date, end_date
+  )
+
+  tryCatch({
+    response <- request(url) |>
+      req_headers(`User-Agent` = "Mozilla/5.0 (R httr2)") |>
+      req_timeout(120) |>
+      req_retry(max_tries = 3, backoff = ~ 5) |>
+      req_perform()
+
+    body <- resp_body_string(response)
+    data <- read_csv(I(body), show_col_types = FALSE,
+                     col_types = cols(`DATE TIME` = col_character(),
+                                     `OBS DATE` = col_character(),
+                                     .default = col_guess()))
+
+    if (nrow(data) == 0 || !"VALUE" %in% names(data)) {
+      message(sprintf("    No data returned for CDEC station %s", station))
+      return(tibble(date = Date(), value = numeric(), unit = character()))
+    }
+
+    # CDEC UNITS column
+    unit_val <- if ("UNITS" %in% names(data)) tolower(data$UNITS[1]) else "af"
+
+    result <- data |>
+      mutate(
+        date  = as.Date(str_sub(`DATE TIME`, 1, 8), format = "%Y%m%d"),
+        value = as.numeric(VALUE),
+        unit  = unit_val
+      ) |>
+      filter(!is.na(value)) |>
+      select(date, value, unit) |>
+      arrange(date) |>
+      distinct(date, .keep_all = TRUE)
+
+    return(result)
+  }, error = function(e) {
+    message(sprintf("    CDEC error: %s", conditionMessage(e)))
+    return(tibble(date = Date(), value = numeric(), unit = character()))
+  })
 }
 
 ################################################################################
@@ -287,7 +592,7 @@ message("\n=== Processing RISE locations ===\n")
 
 for (i in seq_len(nrow(rise_locations))) {
   loc <- rise_locations[i, ]
-  location_id <- loc$location_id
+  location_id <- loc$rise_location_id
   location_name <- loc$name
 
   message(sprintf("[%d/%d] Processing %s (ID: %s)",
@@ -308,7 +613,7 @@ for (i in seq_len(nrow(rise_locations))) {
   stats <- calculate_daily_stats(hist_data, location_id)
   message(sprintf("  Computed statistics for %d day-of-year groups", nrow(stats)))
 
-  # Store results
+  # Store results — key by RISE location_id (same as used in daily script)
   all_historical_data[[location_id]] <- hist_data |> mutate(location_id = location_id)
   all_statistics[[location_id]] <- stats
 
@@ -316,9 +621,103 @@ for (i in seq_len(nrow(rise_locations))) {
   Sys.sleep(0.5)
 }
 
-# TODO: Add processing loops for USACE, USGS, and other sources here
-# message("\n=== Processing USACE locations ===\n")
-# ...
+# Process USACE locations
+message("\n=== Processing USACE locations ===\n")
+
+for (i in seq_len(nrow(usace_locations))) {
+  loc <- usace_locations[i, ]
+  location_id <- loc$geojson_id
+  location_name <- loc$name
+
+  message(sprintf("[%d/%d] Processing %s (ID: %s)",
+                  i, nrow(usace_locations), location_name, location_id))
+
+  # Fetch historical data via CDA timeseries API
+  hist_data <- fetch_usace_historical(location_id)
+
+  if (nrow(hist_data) == 0) {
+    message(sprintf("  WARNING: No data returned for %s", location_name))
+    failed_locations <- c(failed_locations, location_name)
+    next
+  }
+
+  message(sprintf("  Retrieved %d daily observations (%s to %s)",
+                  nrow(hist_data), min(hist_data$date), max(hist_data$date)))
+
+  # Calculate day-of-year statistics
+  stats <- calculate_daily_stats(hist_data, location_id)
+  message(sprintf("  Computed statistics for %d day-of-year groups", nrow(stats)))
+
+  # Store results — key by geojson Identifier (same as used in daily script)
+  all_historical_data[[location_id]] <- hist_data |> mutate(location_id = location_id)
+  all_statistics[[location_id]] <- stats
+}
+
+# Process USGS locations
+message("\n=== Processing USGS locations ===\n")
+
+for (i in seq_len(nrow(usgs_locations))) {
+  loc <- usgs_locations[i, ]
+  location_id <- loc$geojson_id
+  location_name <- loc$name
+
+  message(sprintf("[%d/%d] Processing %s (ID: %s)",
+                  i, nrow(usgs_locations), location_name, location_id))
+
+  # Fetch historical data via OGC API
+  hist_data <- fetch_usgs_historical(location_id)
+
+  if (nrow(hist_data) == 0) {
+    message(sprintf("  WARNING: No data returned for %s", location_name))
+    failed_locations <- c(failed_locations, location_name)
+    next
+  }
+
+  message(sprintf("  Retrieved %d daily observations (%s to %s)",
+                  nrow(hist_data), min(hist_data$date), max(hist_data$date)))
+
+  # Calculate day-of-year statistics
+  stats <- calculate_daily_stats(hist_data, location_id)
+  message(sprintf("  Computed statistics for %d day-of-year groups", nrow(stats)))
+
+  # Store results — key by geojson Identifier (same as used in daily script)
+  all_historical_data[[location_id]] <- hist_data |> mutate(location_id = location_id)
+  all_statistics[[location_id]] <- stats
+
+  Sys.sleep(0.5)
+}
+
+# Process CDEC locations
+message("\n=== Processing CDEC locations ===\n")
+
+for (i in seq_len(nrow(cdec_locations))) {
+  loc <- cdec_locations[i, ]
+  location_id <- loc$geojson_id
+  location_name <- loc$name
+
+  message(sprintf("[%d/%d] Processing %s (ID: %s)",
+                  i, nrow(cdec_locations), location_name, location_id))
+
+  # Fetch historical data via CDEC servlet
+  hist_data <- fetch_cdec_historical(location_id)
+
+  if (nrow(hist_data) == 0) {
+    message(sprintf("  WARNING: No data returned for %s", location_name))
+    failed_locations <- c(failed_locations, location_name)
+    next
+  }
+
+  message(sprintf("  Retrieved %d daily observations (%s to %s)",
+                  nrow(hist_data), min(hist_data$date), max(hist_data$date)))
+
+  # Calculate day-of-year statistics
+  stats <- calculate_daily_stats(hist_data, location_id)
+  message(sprintf("  Computed statistics for %d day-of-year groups", nrow(stats)))
+
+  # Store results — key by geojson Identifier (same as used in daily script)
+  all_historical_data[[location_id]] <- hist_data |> mutate(location_id = location_id)
+  all_statistics[[location_id]] <- stats
+}
 
 ################################################################################
 # COMBINE AND SAVE OUTPUTS
