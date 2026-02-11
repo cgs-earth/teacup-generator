@@ -1,4 +1,55 @@
-# Teacup Generator Application
+# Teacup Generator
+
+This repository generates reservoir conditions data for the WWDH Reservoir Dashboard and RISE teacup visualizations.
+
+## R Workflow (Current)
+
+**The R workflow is the current production system.** It generates daily CSV files with storage values and historical statistics for 214 western US reservoirs, uploading them to HydroShare for consumption by the WWDH Dashboard.
+
+### Quick Start
+
+```bash
+# Run daily generator via Docker
+docker run --env-file .env ghcr.io/cgs-earth/rezviz:latest
+
+# Run for a specific date
+docker run --env-file .env ghcr.io/cgs-earth/rezviz:latest 2026-02-10
+```
+
+### Features
+
+- **214 reservoirs** across the western US
+- **4 data sources**: RISE (~191), USACE (6), USGS (6), CDEC (1)
+- **Historical statistics** based on 30 water years (1990-2020)
+- **Daily CSV output** with storage values, percentiles, and percent full
+- **Automated upload** to HydroShare
+- **Containerized** for reproducible deployments
+
+### Documentation
+
+See **[R-workflow/readme.md](R-workflow/readme.md)** for complete documentation including:
+- Architecture diagram
+- Script descriptions
+- Data sources and APIs
+- Output format specification
+- Docker deployment instructions
+
+### Data Output
+
+Daily CSVs are uploaded to HydroShare:
+- **Resource**: [hydroshare.org/resource/22b2f10103e5426a837defc00927afbd](https://www.hydroshare.org/resource/22b2f10103e5426a837defc00927afbd/)
+- **Period of record**: October 1, 1990 to present (12,917+ files)
+
+---
+
+## .NET Workflow (Deprecated)
+
+> **Note**: The .NET workflow below is deprecated and retained for historical reference. It was previously deployed on the BORGIS server but has been replaced by the R workflow above.
+
+<details>
+<summary>Click to expand deprecated .NET documentation</summary>
+
+### Overview
 
 This application aggregates reservoir conditions data to generate the teacup diagrams that are available on the [RISE Reservoir Conditions page](https://data.usbr.gov/visualizations/reservoir-conditions/).
 
@@ -90,65 +141,15 @@ Uses two csv files, `dataDownloadTest.csv` and `dataDownloadStatsTest.csv` to mo
 
 ** Deprecated, statistical calculations now happen every time DroughtDataDownloaderV2 runs.
 
-<!-- Command line arguments:
-- `-r` - will include RISE as a datasource if provided.
-- `-t` - Will use the Test API for all RISE queries.
-
-
-This program fetches reservoir conditions data for each day in a 30 year period ranging from 10/1/1990 to 9/30/2020. This date range is hard coded into the program and should not be changed, as it was provided by Allison to correspond to a specific hydrological period.
-
-After the data is retrieved, the program calculates the following statistics for each location:
-- Max
-- 90th Percentile
-- 75th Percentile
-- 50th Percentile
-- 25th Percentile
-- 10th Percentile
-- Min
-- Average
-
-The results are then written to the `dataDownloadStats.csv` file. -->
-
-
 ### DroughtDataDownloader
 
 ** Deprecated, please use DroughtDataDownloaderV2.
-
-<!-- Command line arguments:
-- start date
-- end date
-- isDev
-
-This program downloads 30 years of reservoir conditions data for each location specified in the `dataDownload.csv` file.
-
-For each location, the `dataDownload.csv` file contains additional information such as the RISE locationID, data source, and lat/long coordinates.
-
-The data source for each location depends on what information is available.
-
-If a location is available in RISE, the program pulls results data from the RISE API /result endpoint. Otherwise, it uses either the USGS NWIS Surface Water API or the Hydromet CPN Reservoir Storage API depending on the data source field in the `dataDownload.csv` file. 
-
-Once the data has been downloaded, The `Reclamation.TimeSeries` class library is utilized to perform the necessary calculations for the teacup diagrams. The results are then stored within the datafiles directory, with one csv being generated for each day between the start date and end date arguments.
-
-If the isDev arugment is provided, the program will set the RISE API URL root to localhost. Otherwise it will use the production URL if this argument is omitted. -->
 
 ### Teacup
 
 ** Deprecated, please use TeacupV2.
 
-<!-- Command line arguments:
-- start date
-- end date
-
-This program uses the output of the DroughtDataDownloader to generate a set of teacup diagrams and one map for each day in the date range specified by the command line arguments.
-
-The `teacups.cfg` file contains static information used by the program to determine values such as display name and row/column for the generated map.
-
-Additionally, the program keeps one copy of the most recent map with the static file name `USBR_Tea_Cup_Current.pdf`, which get overwritten each time the program runs.
-
-Output files are stored in the teacups directory. -->
-
-
-### Application Architecture Diagram
+### Application Architecture Diagram (.NET)
 
 ![Teacup Application Architecure Diagram](current-architecture-diagram-20240812.PNG "Teacup Application Architecure Diagram")
 
@@ -157,19 +158,6 @@ Output files are stored in the teacups directory. -->
 This repository is split into two main directories: src and release.
 
 The src directory contains all application code, dependencies, tests, and the associated Visual Studio solution file that can be used to develop and build the .NET programs.
-
-<!-- The release directory contains only the files needed to deploy the application to a server:
-- `runUsbrTeacupDataGenerator.bat`
-- `runUsbrTeacupGenerator.bat`
-- `cleanupTeacupFiles.bat`
-- `runBothTeacupJobs.ps1`
-- `_PROGRAM`
-
-The `runUsbrTeacupDataGenerator.bat` and `runUsbrTeacupGenerator.bat` batch files configure and run the corresponding executable file for each .NET program.
-
-The `runBothTeacupJobs.ps1` powershell script is scheduled to run as a windows task on the server and invokes both batch files.
-
-`cleanupTeacupFiles.bat` deletes the output files generated by both programs. -->
 
 The release directory contains only the files needed to deploy the application to a server:
 - `_PROGRAM`
@@ -188,13 +176,13 @@ Command line arguments for `runBothTeacupJobs` are:
 
 By default, the `runBothTeacupJobs` script should be configured to omit the `startDate` and `endDate` arguments, and include the `-useRise` flag.
 
-### Deployment
+### Deployment (.NET)
 
 Deployment for this application is currently a manual process.
 
 This application is deployed to the `IBRSACGIS006` BORGIS server.
 
-To deploy updates, the contents of `release/_PROGRAM` will need to be replaced with the latest versions. This should include the full contents of the `bin/Debug/net8.0` directory within the `DroughtDataDownloaderV2`, `FetchHistoricalData`, `TeacupV2`, and `RiseTeacupsLib` projects. 
+To deploy updates, the contents of `release/_PROGRAM` will need to be replaced with the latest versions. This should include the full contents of the `bin/Debug/net8.0` directory within the `DroughtDataDownloaderV2`, `FetchHistoricalData`, `TeacupV2`, and `RiseTeacupsLib` projects.
 
 The `UsbrTeacups.sln` Visual Studio solution file can be used to compile the projects.
 
@@ -204,3 +192,5 @@ The `buildRelease.ps1` powershell script can be used for automating the construc
 
 When deploying a new version via copying as a zip file, the `runBothTeacupJobs.ps1` file maybe be blocked. To solve this, open PowerShell ISE and run the following command:
 - `Unblock-File -Path D:\ScheduledTasks\RISE_Teacups\runBothTeacupJobs.ps1`
+
+</details>
