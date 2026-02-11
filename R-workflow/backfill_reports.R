@@ -58,6 +58,7 @@ locations <- locations_sf |>
     name = Name,
     location_id = Identifier,
     capacity = as.numeric(str_remove_all(`Total.Capacity`, ",")),
+    active_capacity = as.numeric(str_remove_all(`Active.Capacity`, ",")),
     label_map = `Preferred.Label.for.Map.and.Table`,
     label_popup = `Preferred.Label.for.PopUp.and.Modal`,
     state = state,
@@ -393,7 +394,7 @@ dir.create(HYDROSHARE_DIR, showWarnings = FALSE, recursive = TRUE)
 
 # Pre-compute location info for joining (include source_type for URL generation)
 location_info <- locations |>
-  select(location_id, name, capacity, label_popup, state, doi_region, huc6, longitude, latitude, source_type)
+  select(location_id, name, capacity, active_capacity, label_popup, state, doi_region, huc6, longitude, latitude, source_type)
 
 #' Generate API URL based on source type and location
 #' @param source_type One of: rise, usace, usgs, cdec
@@ -490,6 +491,7 @@ for (i in seq_along(dates)) {
       DataValuePctAvg = pct_average,
       StatsPeriod = STATS_PERIOD,
       MaxCapacity = capacity,
+      ActiveCapacity = active_capacity,
       PctFull = pct_full,
       TeacupUrl = NA_character_,
       DataUrl = data_url,
@@ -504,6 +506,106 @@ for (i in seq_along(dates)) {
 }
 
 message(sprintf("\nGenerated %d CSV files", generated_count))
+
+################################################################################
+# CREATE COMPLETE ARCHIVE FILE
+################################################################################
+
+message("")
+message("=== Creating complete archive file ===")
+
+# Build a complete archive with all daily data
+# Each row is a location-date combination with all metrics
+
+archive_data <- list()
+
+for (i in seq_along(dates)) {
+  target_date <- dates[i]
+
+  if (i %% 1000 == 0) {
+    message(sprintf("  Processing archive [%d/%d] %s", i, length(dates), target_date))
+  }
+
+  target_month <- month(target_date)
+  target_day <- day(target_date)
+
+  # Get historical stats for this day of year
+  todays_stats <- historical_stats |>
+    filter(month == target_month, day == target_day) |>
+    select(location_id, min, max, p10, p25, p50, p75, p90, mean, unit)
+
+  # Get data for this date (or most recent within 7 days)
+  current_values <- all_data |>
+    filter(date <= target_date, date >= target_date - 7) |>
+    group_by(location_id) |>
+    slice_max(date, n = 1, with_ties = FALSE) |>
+    ungroup() |>
+    select(location_id, data_value = value, data_date = date, data_unit = unit)
+
+  # Only include rows that have data
+  daily_archive <- location_info |>
+    inner_join(current_values, by = "location_id") |>
+    left_join(todays_stats, by = "location_id", suffix = c("", "_hist")) |>
+    mutate(
+      report_date = target_date,
+      pct_median = data_value / p50,
+      pct_average = data_value / mean,
+      pct_full = data_value / capacity
+    ) |>
+    select(
+      report_date,
+      location_id,
+      name,
+      state,
+      doi_region,
+      huc6,
+      latitude,
+      longitude,
+      capacity,
+      active_capacity,
+      data_date,
+      data_value,
+      data_unit,
+      hist_min = min,
+      hist_max = max,
+      hist_p10 = p10,
+      hist_p25 = p25,
+      hist_p50 = p50,
+      hist_p75 = p75,
+      hist_p90 = p90,
+      hist_mean = mean,
+      pct_median,
+      pct_average,
+      pct_full
+    )
+
+  if (nrow(daily_archive) > 0) {
+    archive_data[[i]] <- daily_archive
+  }
+}
+
+# Combine all archive data
+complete_archive <- bind_rows(archive_data)
+
+message(sprintf("Archive contains %d rows (%d locations × %d dates)",
+                nrow(complete_archive),
+                n_distinct(complete_archive$location_id),
+                n_distinct(complete_archive$report_date)))
+
+# Create filename with period of record
+archive_filename_base <- sprintf("reservoir_storage_archive_%s_to_%s",
+                                  format(START_DATE, "%Y%m%d"),
+                                  format(END_DATE, "%Y%m%d"))
+
+# Write as parquet (efficient for large data)
+archive_parquet <- file.path(OUTPUT_DIR, paste0(archive_filename_base, ".parquet"))
+write_parquet(complete_archive, archive_parquet)
+message(sprintf("Saved archive: %s", archive_parquet))
+
+# Also write as CSV for broader compatibility
+archive_csv <- file.path(OUTPUT_DIR, paste0(archive_filename_base, ".csv"))
+write_csv(complete_archive, archive_csv)
+message(sprintf("Saved archive: %s", archive_csv))
 
 ################################################################################
 # BATCH UPLOAD TO HYDROSHARE

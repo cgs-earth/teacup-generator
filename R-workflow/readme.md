@@ -48,22 +48,21 @@ R-workflow/
 
 | Script | Purpose |
 |--------|---------|
-| `setup_historical_baseline.R` | Fetch 30 years of historical data (1990-2020) from RISE API for all locations. Creates `historical_baseline.parquet` and `historical_statistics.parquet`. |
+| `setup_historical_baseline.R` | Fetch 30 years of historical data (1990-2020) from all sources. Creates `historical_baseline.parquet` and `historical_statistics.parquet`. |
 | `process_manual_csvs.R` | Process manually downloaded CSVs for locations that failed API fetch. Adds them to the historical baseline. |
-| `create_locations_geojson.R` | Generate `locations.geojson` from `locations.csv` by merging coordinates from RISE/NID and performing spatial joins for DOI region, HUC6, and state. |
-| `fetch_489_by_year.R` | Utility script to fetch location 489 data year-by-year (workaround for API timeout). |
-| `check_failed_locations.R` | Diagnostic script to analyze failed locations and categorize by decision type. |
+| `create_locations_geojson.R` | Generate `locations.geojson` from `data/reference/loc.csv` by merging coordinates from RISE/NID and performing spatial joins for DOI region, HUC6, and state. Run when locations change. |
 
 ### Daily Production Script
 
 | Script | Purpose |
 |--------|---------|
-| `rezviz_data_generator.R` | **Main daily script.** Fetches current storage values, joins with historical statistics, generates output CSV. Run via cron. |
+| `rezviz_data_generator.R` | **Main daily script.** Fetches current storage values, joins with historical statistics, generates output CSV, uploads to HydroShare. |
 
 ### Utility Scripts
 
 | Script | Purpose |
 |--------|---------|
+| `backfill_reports.R` | Generate historical daily CSVs by combining historical baseline with recent data. Batch uploads to HydroShare. |
 | `create_dummy_geojson.R` | Generate test geojson files with dummy storage values for dashboard visualization testing. |
 | `helper_functions.R` | Shared helper functions (API retry logic, etc.). |
 
