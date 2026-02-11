@@ -198,32 +198,9 @@ usace_lookup <- list(
                        ts_name  = "LUC.Stor-Total.Inst.0.0.USBR-COMPUTED-REV")
 )
 
-################################################################################
-# USGS SITE NUMBER LOOKUP
-#
-# Maps location identifiers to USGS site numbers for OGC API daily values.
-# Parameter code 00054 = reservoir storage (acre-feet).
-# Uses the new USGS Water Data OGC API (replaces legacy NWIS web services).
-################################################################################
-
-usgs_lookup <- list(
-  "10312100" = "10312100",   # Lahontan
-  "10344490" = "10344490",   # Boca
-  "10340300" = "10340300",   # Prosser Creek
-  "--"       = "10344300",   # Stampede (ID is "--" in geojson)
-  "11507001" = "11507001"    # Upper Klamath (elevation site, may not have storage)
-)
-
-################################################################################
-# CDEC STATION LOOKUP
-#
-# Maps location identifiers to CDEC station codes.
-# Sensor 15 = reservoir storage.
-################################################################################
-
-cdec_lookup <- list(
-  "THC" = "THC"   # Tahoe
-)
+# Note: USGS and CDEC locations use their geojson Identifier directly as the
+# site/station code. No lookup table needed — the Identifier IS the USGS site
+# number or CDEC station code.
 
 ################################################################################
 # DATA FETCHING FUNCTIONS
@@ -354,12 +331,11 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS)
 #' Fetch from USGS Water Data OGC API (daily values)
 #' Parameter 00054 = reservoir storage (acre-feet)
 #' Replaces legacy NWIS waterservices.usgs.gov (retiring Q1 2027)
+#' The location_id IS the USGS site number (from geojson Identifier)
 #' Returns list(value, date, unit, url)
 fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
-  site_no <- usgs_lookup[[as.character(location_id)]]
-  if (is.null(site_no)) {
-    return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = NA_character_))
-  }
+  # location_id is the USGS site number directly from geojson Identifier
+  site_no <- as.character(location_id)
 
   start_date <- target_date - lookback_days
   end_date   <- target_date
@@ -414,12 +390,11 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
 
 #' Fetch from CDEC API
 #' Sensor 15 = reservoir storage
+#' The location_id IS the CDEC station code (from geojson Identifier)
 #' Returns list(value, date, unit, url)
 fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
-  station <- cdec_lookup[[as.character(location_id)]]
-  if (is.null(station)) {
-    return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = NA_character_))
-  }
+  # location_id is the CDEC station code directly from geojson Identifier
+  station <- as.character(location_id)
 
   start_date <- target_date - lookback_days
   end_date   <- target_date

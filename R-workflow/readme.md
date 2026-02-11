@@ -210,10 +210,47 @@ library(curl)       # Multipart file upload (HydroShare)
 
 Or use the provided Dockerfile which bundles all dependencies.
 
+## Architecture Diagram
+
+See [architecture-diagram.md](architecture-diagram.md) for detailed diagrams of the data pipeline.
+
+```mermaid
+flowchart LR
+    subgraph sources["Data Sources"]
+        RISE["RISE API<br/>~191 loc"]
+        USACE["USACE CDA<br/>6 loc"]
+        USGS["USGS OGC<br/>6 loc"]
+        CDEC["CDEC<br/>1 loc"]
+    end
+
+    subgraph processing["Processing"]
+        GEN["rezviz_data_generator.R"]
+        STATS[("historical_statistics<br/>.parquet")]
+    end
+
+    subgraph output["Output"]
+        CSV["droughtData<br/>YYYYMMDD.csv"]
+        HS["HydroShare"]
+    end
+
+    subgraph consumers["Consumers"]
+        WWDH["WWDH Dashboard"]
+    end
+
+    RISE --> GEN
+    USACE --> GEN
+    USGS --> GEN
+    CDEC --> GEN
+    STATS --> GEN
+    GEN --> CSV
+    CSV --> HS
+    HS --> WWDH
+```
+
 ## Current Status
 
-- **213 reservoirs** in the locations list
-- **128 locations** with complete historical statistics
-- **85 locations** pending (non-RISE sources or API issues)
+- **214 reservoirs** in the locations list
+- **140 locations** with current data (RISE + USACE + USGS + CDEC)
+- **136 locations** with complete historical statistics
 
 Locations without historical statistics can still be visualized with current storage values, but won't have historical comparison metrics (percentiles, percent of average, etc.).

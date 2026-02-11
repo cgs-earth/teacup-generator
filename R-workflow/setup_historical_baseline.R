@@ -57,31 +57,9 @@ usace_lookup <- list(
                        ts_name  = "LUC.Stor-Total.Inst.0.0.USBR-COMPUTED-REV")
 )
 
-################################################################################
-# USGS SITE NUMBER LOOKUP
-#
-# Maps geojson Identifier → USGS site number for OGC API.
-# Parameter code 00054 = reservoir storage (acre-feet).
-################################################################################
-
-usgs_lookup <- list(
-  "10312100" = "10312100",   # Lahontan
-  "10344490" = "10344490",   # Boca
-  "10340300" = "10340300",   # Prosser Creek
-  "--"       = "10344300",   # Stampede (ID is "--" in geojson)
-  "11507001" = "11507001"    # Upper Klamath (may not have storage)
-)
-
-################################################################################
-# CDEC STATION LOOKUP
-#
-# Maps geojson Identifier → CDEC station code.
-# Sensor 15 = reservoir storage.
-################################################################################
-
-cdec_lookup <- list(
-  "THC" = "THC"   # Tahoe
-)
+# Note: USGS and CDEC locations use their geojson Identifier directly as the
+# site/station code. No lookup table needed — the Identifier IS the USGS site
+# number or CDEC station code.
 
 ################################################################################
 # LOAD LOCATION METADATA
@@ -384,19 +362,17 @@ fetch_usace_historical <- function(location_id, start_date = START_DATE, end_dat
 #' Parameter code 00054 = reservoir storage (acre-feet).
 #' The API has a limit of 10,000 items per request, so we paginate by year
 #' to safely cover the full 30-year range.
+#' The location_id IS the USGS site number (from geojson Identifier).
 #'
-#' @param location_id Geojson Identifier (used to look up USGS site number)
+#' @param location_id Geojson Identifier which IS the USGS site number
 #' @param start_date Start date (YYYY-MM-DD)
 #' @param end_date End date (YYYY-MM-DD)
 #' @return tibble with columns: date, value, unit
 fetch_usgs_historical <- function(location_id, start_date = START_DATE, end_date = END_DATE) {
-  site_no <- usgs_lookup[[as.character(location_id)]]
-  if (is.null(site_no)) {
-    warning(sprintf("No USGS lookup entry for identifier '%s'", location_id))
-    return(tibble(date = Date(), value = numeric(), unit = character()))
-  }
+  # location_id is the USGS site number directly from geojson Identifier
+  site_no <- as.character(location_id)
 
-  message(sprintf("  Fetching USGS site %s (identifier: %s)...", site_no, location_id))
+  message(sprintf("  Fetching USGS site %s...", site_no))
 
   all_data <- list()
   sd <- as.Date(start_date)
@@ -462,19 +438,17 @@ fetch_usgs_historical <- function(location_id, start_date = START_DATE, end_date
 #' CDEC CSVDataServlet with sensor 15 (reservoir storage), daily duration.
 #' Note: CDEC requires a User-Agent header to return data.
 #' Data availability varies — Tahoe storage only goes back to ~2023.
+#' The location_id IS the CDEC station code (from geojson Identifier).
 #'
-#' @param location_id Geojson Identifier (used to look up CDEC station code)
+#' @param location_id Geojson Identifier which IS the CDEC station code
 #' @param start_date Start date (YYYY-MM-DD)
 #' @param end_date End date (YYYY-MM-DD)
 #' @return tibble with columns: date, value, unit
 fetch_cdec_historical <- function(location_id, start_date = START_DATE, end_date = END_DATE) {
-  station <- cdec_lookup[[as.character(location_id)]]
-  if (is.null(station)) {
-    warning(sprintf("No CDEC lookup entry for identifier '%s'", location_id))
-    return(tibble(date = Date(), value = numeric(), unit = character()))
-  }
+  # location_id is the CDEC station code directly from geojson Identifier
+  station <- as.character(location_id)
 
-  message(sprintf("  Fetching CDEC station %s (identifier: %s)...", station, location_id))
+  message(sprintf("  Fetching CDEC station %s...", station))
 
   url <- sprintf(
     "https://cdec.water.ca.gov/dynamicapp/req/CSVDataServlet?Stations=%s&SensorNums=15&dur_code=D&Start=%s&End=%s",

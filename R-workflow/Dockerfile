@@ -19,7 +19,8 @@ FROM --platform=linux/amd64 rocker/geospatial:4.4.2
 RUN install2.r --error --skipinstalled \
     httr2 \
     arrow \
-    curl
+    curl \
+    jsonlite
 
 WORKDIR /app
 

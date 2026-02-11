@@ -73,7 +73,7 @@ Cascade Creek Diversion,Do Not Include,,--,,,,,,
 Casitas,Do Not Include,,--,,,,,,
 Causey,Include,RISE,289,USBR Enterprise Asset Registry,,,7870,Causey,Causey Reservoir (Causey Dam)
 Cawker City Dike,Do Not Include,,293,,"GP Hydromet - CCKS (no storage, forebay elevation only)",,,,
-Cedar Bluff,Do Not Include,,3648,,GP Hydromet - CBKS (could not find station on hydromet),,,,
+Cedar Bluff,Include,USGS Cedar Bluff Res NR Ellis KS - USGS-06861500,--,USGS,USGS Monitoring Location USGS-06861500 https://waterdata.usgs.gov/monitoring-location/USGS-06861500,Use USGS Data,173000,Cedar Bluff,Cedar Bluff Reservoir (Cedar Bluff Dam)
 Chance,Do Not Include,,--,,,,,,
 Chapman Diversion,Do Not Include,,--,,,,,,
 Cheney,Include if possible,RISE (Pending),--,USBR Enterprise Asset Registry,GP Hydromet - CHENEY (has storage),Add Storage Data to RISE,262736,Cheney,Cheney Reservoir (Cheney Dam)
