@@ -1,0 +1,140 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+
+Attaching package: ‘arrow’
+
+The following object is masked from ‘package:lubridate’:
+
+    duration
+
+The following object is masked from ‘package:utils’:
+
+    timestamp
+
+Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
+Using libcurl 8.14.1 with LibreSSL/3.3.6 
+
+Attaching package: ‘curl’
+
+The following object is masked from ‘package:readr’:
+
+    parse_date
+
+=== Backfill Daily Reports ===
+From: 1990-10-01 to 2026-02-10
+Total days: 12917
+
+Loading location metadata...
+Warning message:
+There was 1 warning in `transmute()`.
+ℹ In argument: `capacity = as.numeric(str_remove_all(Total.Capacity, ","))`.
+Caused by warning:
+! NAs introduced by coercion 
+  Loaded 214 locations
+Loading historical baseline data...
+  Loaded 1373121 observations (1990-10-01 to 2020-10-01)
+Loading historical statistics...
+  Loaded stats for 136 locations
+
+=== Fetching recent data: 2020-10-01 to 2026-02-10 ===
+
+Fetching RISE data for 191 locations...
+  [20/191] Carter Lake
+  [40/191] Gibson
+  [60/191] Lewiston
+  [80/191] Pathfinder
+  [100/191] Steinaker
+  [120/191] Utah
+  [140/191] Como
+  [160/191] Cle Elum
+  [180/191] Palisades
+  Retrieved data for 127 RISE locations
+Fetching USACE data for 6 locations...
+  [1/6] Cochiti
+  [2/6] Santa Rosa
+  [3/6] Abiquiu
+  [4/6] Franklin D. Roosevelt
+  [5/6] Fort Peck
+  [6/6] Lucky Peak
+Fetching USGS data for 6 locations...
+  [1/6] Lahontan (USGS-10312100)
+  [2/6] Boca (USGS-10344490)
+  [3/6] Prosser Creek (USGS-10340300)
+  [4/6] Stampede (USGS-10344300)
+  [5/6] Upper Klamath (USGS-11507001)
+  [6/6] Cedar Bluff (USGS-06861500)
+Fetching CDEC data for 1 locations...
+  [1/1] Tahoe (CDEC-THC)
+
+Total recent observations: 270593
+Warning messages:
+1: The `file` argument of `vroom()` must use `I()` for literal data as of vroom
+1.5.0.
+  
+  # Bad:
+  vroom("X,Y\n1.5,2.3\n")
+  
+  # Good:
+  vroom(I("X,Y\n1.5,2.3\n"))
+ℹ The deprecated feature was likely used in the readr package.
+  Please report the issue at <https://github.com/tidyverse/readr/issues>. 
+2: There was 1 warning in `mutate()`.
+ℹ In argument: `value = as.numeric(VALUE)`.
+Caused by warning:
+! NAs introduced by coercion 
+
+=== Combining historical and recent data ===
+Total observations: 1643709
+Date range: 1990-10-01 to 2026-02-10
+Locations with data: 140
+
+=== Generating daily CSVs ===
+Generating 12917 daily reports...
+  [500/12917] 1992-02-12
+  [1000/12917] 1993-06-26
+  [1500/12917] 1994-11-08
+  [2000/12917] 1996-03-22
+  [2500/12917] 1997-08-04
+  [3000/12917] 1998-12-17
+  [3500/12917] 2000-04-30
+  [4000/12917] 2001-09-12
+  [4500/12917] 2003-01-25
+  [5000/12917] 2004-06-08
+  [5500/12917] 2005-10-21
+  [6000/12917] 2007-03-05
+  [6500/12917] 2008-07-17
+  [7000/12917] 2009-11-29
+  [7500/12917] 2011-04-13
+  [8000/12917] 2012-08-25
+  [8500/12917] 2014-01-07
+  [9000/12917] 2015-05-22
+  [9500/12917] 2016-10-03
+  [10000/12917] 2018-02-15
+  [10500/12917] 2019-06-30
+  [11000/12917] 2020-11-11
+  [11500/12917] 2022-03-26
+  [12000/12917] 2023-08-08
+  [12500/12917] 2024-12-20
+  [12917/12917] 2026-02-10
+
+Generated 12917 CSV files
+
+=== Uploading to HydroShare ===
+Found 12917 CSV files to upload
+  [1/12917] droughtData19901001.csv

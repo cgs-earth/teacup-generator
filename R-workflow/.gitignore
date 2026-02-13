@@ -1,0 +1,20 @@
+# Environment and credentials
+.env
+
+# HydroShare staging (uploaded, not tracked)
+hydroshare/*.csv
+
+# Large archive files (too big for git)
+output/*archive*.parquet
+output/*archive*.csv
+
+# R session files
+.Rhistory
+.RData
+.Rproj.user/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log

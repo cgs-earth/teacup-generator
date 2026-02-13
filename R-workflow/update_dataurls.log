@@ -1,0 +1,44 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
+Loading location metadata...
+  Loaded 214 locations
+Found 12917 CSV files to update
+  [1/12917] droughtData19901001.csv
+  [500/12917] droughtData19920212.csv
+  [1000/12917] droughtData19930626.csv
+  [1500/12917] droughtData19941108.csv
+  [2000/12917] droughtData19960322.csv
+  [2500/12917] droughtData19970804.csv
+  [3000/12917] droughtData19981217.csv
+  [3500/12917] droughtData20000430.csv
+  [4000/12917] droughtData20010912.csv
+  [4500/12917] droughtData20030125.csv
+  [5000/12917] droughtData20040608.csv
+  [5500/12917] droughtData20051021.csv
+  [6000/12917] droughtData20070305.csv
+  [6500/12917] droughtData20080717.csv
+  [7000/12917] droughtData20091129.csv
+  [7500/12917] droughtData20110413.csv
+  [8000/12917] droughtData20120825.csv
+  [8500/12917] droughtData20140107.csv
+  [9000/12917] droughtData20150522.csv
+  [9500/12917] droughtData20161003.csv
+  [10000/12917] droughtData20180215.csv
+  [10500/12917] droughtData20190630.csv
+  [11000/12917] droughtData20201111.csv
+  [11500/12917] droughtData20220326.csv
+  [12000/12917] droughtData20230808.csv
+  [12500/12917] droughtData20241220.csv
+  [12917/12917] droughtData20260210.csv
+
+Updated 12917 CSV files with DataUrl

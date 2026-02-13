@@ -1,0 +1,64 @@
+RISE_Location_ID,Name,Post_Review_Decision,Source_for_Storage_Data,Location_Page,Catalog_Status,Catalog_ID,Catalog_URL,Storage_Item,Data_Source_Notes,Actions_to_Allow_Inclusion
+3,Gray Reef,Include if possible,RISE (Pending),https://data.usbr.gov/location/3,HAS_STORAGE,1,https://data.usbr.gov/catalog/1,item/18: Daily Lake/Reservoir Storage-af,Storage: ? MB -Hydromet - GRAR,Fix RISE data feed?
+3206,Utah,Include if possible,RISE (Pending),https://data.usbr.gov/location/3206,HAS_STORAGE,4058,https://data.usbr.gov/catalog/4058,item/4515: Daily Reservoir Storage-af,"https://www.usbr.gov/uc/water/hydrodata/reservoir_data/3606/dashboard.html Daily storage data available in HDB, capacity data ?",Add Storage Data to RISE
+3640,Altus,Include if possible,RISE (Pending),https://data.usbr.gov/location/3640,NO_CATALOG_LINK,,,,GP Hydromet - ALTUS (has storage),Add Storage Data to RISE
+3641,Anderson Ranch,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3641,NO_ITEMS,8152,https://data.usbr.gov/catalog/8152,,,
+3642,Arrowrock,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3642,NO_ITEMS,8157,https://data.usbr.gov/catalog/8157,,,
+3643,Beulah,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3643,NO_ITEMS,8164,https://data.usbr.gov/catalog/8164,,,
+3645,Cascade,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3645,NO_ITEMS,8211,https://data.usbr.gov/catalog/8211,,,
+3646,Bully Creek,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3646,NO_ITEMS,8186,https://data.usbr.gov/catalog/8186,,,
+3647,Bumping,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3647,NO_ITEMS,8187,https://data.usbr.gov/catalog/8187,,,
+3649,Deadwood,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3649,NO_ITEMS,8217,https://data.usbr.gov/catalog/8217,,,
+3650,Harry Strunk,Include if possible,RISE (Pending),https://data.usbr.gov/location/3650,NO_CATALOG_LINK,,,,GP Hydromet - HSNE (has storage),Add Storage Data to RISE
+3651,Henry Hagg,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3651,NO_ITEMS,8430,https://data.usbr.gov/catalog/8430,,,
+3652,Hugh Butler,Include if possible,RISE (Pending),https://data.usbr.gov/location/3652,NO_CATALOG_LINK,,,,GP Hydromet - HBNE (has storage),Add Storage Data to RISE
+3653,Como,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3653,NO_ITEMS,8202,https://data.usbr.gov/catalog/8202,,,
+3656,Enders,Include if possible,RISE (Pending),https://data.usbr.gov/location/3656,NO_CATALOG_LINK,,,,GP Hydromet - EDNE (has storage),Add Storage Data to RISE
+3657,Fort Cobb,Include if possible,RISE (Pending),https://data.usbr.gov/location/3657,NO_CATALOG_LINK,,,,GP Hydromet - COBB (has storage),Add Storage Data to RISE
+3658,Foss,Include if possible,RISE (Pending),https://data.usbr.gov/location/3658,NO_CATALOG_LINK,,,,GP Hydromet - FOSS (has storage),Add Storage Data to RISE
+3663,Mann Creek,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3663,NO_ITEMS,8331,https://data.usbr.gov/catalog/8331,,,
+3664,McKay,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3664,NO_ITEMS,8334,https://data.usbr.gov/catalog/8334,,,
+3665,Ochoco,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3665,NO_ITEMS,8365,https://data.usbr.gov/catalog/8365,,,
+3666,Prineville,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3666,NO_ITEMS,8399,https://data.usbr.gov/catalog/8399,,,
+3667,Swanson,Include if possible,RISE (Pending),https://data.usbr.gov/location/3667,NO_CATALOG_LINK,,,,GP Hydromet - TRNE (has storage),Add Storage Data to RISE
+3668,Thief Valley,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3668,NO_ITEMS,8465,https://data.usbr.gov/catalog/8465,,,
+3671,Unity,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3671,NO_ITEMS,8475,https://data.usbr.gov/catalog/8475,,,
+3672,Warm Springs,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/3672,NO_ITEMS,8481,https://data.usbr.gov/catalog/8481,,,
+3674,Thunderbird,Include if possible,RISE (Pending),https://data.usbr.gov/location/3674,NO_CATALOG_LINK,,,,GP Hydromet - NORMAN (has storage),Add Storage Data to RISE
+3702,Clear Lake,Include if possible,RISE (Pending),https://data.usbr.gov/location/3702,NO_CATALOG_LINK,,,,"storage: Hydromet data https://www.usbr.gov/pn/hydromet/klamath/kinstant_graph.html?cbtt=CLK&pcode=AF, instant only",Add Storage Data to RISE
+7166,Agate,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7166,NO_ITEMS,8144,https://data.usbr.gov/catalog/8144,,,
+7167,American Falls,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7167,NO_ITEMS,8150,https://data.usbr.gov/catalog/8150,,,
+7168,Billy Clapp,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7168,NO_ITEMS,8162,https://data.usbr.gov/catalog/8162,,,
+7169,Conconully Lake,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7169,NO_ITEMS,8189,https://data.usbr.gov/catalog/8189,,,
+7170,Cle Elum,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7170,NO_ITEMS,8199,https://data.usbr.gov/catalog/8199,,,
+7171,Cold Springs,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7171,NO_ITEMS,8201,https://data.usbr.gov/catalog/8201,,,
+7172,Crane Prairie,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7172,NO_ITEMS,8205,https://data.usbr.gov/catalog/8205,,,
+7173,Crescent,Include if possible,RISE,https://data.usbr.gov/location/7173,NO_ITEMS,8206,https://data.usbr.gov/catalog/8206,,"Active Storage of 86900, Storage data will be in RISE",Get capacity
+7174,Emigrant,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7174,NO_ITEMS,8236,https://data.usbr.gov/catalog/8236,,,
+7175,Black Canyon,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7175,NO_ITEMS,8237,https://data.usbr.gov/catalog/8237,,,
+7176,Fish,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7176,NO_ITEMS,8247,https://data.usbr.gov/catalog/8247,,,
+7177,Fourmile,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7177,NO_ITEMS,8251,https://data.usbr.gov/catalog/8251,,,
+7178,Grassy,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7178,NO_ITEMS,8266,https://data.usbr.gov/catalog/8266,,,
+7179,Haystack,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7179,NO_ITEMS,8271,https://data.usbr.gov/catalog/8271,,,
+7181,Hungry Horse,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7181,NO_ITEMS,8277,https://data.usbr.gov/catalog/8277,,,
+7182,Howard Prairie,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7182,NO_ITEMS,8284,https://data.usbr.gov/catalog/8284,,,
+7183,Hyatt,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7183,NO_ITEMS,8291,https://data.usbr.gov/catalog/8291,,,
+7184,Island Park,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7184,NO_ITEMS,8296,https://data.usbr.gov/catalog/8296,,,
+7185,Jackson,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7185,NO_ITEMS,8299,https://data.usbr.gov/catalog/8299,,,
+7186,Kachess,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7186,NO_ITEMS,8303,https://data.usbr.gov/catalog/8303,,,
+7187,Keechelus,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7187,NO_ITEMS,8304,https://data.usbr.gov/catalog/8304,,,
+7188,Lowell,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7188,NO_ITEMS,8325,https://data.usbr.gov/catalog/8325,,,
+7191,Walcott,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7191,NO_ITEMS,8345,https://data.usbr.gov/catalog/8345,,,
+7192,Owyhee,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7192,NO_ITEMS,8375,https://data.usbr.gov/catalog/8375,,,
+7193,Palisades,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7193,NO_ITEMS,8377,https://data.usbr.gov/catalog/8377,,,
+7195,Mason,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7195,NO_ITEMS,8388,https://data.usbr.gov/catalog/8388,,,
+7196,Rimrock,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7196,NO_ITEMS,8410,https://data.usbr.gov/catalog/8410,,,
+7197,Ririe,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7197,NO_ITEMS,8411,https://data.usbr.gov/catalog/8411,,,
+7198,Mann,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7198,NO_ITEMS,8422,https://data.usbr.gov/catalog/8422,,,
+7199,Soldiers Meadow,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7199,NO_ITEMS,8448,https://data.usbr.gov/catalog/8448,,,
+7200,Clear Lake (OR),Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7200,NO_ITEMS,8483,https://data.usbr.gov/catalog/8483,,,
+7201,Wickiup,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7201,NO_ITEMS,8488,https://data.usbr.gov/catalog/8488,,,
+7202,Little Wood River,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7202,NO_ITEMS,8491,https://data.usbr.gov/catalog/8491,,,
+7264,Banks,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7264,NO_ITEMS,8176,https://data.usbr.gov/catalog/8176,,,
+7265,Potholes,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7265,NO_ITEMS,8396,https://data.usbr.gov/catalog/8396,,,
+7266,Scooteney,Include (Omit % Avg if needed),RISE,https://data.usbr.gov/location/7266,NO_ITEMS,8432,https://data.usbr.gov/catalog/8432,,,

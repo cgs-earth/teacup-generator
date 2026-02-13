@@ -1,0 +1,28 @@
+name: Daily Reservoir Data
+
+on:
+  schedule:
+    # Run 3x daily: midnight, 8 AM, 4 PM Mountain Time (UTC-7)
+    # = 7 AM, 3 PM, 11 PM UTC
+    - cron: '0 7,15,23 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate and upload reservoir data
+        env:
+          HYDROSHARE_USERNAME: ${{ secrets.HYDROSHARE_USERNAME }}
+          HYDROSHARE_PASSWORD: ${{ secrets.HYDROSHARE_PASSWORD }}
+        run: |
+          # Create env file
+          echo "HYDROSHARE_USERNAME=$HYDROSHARE_USERNAME" > .env
+          echo "HYDROSHARE_PASSWORD=$HYDROSHARE_PASSWORD" >> .env
+
+          # Run for yesterday (default)
+          docker run --env-file .env ghcr.io/cgs-earth/rezviz:latest
+
+          # Clean up
+          rm .env
