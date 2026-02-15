@@ -1,0 +1,56 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+      - add-R-workflow
+    paths:
+      - 'R-workflow/rezviz_data_generator.R'
+      - 'R-workflow/config/locations.geojson'
+      - 'R-workflow/data/reference/loc.csv'
+      - 'R-workflow/output/historical_statistics.parquet'
+      - 'R-workflow/output/historical_baseline.parquet'
+      - 'R-workflow/Dockerfile'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Regenerate locations.geojson from loc.csv
+        run: |
+          docker run --rm -v ${{ github.workspace }}/R-workflow:/app -w /app rocker/geospatial:4.4.2 \
+            Rscript create_locations_geojson.R
+
+      - name: Commit updated locations.geojson
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add R-workflow/config/locations.geojson
+          git diff --staged --quiet || git commit -m "Auto-regenerate locations.geojson from loc.csv"
+          git push
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./R-workflow
+          push: true
+          tags: |
+            ghcr.io/cgs-earth/rezviz:latest
+            ghcr.io/cgs-earth/rezviz:${{ github.sha }}
