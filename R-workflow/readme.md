@@ -253,3 +253,129 @@ flowchart LR
 - **136 locations** with complete historical statistics
 
 Locations without historical statistics can still be visualized with current storage values, but won't have historical comparison metrics (percentiles, percent of average, etc.).
+
+## Adding New Reservoirs
+
+To add a new reservoir, you only need to edit the data files—no code changes required.
+
+### Step 1: Add to `data/reference/loc.csv`
+
+Add a row with the following columns:
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| `Name` | Short name | `Cedar Bluff` |
+| `Post-Review Decision` | `Include` or `Do Not Include` | `Include` |
+| `Source for Storage Data` | Full source description | `USGS Cedar Bluff Res NR Ellis KS - USGS-06861500` |
+| `Storage Data Type` | Usually `Storage` | `Storage` |
+| `Source_Name` | One of: `RISE`, `USGS`, `USACE`, `CDEC` | `USGS` |
+| `Identifier` | API identifier (see below) | `06861500` |
+| `Source for Capacity` | Optional | |
+| `Data Source Notes` | URL or notes | `https://waterdata.usgs.gov/monitoring-location/USGS-06861500` |
+| `Actions to Allow Inclusion` | Optional notes | |
+| `Total Capacity` | Total capacity in acre-feet | `364342` |
+| `Active Capacity` | Active capacity (optional) | `335768` |
+| `Preferred Label for Map and Table` | Short display label | `Cedar Bluff` |
+| `Preferred Label for PopUp and Modal` | Full display name | `Cedar Bluff Reservoir (Cedar Bluff Dam)` |
+| `Longitude` | Decimal degrees (optional, auto-filled for RISE) | `-99.7222` |
+| `Latitude` | Decimal degrees (optional, auto-filled for RISE) | `38.7939` |
+
+### Step 2: Find the Identifier
+
+The `Identifier` field depends on the data source:
+
+#### RISE
+- Use the RISE location ID (numeric)
+- Find it at: https://data.usbr.gov or https://api.wwdh.internetofwater.app/collections/rise-edr/locations
+- Example: `393` for Lake Powell
+
+#### USGS
+- Use the USGS site number (typically 8 digits)
+- Find it at: https://waterdata.usgs.gov/nwis
+- Look for sites with parameter code `00054` (reservoir storage)
+- Example: `06861500` for Cedar Bluff
+
+#### USACE
+- Use a short identifier that matches the USACE lookup table
+- Currently supported: `305` (Cochiti), `abiquiu`, `Santa Rosa`, `gcl` (Grand Coulee), `FTPK` (Fort Peck), `luc` (Lucky Peak)
+- To add a new USACE location, you must also add it to the `usace_lookup` table in `rezviz_data_generator.R` and `backfill_reports.R`:
+  ```r
+  usace_lookup <- list(
+    "your_id" = list(provider = "spa", ts_name = "YourLocation.Stor.Inst.15Minutes.0.DCP-rev"),
+    ...
+  )
+  ```
+
+#### CDEC
+- Use the CDEC station code (3 letters)
+- Find it at: https://cdec.water.ca.gov/dynamicapp/staSearch
+- Look for stations with sensor 15 (reservoir storage)
+- Example: `THC` for Lake Tahoe
+
+### Step 3: Regenerate `locations.geojson`
+
+```bash
+Rscript create_locations_geojson.R
+```
+
+This merges coordinates from RISE/NID and performs spatial joins to add DOI region, HUC6, and state.
+
+### Step 4: Rebuild Docker Image (for production)
+
+```bash
+docker build -t ghcr.io/cgs-earth/rezviz:latest .
+docker push ghcr.io/cgs-earth/rezviz:latest
+```
+
+### Step 5: (Optional) Fetch Historical Data
+
+If you want historical statistics for the new reservoir:
+
+```bash
+# Re-run historical baseline (will fetch new locations)
+Rscript setup_historical_baseline.R
+
+# Or manually download CSV and process
+# Place CSV in data/manual/{identifier}.csv
+Rscript process_manual_csvs.R
+```
+
+### Example: Adding a USGS Reservoir
+
+1. **Find the site** at https://waterdata.usgs.gov with storage data (parameter 00054)
+
+2. **Add to `data/reference/loc.csv`**:
+   ```
+   My Reservoir,Include,USGS My Reservoir - USGS-12345678,Storage,USGS,12345678,,https://waterdata.usgs.gov/monitoring-location/USGS-12345678,,500000,450000,My Reservoir,My Reservoir (My Dam),-110.5,35.2,,,
+   ```
+
+3. **Regenerate geojson**:
+   ```bash
+   Rscript create_locations_geojson.R
+   ```
+
+4. **Test locally**:
+   ```bash
+   Rscript rezviz_data_generator.R
+   # Check that the new reservoir appears with data
+   ```
+
+5. **Rebuild and push Docker**:
+   ```bash
+   docker build -t ghcr.io/cgs-earth/rezviz:latest .
+   docker push ghcr.io/cgs-earth/rezviz:latest
+   ```
+
+### Example: Adding a RISE Reservoir
+
+RISE locations are the simplest—coordinates are auto-filled:
+
+1. **Find the location** at https://data.usbr.gov or the RISE API
+
+2. **Add to `data/reference/loc.csv`**:
+   ```
+   New Lake,Include,RISE,Storage,RISE,12345,USBR Enterprise Asset Registry,,,100000,90000,New Lake,New Lake (New Dam),,,,,
+   ```
+   (Leave Longitude/Latitude blank—they'll be filled from RISE)
+
+3. **Regenerate and rebuild** as above
