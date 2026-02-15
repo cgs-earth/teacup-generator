@@ -296,15 +296,19 @@ The `Identifier` field depends on the data source:
 - Example: `06861500` for Cedar Bluff
 
 #### USACE
-- Use a short identifier that matches the USACE lookup table
-- Currently supported: `305` (Cochiti), `abiquiu`, `Santa Rosa`, `gcl` (Grand Coulee), `FTPK` (Fort Peck), `luc` (Lucky Peak)
-- To add a new USACE location, you must also add it to the `usace_lookup` table in `rezviz_data_generator.R` and `backfill_reports.R`:
-  ```r
-  usace_lookup <- list(
-    "your_id" = list(provider = "spa", ts_name = "YourLocation.Stor.Inst.15Minutes.0.DCP-rev"),
-    ...
-  )
-  ```
+- Use the format `provider/ts_name` where:
+  - `provider` is the USACE district code (e.g., `spa`, `nwdp`, `nwdm`, `nww`)
+  - `ts_name` is the full timeseries name (e.g., `Cochiti.Stor.Inst.15Minutes.0.DCP-rev`)
+- Examples:
+  - `spa/Cochiti.Stor.Inst.15Minutes.0.DCP-rev` (Cochiti, SPA district)
+  - `spa/Abiquiu.Stor.Inst.15Minutes.0.DCP-rev` (Abiquiu, SPA district)
+  - `nwdp/GCL.Stor.Inst.1Hour.0.CBT-REV` (Grand Coulee, NWD-Pacific district)
+  - `nwdm/FTPK.Stor.Inst.~1Day.0.Best-MRBWM` (Fort Peck, NWD-Missouri district)
+  - `nww/LUC.Stor-Total.Inst.0.0.USBR-COMPUTED-REV` (Lucky Peak, NWW district)
+- Find available providers and timeseries from the USACE CDA API:
+  - Browse providers: https://water.usace.army.mil/cda/reporting/providers/
+  - Browse timeseries: https://water.usace.army.mil/cda/reporting/providers/{provider}/timeseries
+  - Look for timeseries with "Stor" (storage) in the name
 
 #### CDEC
 - Use the CDEC station code (3 letters)

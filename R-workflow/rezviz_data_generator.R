@@ -171,37 +171,11 @@ classify_source <- function(source_str) {
   return("unknown")
 }
 
-################################################################################
-# USACE CDA TIMESERIES NAME LOOKUP
-#
-# Maps location identifiers to their USACE CDA timeseries API parameters.
-# Each entry: list(provider, ts_name)
-################################################################################
-
-usace_lookup <- list(
-  # Cochiti - SPA district, 15-min DCP
-  "305"         = list(provider = "spa",
-                       ts_name  = "Cochiti.Stor.Inst.15Minutes.0.DCP-rev"),
-  # Abiquiu - SPA district, 15-min DCP
-  "abiquiu"     = list(provider = "spa",
-                       ts_name  = "Abiquiu.Stor.Inst.15Minutes.0.DCP-rev"),
-  # Santa Rosa - SPA district, 15-min DCP
-  "Santa Rosa"  = list(provider = "spa",
-                       ts_name  = "Santa Rosa.Stor.Inst.15Minutes.0.DCP-rev"),
-  # Grand Coulee (Franklin D. Roosevelt) - NWD-P district, 1-hour
-  "gcl"         = list(provider = "nwdp",
-                       ts_name  = "GCL.Stor.Inst.1Hour.0.CBT-REV"),
-  # Fort Peck - NWD-M district, ~1Day
-  "FTPK"        = list(provider = "nwdm",
-                       ts_name  = "FTPK.Stor.Inst.~1Day.0.Best-MRBWM"),
-  # Lucky Peak - NWW district
-  "luc"         = list(provider = "nww",
-                       ts_name  = "LUC.Stor-Total.Inst.0.0.USBR-COMPUTED-REV")
-)
-
-# Note: USGS and CDEC locations use their geojson Identifier directly as the
-# site/station code. No lookup table needed — the Identifier IS the USGS site
-# number or CDEC station code.
+# Note: All data sources now use the geojson Identifier directly:
+#   - RISE: Identifier is the RISE location ID (e.g., "7166")
+#   - USACE: Identifier is "provider/ts_name" (e.g., "spa/Abiquiu.Stor.Inst.15Minutes.0.DCP-rev")
+#   - USGS: Identifier is the USGS site number (e.g., "10344490")
+#   - CDEC: Identifier is the CDEC station code (e.g., "THC")
 
 ################################################################################
 # DATA FETCHING FUNCTIONS
@@ -252,13 +226,20 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
 }
 
 #' Fetch from USACE CDA API
+#' The location_id is "provider/ts_name" (e.g., "spa/Abiquiu.Stor.Inst.15Minutes.0.DCP-rev")
 #' Returns list(value, date, unit, url)
 fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
-  lookup <- usace_lookup[[as.character(location_id)]]
-  if (is.null(lookup)) {
-    message(sprintf("    USACE: no lookup entry for ID '%s'", as.character(location_id)))
+  # Parse provider and timeseries name from identifier format: "provider/ts_name"
+  id_str <- as.character(location_id)
+  slash_pos <- str_locate(id_str, "/")[1, "start"]
+
+  if (is.na(slash_pos)) {
+    message(sprintf("    USACE: invalid identifier format '%s' (expected 'provider/ts_name')", id_str))
     return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = NA_character_))
   }
+
+  provider <- str_sub(id_str, 1, slash_pos - 1)
+  ts_name  <- str_sub(id_str, slash_pos + 1)
 
   # Query the full lookback window in one call
   begin_date <- target_date - lookback_days
@@ -268,8 +249,8 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS)
 
   url <- sprintf(
     "https://water.usace.army.mil/cda/reporting/providers/%s/timeseries?name=%s&begin=%s&end=%s&format=csv",
-    lookup$provider,
-    URLencode(lookup$ts_name, reserved = TRUE),
+    provider,
+    URLencode(ts_name, reserved = TRUE),
     begin_str, end_str
   )
 

@@ -124,15 +124,7 @@ if (RECENT_END >= RECENT_START) {
   locations <- locations |>
     mutate(source_type = sapply(source, classify_source))
 
-  # USACE lookup
-  usace_lookup <- list(
-    "305" = list(provider = "spa", ts_name = "Cochiti.Stor.Inst.15Minutes.0.DCP-rev"),
-    "abiquiu" = list(provider = "spa", ts_name = "Abiquiu.Stor.Inst.15Minutes.0.DCP-rev"),
-    "Santa Rosa" = list(provider = "spa", ts_name = "Santa Rosa.Stor.Inst.15Minutes.0.DCP-rev"),
-    "gcl" = list(provider = "nwdp", ts_name = "GCL.Stor.Inst.1Hour.0.CBT-REV"),
-    "FTPK" = list(provider = "nwdm", ts_name = "FTPK.Stor.Inst.~1Day.0.Best-MRBWM"),
-    "luc" = list(provider = "nww", ts_name = "LUC.Stor-Total.Inst.0.0.USBR-COMPUTED-REV")
-  )
+  # USACE identifiers are now "provider/ts_name" format - parsed inline
 
   #---------------------------------------------------------------------------
   # Fetch RISE data (bulk)
@@ -194,10 +186,17 @@ if (RECENT_END >= RECENT_START) {
 
   for (i in seq_len(nrow(usace_locs))) {
     loc <- usace_locs[i, ]
-    loc_id <- loc$location_id
-    lookup <- usace_lookup[[as.character(loc_id)]]
+    loc_id <- as.character(loc$location_id)
 
-    if (is.null(lookup)) next
+    # Parse provider and ts_name from identifier format: "provider/ts_name"
+    slash_pos <- str_locate(loc_id, "/")[1, "start"]
+    if (is.na(slash_pos)) {
+      message(sprintf("  [%d/%d] %s - invalid identifier format", i, nrow(usace_locs), loc$name))
+      next
+    }
+
+    provider <- str_sub(loc_id, 1, slash_pos - 1)
+    ts_name  <- str_sub(loc_id, slash_pos + 1)
 
     message(sprintf("  [%d/%d] %s", i, nrow(usace_locs), loc$name))
 
@@ -206,7 +205,7 @@ if (RECENT_END >= RECENT_START) {
 
     url <- sprintf(
       "https://water.usace.army.mil/cda/reporting/providers/%s/timeseries?name=%s&begin=%s&end=%s&format=csv",
-      lookup$provider, URLencode(lookup$ts_name, reserved = TRUE), begin_str, end_str
+      provider, URLencode(ts_name, reserved = TRUE), begin_str, end_str
     )
 
     tryCatch({
