@@ -37,6 +37,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add R-workflow/config/locations.geojson
           git diff --staged --quiet || git commit -m "Auto-regenerate locations.geojson from loc.csv"
+          git pull --rebase
           git push
 
       - name: Log in to GitHub Container Registry
