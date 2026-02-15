@@ -26,19 +26,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: '4.4'
-
-      - name: Install R dependencies
-        run: |
-          install.packages(c("dplyr", "readr", "sf", "jsonlite", "stringr"), repos = "https://cloud.r-project.org")
-        shell: Rscript {0}
-
       - name: Regenerate locations.geojson from loc.csv
-        working-directory: R-workflow
-        run: Rscript create_locations_geojson.R
+        run: |
+          docker run --rm -v ${{ github.workspace }}/R-workflow:/app -w /app rocker/geospatial:4.4.2 \
+            Rscript create_locations_geojson.R
 
       - name: Commit updated locations.geojson
         run: |
