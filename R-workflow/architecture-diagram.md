@@ -14,6 +14,7 @@ flowchart TB
     subgraph config["Configuration"]
         CSV["config/locations.csv<br/>214 reservoirs<br/>Include/Exclude decisions"]
         GEOJSON["config/locations.geojson<br/>Coordinates, DOI Region<br/>HUC6, State"]
+        ELEV_CURVES["config/elevation_storage_curves.csv<br/>Elevation-to-storage lookup<br/>for elevation-based reservoirs"]
         MANUAL["data/manual/*.csv<br/>Manually downloaded<br/>for problem locations"]
     end
 
@@ -24,11 +25,12 @@ flowchart TB
     end
 
     subgraph daily["Daily Production"]
-        GENERATOR["rezviz_data_generator.R<br/>Fetch current storage<br/>Join with historical stats<br/>Compute percentiles"]
+        GENERATOR["rezviz_data_generator.R<br/>Fetch current storage<br/>Join with historical stats<br/>Compute percentiles<br/>Auto-backfill new locations"]
     end
 
     subgraph output["Output"]
         DAILY_CSV["hydroshare/droughtDataYYYYMMDD.csv<br/>~140 reservoirs per day<br/>Storage + Historical Metrics"]
+        BACKFILL_CSV["hydroshare/backfill_YYYYMMDD.csv<br/>Historical data for<br/>newly added locations"]
         HYDROSHARE["HydroShare Resource<br/>22b2f10103e5426a837defc00927afbd<br/>Public archive since 1990"]
     end
 
@@ -52,8 +54,11 @@ flowchart TB
     CDEC --> GENERATOR
     HIST_STATS --> GENERATOR
     GEOJSON --> GENERATOR
+    ELEV_CURVES --> GENERATOR
     GENERATOR --> DAILY_CSV
+    GENERATOR --> BACKFILL_CSV
     DAILY_CSV --> HYDROSHARE
+    BACKFILL_CSV --> HYDROSHARE
 
     %% Consumers
     HYDROSHARE --> WWDH
@@ -72,7 +77,7 @@ flowchart LR
         BASE["rocker/geospatial:4.4.2"]
         PKGS["R Packages<br/>httr2, dplyr, arrow<br/>sf, curl, jsonlite"]
         SCRIPT["rezviz_data_generator.R"]
-        BUNDLED["Bundled Data<br/>locations.geojson<br/>historical_statistics.parquet"]
+        BUNDLED["Bundled Data<br/>locations.geojson<br/>historical_statistics.parquet<br/>elevation_storage_curves.csv"]
     end
 
     subgraph runtime["Runtime"]
@@ -105,8 +110,8 @@ flowchart LR
     end
 
     subgraph usgs_detail["USGS (6 locations)"]
-        USGS_API["api.waterdata.usgs.gov<br/>/ogcapi/v0/collections/daily/items"]
-        USGS_LOCS["Lahontan, Boca, Prosser Creek<br/>Stampede, Upper Klamath, Cedar Bluff"]
+        USGS_API["api.waterdata.usgs.gov<br/>/ogcapi/v0/collections/daily/items<br/>param 00054 (storage) or<br/>62614/62615 (elevation)"]
+        USGS_LOCS["Lahontan, Boca, Prosser Creek<br/>Stampede, Cedar Bluff (storage)<br/>Upper Klamath (elevation→storage)"]
     end
 
     subgraph cdec_detail["CDEC (1 location)"]
@@ -142,6 +147,79 @@ flowchart LR
 | MaxCapacity | Dam capacity | 24322000 |
 | PctFull | Current/Capacity | 0.30 |
 | DataUrl | API endpoint | "https://api.wwdh..." |
+
+## Elevation-to-Storage Conversion
+
+For reservoirs that report water surface elevation instead of storage volume (e.g., Upper Klamath Lake), the workflow converts elevation to storage using lookup tables. This is supported for **all data sources** (RISE, USACE, USGS, CDEC).
+
+```mermaid
+flowchart LR
+    subgraph sources["Any Data Source"]
+        RISE_E["RISE<br/>Elevation data"]
+        USACE_E["USACE<br/>Elevation data"]
+        USGS_E["USGS<br/>param 62614/62615"]
+        CDEC_E["CDEC<br/>Elevation data"]
+    end
+
+    subgraph conversion["Conversion"]
+        CURVE["elevation_storage_curves.csv<br/>Elevation → Storage lookup"]
+        INTERP["Linear Interpolation"]
+    end
+
+    subgraph result["Result"]
+        STORAGE["Storage (af)<br/>Same format as<br/>direct storage sources"]
+    end
+
+    RISE_E --> INTERP
+    USACE_E --> INTERP
+    USGS_E --> INTERP
+    CDEC_E --> INTERP
+    CURVE --> INTERP
+    INTERP --> STORAGE
+```
+
+**Current elevation-based locations:**
+- Upper Klamath Lake (USGS 11507001) - 2017 KBAO elevation-capacity curve
+
+**To add elevation-based reservoir from any source:**
+1. Add elevation-storage curve to `config/elevation_storage_curves.csv`
+2. Set `Storage Data Type = Elevation` in `config/locations.csv`
+
+## Auto-Backfill Process
+
+When a new location appears in `locations.geojson` but is not in `historical_baseline.parquet`, the daily script automatically backfills historical data.
+
+```mermaid
+flowchart TB
+    subgraph detection["Detection"]
+        GEOJSON_LOCS["Locations in geojson"]
+        BASELINE_LOCS["Locations in baseline.parquet"]
+        DIFF["New locations =<br/>geojson - baseline"]
+    end
+
+    subgraph backfill["Backfill Process"]
+        FETCH["Fetch historical data<br/>1990-10-01 to 2020-09-30"]
+        STATS["Compute day-of-year<br/>statistics"]
+        UPDATE["Append to parquet files"]
+    end
+
+    subgraph output_bf["Output"]
+        BACKFILL["backfill_YYYYMMDD.csv<br/>All historical rows<br/>for new locations"]
+        HS["Upload to HydroShare"]
+    end
+
+    GEOJSON_LOCS --> DIFF
+    BASELINE_LOCS --> DIFF
+    DIFF --> FETCH
+    FETCH --> STATS
+    STATS --> UPDATE
+    FETCH --> BACKFILL
+    BACKFILL --> HS
+```
+
+**Triggers:**
+- Newly added reservoirs in `locations.csv`
+- Status change from "Do Not Include" to "Include"
 
 ## Historical Statistics Period
 
