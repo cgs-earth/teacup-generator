@@ -407,19 +407,27 @@ if (nrow(new_locations) > 0) {
 
         features <- data$features
 
-        # If elevation query returned nothing, try alternate elevation parameter
+        # If elevation query returned nothing, try alternate elevation parameters
+        # Priority: 72275 (USBR datum, e.g. Klamath Basin) > 62615 (NAVD88) > 62614 (NGVD29)
         if (length(features) == 0 && tolower(data_type_str) == "elevation") {
-          url <- sprintf(
-            "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=62615&time=%s/%s&limit=50000",
-            site_no, BASELINE_START, BASELINE_END
-          )
-          response <- request(url) |>
-            req_timeout(300) |>
-            req_retry(max_tries = 3, backoff = ~ 10) |>
-            req_perform()
-          body <- resp_body_string(response)
-          data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
-          features <- data$features
+          for (alt_param in c("72275", "62615")) {
+            message(sprintf("    Trying alternate elevation parameter %s...", alt_param))
+            url <- sprintf(
+              "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=%s&time=%s/%s&limit=50000",
+              site_no, alt_param, BASELINE_START, BASELINE_END
+            )
+            response <- request(url) |>
+              req_timeout(300) |>
+              req_retry(max_tries = 3, backoff = ~ 10) |>
+              req_perform()
+            body <- resp_body_string(response)
+            data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
+            features <- data$features
+            if (length(features) > 0) {
+              message(sprintf("    Found %d records with parameter %s", length(features), alt_param))
+              break
+            }
+          }
         }
 
         if (length(features) > 0) {
@@ -809,8 +817,10 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 #' Parameter 00054 = reservoir storage (acre-feet)
 #' Parameter 62614 = lake/reservoir water surface elevation (ft NGVD29)
 #' Parameter 62615 = lake/reservoir water surface elevation (ft NAVD88)
+#' Parameter 72275 = lake/reservoir elevation (ft USBR datum, e.g. Klamath Basin)
 #' Replaces legacy NWIS waterservices.usgs.gov (retiring Q1 2027)
 #' The location_id IS the USGS site number (from geojson Identifier)
+#' For elevation data, tries 62614 first, then falls back to 72275, then 62615
 #' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage
 #' Returns list(value, date, unit, url)
 fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
@@ -845,19 +855,23 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 
     features <- data$features
 
-    # If elevation query returned nothing, try alternate elevation parameter
+    # If elevation query returned nothing, try alternate elevation parameters
+    # Priority: 72275 (USBR datum, e.g. Klamath Basin) > 62615 (NAVD88) > 62614 (NGVD29)
     if (length(features) == 0 && tolower(data_type) == "elevation") {
-      url <- sprintf(
-        "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=62615&time=%s/%s&limit=50",
-        site_no, start_date, end_date
-      )
-      response <- request(url) |>
-        req_timeout(60) |>
-        req_retry(max_tries = 2, backoff = ~ 2) |>
-        req_perform()
-      body <- resp_body_string(response)
-      data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
-      features <- data$features
+      for (alt_param in c("72275", "62615")) {
+        url <- sprintf(
+          "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=%s&time=%s/%s&limit=50",
+          site_no, alt_param, start_date, end_date
+        )
+        response <- request(url) |>
+          req_timeout(60) |>
+          req_retry(max_tries = 2, backoff = ~ 2) |>
+          req_perform()
+        body <- resp_body_string(response)
+        data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
+        features <- data$features
+        if (length(features) > 0) break
+      }
     }
 
     if (length(features) == 0) {
