@@ -73,11 +73,20 @@ flowchart TB
 
 ```mermaid
 flowchart LR
+    subgraph hydroshare["HydroShare"]
+        HS_PARQUET["historical_baseline.parquet<br/>historical_statistics.parquet"]
+    end
+
+    subgraph build["Docker Build"]
+        DOWNLOAD["curl downloads<br/>parquet files"]
+    end
+
     subgraph image["ghcr.io/cgs-earth/rezviz:latest"]
         BASE["rocker/geospatial:4.4.2"]
         PKGS["R Packages<br/>httr2, dplyr, arrow<br/>sf, curl, jsonlite"]
         SCRIPT["rezviz_data_generator.R"]
-        BUNDLED["Bundled Data<br/>locations.geojson<br/>elevation_storage_curves.csv<br/>historical_baseline.parquet<br/>historical_statistics.parquet"]
+        CONFIG["Config Files<br/>locations.geojson<br/>elevation_storage_curves.csv"]
+        PARQUET["Parquet Files<br/>(from HydroShare)"]
     end
 
     subgraph runtime["Runtime"]
@@ -85,18 +94,14 @@ flowchart LR
         VOLUME["Volume mount<br/>./hydroshare:/app/hydroshare<br/>(optional)"]
     end
 
-    subgraph cmd["Commands"]
-        RUN1["docker run --env-file .env<br/>ghcr.io/cgs-earth/rezviz:latest"]
-        RUN2["docker run --env-file .env<br/>ghcr.io/cgs-earth/rezviz:latest 2026-01-15"]
-    end
-
-    ENV --> RUN1
-    ENV --> RUN2
-    VOLUME --> RUN1
-    VOLUME --> RUN2
+    HS_PARQUET -->|docker build| DOWNLOAD
+    DOWNLOAD --> PARQUET
+    ENV --> image
+    VOLUME --> image
 ```
 
-**Note:** Parquet files are bundled in the image. Backfills are uploaded to HydroShare; rebuild the image periodically to incorporate them.
+**Build-time:** Parquet files are downloaded from HydroShare during `docker build`.
+**Runtime:** If backfills occur, updated parquet files are uploaded to HydroShare. Rebuild the image to incorporate them.
 
 ## Data Sources Detail
 
