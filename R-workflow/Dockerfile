@@ -38,10 +38,15 @@ RUN mkdir -p hydroshare output
 
 # Download latest parquet files from HydroShare during build
 # HydroShare resource: 22b2f10103e5426a837defc00927afbd
-RUN curl -L -o output/historical_baseline.parquet \
+# Using --fail to catch HTTP errors, -L to follow redirects
+RUN curl -fL -o output/historical_baseline.parquet \
     "https://www.hydroshare.org/hsapi/resource/22b2f10103e5426a837defc00927afbd/files/historical_baseline.parquet/" && \
-    curl -L -o output/historical_statistics.parquet \
-    "https://www.hydroshare.org/hsapi/resource/22b2f10103e5426a837defc00927afbd/files/historical_statistics.parquet/"
+    curl -fL -o output/historical_statistics.parquet \
+    "https://www.hydroshare.org/hsapi/resource/22b2f10103e5426a837defc00927afbd/files/historical_statistics.parquet/" && \
+    echo "Validating parquet files..." && \
+    head -c 4 output/historical_baseline.parquet | grep -q "PAR1" && \
+    head -c 4 output/historical_statistics.parquet | grep -q "PAR1" && \
+    echo "Parquet files validated successfully"
 
 # ENTRYPOINT lets us append the date argument at docker run time
 ENTRYPOINT ["Rscript", "rezviz_data_generator.R"]
