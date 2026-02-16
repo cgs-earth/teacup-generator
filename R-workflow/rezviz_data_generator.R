@@ -141,10 +141,78 @@ locations <- locations_sf |>
     huc6 = huc6,
     longitude = Longitude,
     latitude = Latitude,
-    source = `Source.for.Storage.Data`
+    source = `Source.for.Storage.Data`,
+    data_type = `Storage.Data.Type`  # "Storage" or "Elevation"
   )
 
 message(sprintf("Loaded %d locations from geojson", nrow(locations)))
+
+################################################################################
+# ELEVATION-TO-STORAGE CONVERSION
+################################################################################
+
+# Load elevation-storage curves for locations that report elevation instead of storage
+elev_curves_file <- file.path(CONFIG_DIR, "elevation_storage_curves.csv")
+if (file.exists(elev_curves_file)) {
+  elev_curves <- read_csv(elev_curves_file, comment = "#", show_col_types = FALSE)
+  elev_curve_ids <- unique(elev_curves$location_id)
+  message(sprintf("Loaded elevation-storage curves for %d location(s): %s",
+                  length(elev_curve_ids), paste(elev_curve_ids, collapse = ", ")))
+} else {
+  elev_curves <- NULL
+  elev_curve_ids <- character(0)
+  message("No elevation-storage curves file found")
+}
+
+#' Convert elevation to storage using linear interpolation
+#'
+#' @param location_id The location identifier
+#' @param elevation_ft Water surface elevation in feet
+#' @return Storage in acre-feet, or NA if no curve available
+elevation_to_storage <- function(location_id, elevation_ft) {
+  if (is.null(elev_curves) || is.na(elevation_ft)) return(NA_real_)
+
+  loc_id <- as.character(location_id)
+  curve <- elev_curves |> filter(location_id == loc_id)
+
+  if (nrow(curve) == 0) {
+    warning(sprintf("No elevation-storage curve for location %s", loc_id))
+    return(NA_real_)
+  }
+
+  # Handle edge cases
+  if (elevation_ft <= min(curve$elevation_ft)) return(min(curve$storage_af))
+  if (elevation_ft >= max(curve$elevation_ft)) return(max(curve$storage_af))
+
+  # Linear interpolation
+  # Find the two points to interpolate between
+  curve <- curve |> arrange(elevation_ft)
+  idx_upper <- which(curve$elevation_ft >= elevation_ft)[1]
+  idx_lower <- idx_upper - 1
+
+  x1 <- curve$elevation_ft[idx_lower]
+  x2 <- curve$elevation_ft[idx_upper]
+  y1 <- curve$storage_af[idx_lower]
+  y2 <- curve$storage_af[idx_upper]
+
+  # Linear interpolation formula
+  storage <- y1 + (elevation_ft - x1) * (y2 - y1) / (x2 - x1)
+  return(storage)
+}
+
+# Check for locations that need elevation conversion but lack curves
+elevation_locations <- locations |> filter(tolower(data_type) == "elevation")
+if (nrow(elevation_locations) > 0) {
+  missing_curves <- setdiff(elevation_locations$location_id, elev_curve_ids)
+  if (length(missing_curves) > 0) {
+    message(sprintf("WARNING: %d location(s) report elevation but lack conversion curves:",
+                    length(missing_curves)))
+    for (loc_id in missing_curves) {
+      loc_name <- locations$name[locations$location_id == loc_id]
+      message(sprintf("  - %s (ID: %s)", loc_name, loc_id))
+    }
+  }
+}
 
 ################################################################################
 # SOURCE TYPE CLASSIFICATION
@@ -175,6 +243,13 @@ classify_source <- function(source_str) {
 ################################################################################
 
 # Check which locations are missing from historical baseline
+# This catches both:
+#   1. Newly added locations (not previously in locations.csv)
+#   2. Status changes from "Do Not Include" -> "Include" (now in geojson but no baseline data)
+#
+# The geojson only contains "Include" locations, so any location_id in geojson
+# but not in historical_baseline.parquet needs to be backfilled.
+
 baseline_file <- file.path(OUTPUT_DIR, "historical_baseline.parquet")
 baseline_location_ids <- if (file.exists(baseline_file)) {
   read_parquet(baseline_file) |> pull(location_id) |> unique()
@@ -187,8 +262,12 @@ new_locations <- locations |> filter(location_id %in% new_location_ids)
 
 if (nrow(new_locations) > 0) {
 
-  message(sprintf("\n=== Detected %d new location(s) - fetching historical data ===\n",
-                  nrow(new_locations)))
+  message(sprintf("\n=== Detected %d new location(s) requiring backfill ===", nrow(new_locations)))
+  message("(These may be newly added or changed from 'Do Not Include' to 'Include')\n")
+  for (j in seq_len(nrow(new_locations))) {
+    message(sprintf("  - %s (ID: %s)", new_locations$name[j], new_locations$location_id[j]))
+  }
+  message("")
 
   # Historical period for baseline
   BASELINE_START <- as.Date("1990-10-01")
@@ -198,13 +277,15 @@ if (nrow(new_locations) > 0) {
 
   for (i in seq_len(nrow(new_locations))) {
     loc <- new_locations[i, ]
-    loc_id     <- loc$location_id
-    loc_name   <- loc$name
-    source_str <- loc$source
-    src_type   <- classify_source(source_str)
+    loc_id        <- loc$location_id
+    loc_name      <- loc$name
+    source_str    <- loc$source
+    data_type_str <- if (!is.na(loc$data_type)) loc$data_type else "Storage"
+    src_type      <- classify_source(source_str)
 
-    message(sprintf("[%d/%d] Backfilling %s (ID: %s) [%s]...",
-                    i, nrow(new_locations), loc_name, loc_id, src_type))
+    type_suffix <- if (tolower(data_type_str) == "elevation") " (elevation->storage)" else ""
+    message(sprintf("[%d/%d] Backfilling %s (ID: %s) [%s]%s...",
+                    i, nrow(new_locations), loc_name, loc_id, src_type, type_suffix))
 
     # Fetch full historical range based on source type
     hist_data <- NULL
@@ -300,10 +381,19 @@ if (nrow(new_locations) > 0) {
 
     } else if (src_type == "usgs") {
       # USGS: fetch via OGC API
+      # Handle elevation vs storage data types
       site_no <- as.character(loc_id)
+
+      # Select parameter code based on data type
+      if (tolower(data_type_str) == "elevation") {
+        param_code <- "62614"  # Elevation (NGVD29)
+      } else {
+        param_code <- "00054"  # Storage (acre-feet)
+      }
+
       url <- sprintf(
-        "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=00054&time=%s/%s&limit=50000",
-        site_no, BASELINE_START, BASELINE_END
+        "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=%s&time=%s/%s&limit=50000",
+        site_no, param_code, BASELINE_START, BASELINE_END
       )
 
       tryCatch({
@@ -316,6 +406,22 @@ if (nrow(new_locations) > 0) {
         data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
 
         features <- data$features
+
+        # If elevation query returned nothing, try alternate elevation parameter
+        if (length(features) == 0 && tolower(data_type_str) == "elevation") {
+          url <- sprintf(
+            "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=62615&time=%s/%s&limit=50000",
+            site_no, BASELINE_START, BASELINE_END
+          )
+          response <- request(url) |>
+            req_timeout(300) |>
+            req_retry(max_tries = 3, backoff = ~ 10) |>
+            req_perform()
+          body <- resp_body_string(response)
+          data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
+          features <- data$features
+        }
+
         if (length(features) > 0) {
           hist_data <- tibble(
             location_id = loc_id,
@@ -323,9 +429,29 @@ if (nrow(new_locations) > 0) {
             value = as.numeric(sapply(features, function(f) f$properties$value)),
             unit = sapply(features, function(f) f$properties$unit_of_measure)
           ) |>
-            mutate(unit = ifelse(tolower(unit) == "acre-ft", "af", tolower(unit))) |>
             filter(!is.na(value)) |>
             distinct(date, .keep_all = TRUE)
+
+          # Convert elevation to storage if needed
+          if (tolower(data_type_str) == "elevation") {
+            message(sprintf("    Converting %d elevation readings to storage...", nrow(hist_data)))
+            hist_data <- hist_data |>
+              rowwise() |>
+              mutate(
+                storage = elevation_to_storage(location_id, value)
+              ) |>
+              ungroup() |>
+              filter(!is.na(storage)) |>
+              mutate(
+                value = storage,
+                unit = "af"
+              ) |>
+              select(-storage)
+            message(sprintf("    Successfully converted %d readings", nrow(hist_data)))
+          } else {
+            hist_data <- hist_data |>
+              mutate(unit = ifelse(tolower(unit) == "acre-ft", "af", tolower(unit)))
+          }
         }
       }, error = function(e) {
         message(sprintf("    Error fetching USGS historical: %s", conditionMessage(e)))
@@ -516,8 +642,10 @@ message(sprintf("  %d locations will have NA for historical metrics",
 ################################################################################
 
 #' Fetch from RISE via WWDH API
+#' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage using curve
 #' Returns list(value, date, unit, url)
-fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
+fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
+                       data_type = "Storage") {
   for (days_back in 0:lookback_days) {
     query_date <- target_date - days_back
     start_date <- query_date
@@ -546,10 +674,26 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
       data <- read_csv(I(csv_content), show_col_types = FALSE)
       if (nrow(data) == 0) next
 
+      raw_value <- data$value[1]
+      raw_date <- as.Date(data$datetime[1])
+      raw_unit <- data$unit[1]
+
+      # Convert elevation to storage if needed
+      if (tolower(data_type) == "elevation") {
+        storage_val <- elevation_to_storage(location_id, raw_value)
+        if (!is.na(storage_val)) {
+          message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
+          return(list(value = storage_val, date = raw_date, unit = "af", url = url))
+        } else {
+          message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
+          return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+        }
+      }
+
       return(list(
-        value = data$value[1],
-        date  = as.Date(data$datetime[1]),
-        unit  = data$unit[1],
+        value = raw_value,
+        date  = raw_date,
+        unit  = raw_unit,
         url   = url
       ))
     }, error = function(e) {
@@ -561,8 +705,10 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
 
 #' Fetch from USACE CDA API
 #' The location_id is "provider/ts_name" (e.g., "spa/Abiquiu.Stor.Inst.15Minutes.0.DCP-rev")
+#' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage using curve
 #' Returns list(value, date, unit, url)
-fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
+fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
+                        data_type = "Storage") {
   # Parse provider and timeseries name from identifier format: "provider/ts_name"
   id_str <- as.character(location_id)
   slash_pos <- str_locate(id_str, "/")[1, "start"]
@@ -632,9 +778,24 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS)
       "ac-ft"
     }
 
+    raw_value <- recent$value[1]
+    raw_date <- recent$date[1]
+
+    # Convert elevation to storage if needed
+    if (tolower(data_type) == "elevation") {
+      storage_val <- elevation_to_storage(location_id, raw_value)
+      if (!is.na(storage_val)) {
+        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
+        return(list(value = storage_val, date = raw_date, unit = "af", url = url))
+      } else {
+        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
+        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+      }
+    }
+
     return(list(
-      value = recent$value[1],
-      date  = recent$date[1],
+      value = raw_value,
+      date  = raw_date,
       unit  = unit_val,
       url   = url
     ))
@@ -646,19 +807,31 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS)
 
 #' Fetch from USGS Water Data OGC API (daily values)
 #' Parameter 00054 = reservoir storage (acre-feet)
+#' Parameter 62614 = lake/reservoir water surface elevation (ft NGVD29)
+#' Parameter 62615 = lake/reservoir water surface elevation (ft NAVD88)
 #' Replaces legacy NWIS waterservices.usgs.gov (retiring Q1 2027)
 #' The location_id IS the USGS site number (from geojson Identifier)
+#' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage
 #' Returns list(value, date, unit, url)
-fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
+fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
+                       data_type = "Storage") {
   # location_id is the USGS site number directly from geojson Identifier
   site_no <- as.character(location_id)
 
   start_date <- target_date - lookback_days
   end_date   <- target_date
 
+  # Select parameter code based on data type
+  if (tolower(data_type) == "elevation") {
+    # Try elevation parameters: 62614 (NGVD29) or 62615 (NAVD88)
+    param_code <- "62614"  # Primary elevation parameter
+  } else {
+    param_code <- "00054"  # Storage in acre-feet
+  }
+
   url <- sprintf(
-    "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=00054&time=%s/%s&limit=50",
-    site_no, start_date, end_date
+    "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=%s&time=%s/%s&limit=50",
+    site_no, param_code, start_date, end_date
   )
 
   tryCatch({
@@ -671,6 +844,22 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
     data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
 
     features <- data$features
+
+    # If elevation query returned nothing, try alternate elevation parameter
+    if (length(features) == 0 && tolower(data_type) == "elevation") {
+      url <- sprintf(
+        "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=62615&time=%s/%s&limit=50",
+        site_no, start_date, end_date
+      )
+      response <- request(url) |>
+        req_timeout(60) |>
+        req_retry(max_tries = 2, backoff = ~ 2) |>
+        req_perform()
+      body <- resp_body_string(response)
+      data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
+      features <- data$features
+    }
+
     if (length(features) == 0) {
       return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
     }
@@ -688,12 +877,32 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
       return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
     }
 
-    # Normalize unit string
-    unit_val <- tolower(parsed$unit[1])
+    raw_value <- parsed$value[1]
+    raw_unit <- tolower(parsed$unit[1])
+
+    # Convert elevation to storage if needed
+    if (tolower(data_type) == "elevation") {
+      storage_val <- elevation_to_storage(location_id, raw_value)
+      if (!is.na(storage_val)) {
+        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
+        return(list(
+          value = storage_val,
+          date  = parsed$date[1],
+          unit  = "af",
+          url   = url
+        ))
+      } else {
+        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
+        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+      }
+    }
+
+    # Normalize unit string for storage
+    unit_val <- raw_unit
     if (unit_val == "acre-ft") unit_val <- "af"
 
     return(list(
-      value = parsed$value[1],
+      value = raw_value,
       date  = parsed$date[1],
       unit  = unit_val,
       url   = url
@@ -707,8 +916,10 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
 #' Fetch from CDEC API
 #' Sensor 15 = reservoir storage
 #' The location_id IS the CDEC station code (from geojson Identifier)
+#' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage using curve
 #' Returns list(value, date, unit, url)
-fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
+fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
+                       data_type = "Storage") {
   # location_id is the CDEC station code directly from geojson Identifier
   station <- as.character(location_id)
 
@@ -748,10 +959,24 @@ fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
 
     # CDEC UNITS column
     unit_val <- if ("UNITS" %in% names(data)) data$UNITS[1] else "AF"
+    raw_value <- data$value[1]
+    raw_date <- data$date[1]
+
+    # Convert elevation to storage if needed
+    if (tolower(data_type) == "elevation") {
+      storage_val <- elevation_to_storage(location_id, raw_value)
+      if (!is.na(storage_val)) {
+        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
+        return(list(value = storage_val, date = raw_date, unit = "af", url = url))
+      } else {
+        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
+        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+      }
+    }
 
     return(list(
-      value = data$value[1],
-      date  = data$date[1],
+      value = raw_value,
+      date  = raw_date,
       unit  = tolower(unit_val),
       url   = url
     ))
@@ -761,18 +986,20 @@ fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
 }
 
 #' Master fetch: dispatch to the correct source-specific function
+#' @param data_type "Storage" or "Elevation" - passed to source-specific fetchers
 #' Returns list(value, date, unit, url)
 fetch_current_value <- function(location_id, source_str, target_date,
-                                lookback_days = LOOKBACK_DAYS) {
+                                lookback_days = LOOKBACK_DAYS,
+                                data_type = "Storage") {
   src_type <- classify_source(source_str)
 
   result <- switch(src_type,
-    "rise"     = fetch_rise(location_id, target_date, lookback_days),
-    "usace_cda" = fetch_usace(location_id, target_date, lookback_days),
-    "usgs"     = fetch_usgs(location_id, target_date, lookback_days),
-    "cdec"     = fetch_cdec(location_id, target_date, lookback_days),
+    "rise"     = fetch_rise(location_id, target_date, lookback_days, data_type),
+    "usace_cda" = fetch_usace(location_id, target_date, lookback_days, data_type),
+    "usgs"     = fetch_usgs(location_id, target_date, lookback_days, data_type),
+    "cdec"     = fetch_cdec(location_id, target_date, lookback_days, data_type),
     # For "unknown" or RISE (Pending), still try RISE
-    fetch_rise(location_id, target_date, lookback_days)
+    fetch_rise(location_id, target_date, lookback_days, data_type)
   )
 
   return(result)
@@ -791,13 +1018,16 @@ for (i in seq_len(nrow(locations))) {
   location_id   <- loc$location_id
   location_name <- loc$name
   source_str    <- loc$source
+  data_type_str <- if (!is.na(loc$data_type)) loc$data_type else "Storage"
 
   src_type <- classify_source(source_str)
-  message(sprintf("[%d/%d] %s (ID: %s) [%s]...",
-                  i, nrow(locations), location_name, location_id, src_type))
+  type_suffix <- if (tolower(data_type_str) == "elevation") " (elevation->storage)" else ""
+  message(sprintf("[%d/%d] %s (ID: %s) [%s]%s...",
+                  i, nrow(locations), location_name, location_id, src_type, type_suffix))
 
   # Fetch current value from the appropriate source
-  current <- fetch_current_value(location_id, source_str, TARGET_DATE)
+  current <- fetch_current_value(location_id, source_str, TARGET_DATE,
+                                  data_type = data_type_str)
 
   if (is.na(current$value)) {
     message(sprintf("  No data found"))
