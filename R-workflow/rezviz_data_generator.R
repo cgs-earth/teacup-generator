@@ -585,7 +585,7 @@ if (nrow(new_locations) > 0) {
         State          = state,
         DoiRegion      = doi_region,
         Huc6           = huc6,
-        DataUnits      = unit.x,
+        DataUnits      = unit,
         DataValue      = value,
         DataDate       = format(date, "%m/%d/%Y"),
         DateQueried    = format(Sys.Date(), "%m/%d/%Y"),
