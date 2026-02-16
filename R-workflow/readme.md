@@ -105,7 +105,9 @@ Output: `hydroshare/droughtDataYYYYMMDD.csv` (also uploaded to HydroShare)
 
 ### Docker
 
-The daily script is containerized for portable, reproducible runs. The image is based on `rocker/geospatial:4.4.2` and bundles all R dependencies, the location metadata, and historical statistics.
+The daily script is containerized for portable, reproducible runs. The image is based on `rocker/geospatial:4.4.2` and bundles all R dependencies and location metadata.
+
+**Note:** Historical parquet files are bundled in the Docker image. If new locations are backfilled at runtime, updated parquet files are uploaded to HydroShare. Rebuild the image periodically to incorporate the latest backfills.
 
 **Build:**
 
@@ -133,6 +135,12 @@ HydroShare credentials are passed at runtime via `--env-file .env` (never baked 
 HYDROSHARE_USERNAME=user@example.com
 HYDROSHARE_PASSWORD=yourpassword
 ```
+
+**Data Flow:**
+1. Uses bundled parquet files from the Docker image
+2. If new locations are detected, historical data is backfilled
+3. Updated parquet files are uploaded to HydroShare
+4. Rebuild the image to incorporate backfills into future runs
 
 ## Historical Statistics
 

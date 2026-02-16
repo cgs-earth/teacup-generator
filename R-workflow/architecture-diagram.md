@@ -77,7 +77,7 @@ flowchart LR
         BASE["rocker/geospatial:4.4.2"]
         PKGS["R Packages<br/>httr2, dplyr, arrow<br/>sf, curl, jsonlite"]
         SCRIPT["rezviz_data_generator.R"]
-        BUNDLED["Bundled Data<br/>locations.geojson<br/>historical_statistics.parquet<br/>elevation_storage_curves.csv"]
+        BUNDLED["Bundled Data<br/>locations.geojson<br/>elevation_storage_curves.csv<br/>historical_baseline.parquet<br/>historical_statistics.parquet"]
     end
 
     subgraph runtime["Runtime"]
@@ -95,6 +95,8 @@ flowchart LR
     VOLUME --> RUN1
     VOLUME --> RUN2
 ```
+
+**Note:** Parquet files are bundled in the image. Backfills are uploaded to HydroShare; rebuild the image periodically to incorporate them.
 
 ## Data Sources Detail
 

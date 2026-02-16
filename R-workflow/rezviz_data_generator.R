@@ -71,10 +71,20 @@ message(sprintf("Target date: %s", TARGET_DATE))
 message(sprintf("Run time: %s", Sys.time()))
 
 ################################################################################
+# PARQUET FILE PATHS
+################################################################################
+
+# Parquet files should be bundled in the Docker image or present locally.
+# After backfill, updated parquet files are uploaded to HydroShare.
+# Rebuild the Docker image periodically to incorporate backfills.
+
+stats_file <- file.path(OUTPUT_DIR, "historical_statistics.parquet")
+baseline_file <- file.path(OUTPUT_DIR, "historical_baseline.parquet")
+
+################################################################################
 # LOAD HISTORICAL STATISTICS
 ################################################################################
 
-stats_file <- file.path(OUTPUT_DIR, "historical_statistics.parquet")
 if (!file.exists(stats_file)) {
   stop("Historical statistics file not found. Run setup_historical_baseline.R first.")
 }
@@ -626,13 +636,16 @@ if (nrow(new_locations) > 0) {
 
     # Upload backfill to HydroShare (will happen later with main upload)
     BACKFILL_PATH <- backfill_path
+    PARQUET_UPDATED <- TRUE  # Flag to upload parquet files at end
   } else {
     message("\nNo historical data retrieved for new locations")
     BACKFILL_PATH <- NULL
+    PARQUET_UPDATED <- FALSE
   }
 } else {
   message("\nNo new locations detected")
   BACKFILL_PATH <- NULL
+  PARQUET_UPDATED <- FALSE
 }
 
 # Reload statistics after potential updates
@@ -1235,6 +1248,37 @@ if (hs_username == "" || hs_password == "") {
     }, error = function(e) {
       message(sprintf("ERROR uploading backfill to HydroShare: %s", e$message))
     })
+  }
+
+  # Upload updated parquet files if backfill occurred
+  # This ensures the next run starts with the latest historical data
+  if (exists("PARQUET_UPDATED") && PARQUET_UPDATED) {
+    message("\n=== Uploading updated parquet files to HydroShare ===")
+
+    stats_file <- file.path(OUTPUT_DIR, "historical_statistics.parquet")
+    baseline_file <- file.path(OUTPUT_DIR, "historical_baseline.parquet")
+
+    if (file.exists(stats_file)) {
+      message(sprintf("Uploading historical_statistics.parquet (%.1f MB)...",
+                      file.size(stats_file) / 1e6))
+      tryCatch({
+        upload_to_hydroshare(stats_file, HYDROSHARE_RESOURCE_ID, hs_username, hs_password)
+      }, error = function(e) {
+        message(sprintf("ERROR uploading historical_statistics.parquet: %s", e$message))
+      })
+    }
+
+    if (file.exists(baseline_file)) {
+      message(sprintf("Uploading historical_baseline.parquet (%.1f MB)...",
+                      file.size(baseline_file) / 1e6))
+      tryCatch({
+        upload_to_hydroshare(baseline_file, HYDROSHARE_RESOURCE_ID, hs_username, hs_password)
+      }, error = function(e) {
+        message(sprintf("ERROR uploading historical_baseline.parquet: %s", e$message))
+      })
+    }
+
+    message("Parquet files uploaded - next run will use updated historical data")
   }
 }
 
