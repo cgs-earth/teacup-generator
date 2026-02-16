@@ -7,8 +7,8 @@ on:
       - add-R-workflow
     paths:
       - 'R-workflow/rezviz_data_generator.R'
+      - 'R-workflow/config/locations.csv'
       - 'R-workflow/config/locations.geojson'
-      - 'R-workflow/data/reference/loc.csv'
       - 'R-workflow/output/historical_statistics.parquet'
       - 'R-workflow/output/historical_baseline.parquet'
       - 'R-workflow/Dockerfile'
@@ -26,7 +26,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Regenerate locations.geojson from loc.csv
+      - name: Regenerate locations.geojson from locations.csv
         run: |
           docker run --rm -v ${{ github.workspace }}/R-workflow:/app -w /app rocker/geospatial:4.4.2 \
             Rscript create_locations_geojson.R
@@ -36,7 +36,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add R-workflow/config/locations.geojson
-          git diff --staged --quiet || git commit -m "Auto-regenerate locations.geojson from loc.csv"
+          git diff --staged --quiet || git commit -m "Auto-regenerate locations.geojson from locations.csv"
           git pull --rebase
           git push
 
