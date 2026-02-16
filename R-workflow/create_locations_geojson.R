@@ -1,7 +1,7 @@
 # create_locations_geojson.R
 #
 # Create locations.geojson by:
-# 1. Reading loc.csv
+# 1. Reading locations.csv (source of truth for reservoir metadata)
 # 2. Merging in lat/lon from rise.geojson for RISE locations
 # 3. Spatial join to get doiRegion, huc6, and state
 # 4. Output as locations.geojson
@@ -20,8 +20,8 @@ REFERENCE_DIR <- "data/reference"
 # LOAD DATA
 ################################################################################
 
-message("Loading loc.csv...")
-locations <- read_csv(file.path(REFERENCE_DIR, "loc.csv"), show_col_types = FALSE)
+message("Loading locations.csv...")
+locations <- read_csv(file.path(CONFIG_DIR, "locations.csv"), show_col_types = FALSE)
 message(sprintf("  %d locations loaded", nrow(locations)))
 
 message("Loading rise.geojson...")

@@ -19,8 +19,7 @@ R-workflow/
 │       ├── huc6.geojson        # HUC6 watershed boundaries
 │       ├── states.geojson      # State boundaries
 │       ├── rise.geojson        # RISE locations with coordinates
-│       ├── nid.csv             # National Inventory of Dams
-│       └── loc.csv             # Intermediate locations data
+│       └── nid.csv             # National Inventory of Dams
 │
 ├── examples/                   # Test/example outputs for visualization
 │   ├── reservoirs_*.geojson    # Dummy data files for dashboard testing
@@ -50,7 +49,7 @@ R-workflow/
 |--------|---------|
 | `setup_historical_baseline.R` | Fetch 30 years of historical data (1990-2020) from all sources. Creates `historical_baseline.parquet` and `historical_statistics.parquet`. |
 | `process_manual_csvs.R` | Process manually downloaded CSVs for locations that failed API fetch. Adds them to the historical baseline. |
-| `create_locations_geojson.R` | Generate `locations.geojson` from `data/reference/loc.csv` by merging coordinates from RISE/NID and performing spatial joins for DOI region, HUC6, and state. Run when locations change. |
+| `create_locations_geojson.R` | Generate `locations.geojson` from `config/locations.csv` by merging coordinates from RISE/NID and performing spatial joins for DOI region, HUC6, and state. Runs automatically via GitHub Actions when `locations.csv` changes. |
 
 ### Daily Production Script
 
@@ -258,7 +257,7 @@ Locations without historical statistics can still be visualized with current sto
 
 To add a new reservoir, you only need to edit the data files—no code changes required.
 
-### Step 1: Add to `data/reference/loc.csv`
+### Step 1: Add to `config/locations.csv`
 
 Add a row with the following columns:
 
@@ -348,7 +347,7 @@ Rscript process_manual_csvs.R
 
 1. **Find the site** at https://waterdata.usgs.gov with storage data (parameter 00054)
 
-2. **Add to `data/reference/loc.csv`**:
+2. **Add to `config/locations.csv`**:
    ```
    My Reservoir,Include,USGS My Reservoir - USGS-12345678,Storage,USGS,12345678,,https://waterdata.usgs.gov/monitoring-location/USGS-12345678,,500000,450000,My Reservoir,My Reservoir (My Dam),-110.5,35.2,,,
    ```
@@ -376,7 +375,7 @@ RISE locations are the simplest—coordinates are auto-filled:
 
 1. **Find the location** at https://data.usbr.gov or the RISE API
 
-2. **Add to `data/reference/loc.csv`**:
+2. **Add to `config/locations.csv`**:
    ```
    New Lake,Include,RISE,Storage,RISE,12345,USBR Enterprise Asset Registry,,,100000,90000,New Lake,New Lake (New Dam),,,,,
    ```
