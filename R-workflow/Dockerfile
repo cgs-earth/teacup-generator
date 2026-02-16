@@ -13,9 +13,9 @@
 # Run and keep the CSV locally:
 #   docker run --env-file .env -v $(pwd)/hydroshare:/app/hydroshare rezviz 2026-01-15
 #
-# Historical parquet files are bundled in the image. If new locations are
-# backfilled at runtime, updated parquet files are uploaded to HydroShare.
-# Rebuild the image periodically to incorporate the latest backfills.
+# Historical parquet files are downloaded from HydroShare during build.
+# If new locations are backfilled at runtime, updated parquet files are
+# uploaded to HydroShare. Rebuild the image to incorporate backfills.
 
 FROM --platform=linux/amd64 rocker/geospatial:4.4.2
 
@@ -34,11 +34,14 @@ COPY config/locations.geojson config/
 COPY config/elevation_storage_curves.csv config/
 
 # Create output directories
-RUN mkdir -p hydroshare
+RUN mkdir -p hydroshare output
 
-# Bundle historical parquet files
-COPY output/historical_baseline.parquet output/
-COPY output/historical_statistics.parquet output/
+# Download latest parquet files from HydroShare during build
+# HydroShare resource: 22b2f10103e5426a837defc00927afbd
+RUN curl -L -o output/historical_baseline.parquet \
+    "https://www.hydroshare.org/hsapi/resource/22b2f10103e5426a837defc00927afbd/files/historical_baseline.parquet/" && \
+    curl -L -o output/historical_statistics.parquet \
+    "https://www.hydroshare.org/hsapi/resource/22b2f10103e5426a837defc00927afbd/files/historical_statistics.parquet/"
 
 # ENTRYPOINT lets us append the date argument at docker run time
 ENTRYPOINT ["Rscript", "rezviz_data_generator.R"]
