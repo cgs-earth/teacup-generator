@@ -146,13 +146,6 @@ locations <- locations_sf |>
 
 message(sprintf("Loaded %d locations from geojson", nrow(locations)))
 
-# Track which locations have historical statistics (for logging)
-locations_with_stats <- unique(historical_stats$location_id)
-n_with_stats <- sum(locations$location_id %in% locations_with_stats)
-message(sprintf("  %d locations have historical statistics", n_with_stats))
-message(sprintf("  %d locations will have NA for historical metrics",
-                nrow(locations) - n_with_stats))
-
 ################################################################################
 # SOURCE TYPE CLASSIFICATION
 ################################################################################
@@ -176,6 +169,347 @@ classify_source <- function(source_str) {
 #   - USACE: Identifier is "provider/ts_name" (e.g., "spa/Abiquiu.Stor.Inst.15Minutes.0.DCP-rev")
 #   - USGS: Identifier is the USGS site number (e.g., "10344490")
 #   - CDEC: Identifier is the CDEC station code (e.g., "THC")
+
+################################################################################
+# DETECT AND BACKFILL NEW LOCATIONS
+################################################################################
+
+# Check which locations are missing from historical baseline
+baseline_file <- file.path(OUTPUT_DIR, "historical_baseline.parquet")
+baseline_location_ids <- if (file.exists(baseline_file)) {
+  read_parquet(baseline_file) |> pull(location_id) |> unique()
+} else {
+  character(0)
+}
+
+new_location_ids <- setdiff(locations$location_id, baseline_location_ids)
+new_locations <- locations |> filter(location_id %in% new_location_ids)
+
+if (nrow(new_locations) > 0) {
+
+  message(sprintf("\n=== Detected %d new location(s) - fetching historical data ===\n",
+                  nrow(new_locations)))
+
+  # Historical period for baseline
+  BASELINE_START <- as.Date("1990-10-01")
+  BASELINE_END   <- as.Date("2020-09-30")
+
+  new_baseline_data <- list()
+
+  for (i in seq_len(nrow(new_locations))) {
+    loc <- new_locations[i, ]
+    loc_id     <- loc$location_id
+    loc_name   <- loc$name
+    source_str <- loc$source
+    src_type   <- classify_source(source_str)
+
+    message(sprintf("[%d/%d] Backfilling %s (ID: %s) [%s]...",
+                    i, nrow(new_locations), loc_name, loc_id, src_type))
+
+    # Fetch full historical range based on source type
+    hist_data <- NULL
+
+    if (src_type == "rise") {
+      # RISE: fetch full range via WWDH API
+      url <- paste0(
+        WWDH_API_BASE,
+        "/collections/rise-edr/locations/", loc_id,
+        "?parameter-name=Storage",
+        "&limit=50000",
+        "&datetime=", BASELINE_START, "/", BASELINE_END + 1,
+        "&f=csv"
+      )
+
+      tryCatch({
+        response <- request(url) |>
+          req_timeout(300) |>
+          req_retry(max_tries = 3, backoff = ~ 10) |>
+          req_perform()
+
+        if (resp_status(response) == 200) {
+          csv_content <- resp_body_string(response)
+          if (nchar(csv_content) > 50) {
+            data <- read_csv(I(csv_content), show_col_types = FALSE)
+            if (nrow(data) > 0 && "datetime" %in% names(data)) {
+              hist_data <- data |>
+                transmute(
+                  location_id = loc_id,
+                  date = as.Date(datetime),
+                  value = value,
+                  unit = unit
+                ) |>
+                filter(!is.na(value)) |>
+                distinct(date, .keep_all = TRUE)
+            }
+          }
+        }
+      }, error = function(e) {
+        message(sprintf("    Error fetching RISE historical: %s", conditionMessage(e)))
+      })
+
+    } else if (src_type == "usace_cda") {
+      # USACE: parse provider/ts_name and fetch
+      id_str <- as.character(loc_id)
+      slash_pos <- str_locate(id_str, "/")[1, "start"]
+
+      if (!is.na(slash_pos)) {
+        provider <- str_sub(id_str, 1, slash_pos - 1)
+        ts_name  <- str_sub(id_str, slash_pos + 1)
+
+        begin_str <- paste0(format(BASELINE_START, "%Y-%m-%dT00:00:00"), ".000Z")
+        end_str   <- paste0(format(BASELINE_END + 1, "%Y-%m-%dT00:00:00"), ".000Z")
+
+        url <- sprintf(
+          "https://water.usace.army.mil/cda/reporting/providers/%s/timeseries?name=%s&begin=%s&end=%s&format=csv",
+          provider, URLencode(ts_name, reserved = TRUE), begin_str, end_str
+        )
+
+        tryCatch({
+          response <- request(url) |>
+            req_timeout(300) |>
+            req_retry(max_tries = 3, backoff = ~ 10) |>
+            req_perform()
+
+          body <- resp_body_string(response)
+          body <- str_replace_all(body, "\r", "")
+          lines <- str_split(body, "\n")[[1]]
+
+          unit_line <- lines[str_starts(lines, "##unit:")]
+          unit_val <- if (length(unit_line) > 0) trimws(str_remove(unit_line[1], "##unit:")) else "ac-ft"
+          if (tolower(unit_val) == "ac-ft") unit_val <- "af"
+
+          data_lines <- lines[!str_starts(lines, "##") & nchar(trimws(lines)) > 0]
+
+          if (length(data_lines) > 0) {
+            hist_data <- tibble(raw = data_lines) |>
+              mutate(
+                datetime = str_extract(raw, "^[^,]+"),
+                value = as.numeric(str_extract(raw, "[^,]+$")),
+                date = as.Date(str_sub(datetime, 1, 10))
+              ) |>
+              filter(!is.na(value), !is.na(date)) |>
+              group_by(date) |>
+              summarize(value = last(value), .groups = "drop") |>
+              mutate(location_id = loc_id, unit = unit_val) |>
+              select(location_id, date, value, unit)
+          }
+        }, error = function(e) {
+          message(sprintf("    Error fetching USACE historical: %s", conditionMessage(e)))
+        })
+      }
+
+    } else if (src_type == "usgs") {
+      # USGS: fetch via OGC API
+      site_no <- as.character(loc_id)
+      url <- sprintf(
+        "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=00054&time=%s/%s&limit=50000",
+        site_no, BASELINE_START, BASELINE_END
+      )
+
+      tryCatch({
+        response <- request(url) |>
+          req_timeout(300) |>
+          req_retry(max_tries = 3, backoff = ~ 10) |>
+          req_perform()
+
+        body <- resp_body_string(response)
+        data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
+
+        features <- data$features
+        if (length(features) > 0) {
+          hist_data <- tibble(
+            location_id = loc_id,
+            date = as.Date(sapply(features, function(f) f$properties$time)),
+            value = as.numeric(sapply(features, function(f) f$properties$value)),
+            unit = sapply(features, function(f) f$properties$unit_of_measure)
+          ) |>
+            mutate(unit = ifelse(tolower(unit) == "acre-ft", "af", tolower(unit))) |>
+            filter(!is.na(value)) |>
+            distinct(date, .keep_all = TRUE)
+        }
+      }, error = function(e) {
+        message(sprintf("    Error fetching USGS historical: %s", conditionMessage(e)))
+      })
+
+    } else if (src_type == "cdec") {
+      # CDEC: fetch via CSV servlet
+      station <- as.character(loc_id)
+      url <- sprintf(
+        "https://cdec.water.ca.gov/dynamicapp/req/CSVDataServlet?Stations=%s&SensorNums=15&dur_code=D&Start=%s&End=%s",
+        station, BASELINE_START, BASELINE_END
+      )
+
+      tryCatch({
+        response <- request(url) |>
+          req_timeout(300) |>
+          req_retry(max_tries = 3, backoff = ~ 10) |>
+          req_perform()
+
+        body <- resp_body_string(response)
+        data <- read_csv(I(body), show_col_types = FALSE,
+                         col_types = cols(`DATE TIME` = col_character(),
+                                          `OBS DATE` = col_character(),
+                                          .default = col_guess()))
+
+        if (nrow(data) > 0 && "VALUE" %in% names(data)) {
+          unit_val <- if ("UNITS" %in% names(data)) tolower(data$UNITS[1]) else "af"
+
+          hist_data <- data |>
+            mutate(
+              date = as.Date(str_sub(`DATE TIME`, 1, 8), format = "%Y%m%d"),
+              value = as.numeric(VALUE)
+            ) |>
+            filter(!is.na(value)) |>
+            transmute(location_id = loc_id, date, value, unit = unit_val) |>
+            distinct(date, .keep_all = TRUE)
+        }
+      }, error = function(e) {
+        message(sprintf("    Error fetching CDEC historical: %s", conditionMessage(e)))
+      })
+    }
+
+    if (!is.null(hist_data) && nrow(hist_data) > 0) {
+      message(sprintf("    Retrieved %d historical observations", nrow(hist_data)))
+      new_baseline_data[[length(new_baseline_data) + 1]] <- hist_data
+    } else {
+      message(sprintf("    No historical data retrieved"))
+    }
+
+    Sys.sleep(1)  # Rate limiting for bulk fetches
+  }
+
+  # Combine and append to baseline
+  if (length(new_baseline_data) > 0) {
+    new_baseline <- bind_rows(new_baseline_data)
+    message(sprintf("\nTotal new historical observations: %d", nrow(new_baseline)))
+
+    # Load existing baseline and append
+    if (file.exists(baseline_file)) {
+      existing_baseline <- read_parquet(baseline_file)
+      combined_baseline <- bind_rows(existing_baseline, new_baseline)
+    } else {
+      combined_baseline <- new_baseline
+    }
+
+    # Save updated baseline
+    write_parquet(combined_baseline, baseline_file)
+    message(sprintf("Updated historical_baseline.parquet: %d total observations",
+                    nrow(combined_baseline)))
+
+    # Compute statistics for new locations
+    message("\nComputing statistics for new locations...")
+
+    new_stats <- new_baseline |>
+      filter(date >= BASELINE_START, date <= BASELINE_END) |>
+      mutate(month = month(date), day = day(date)) |>
+      group_by(location_id, month, day) |>
+      summarize(
+        min  = min(value, na.rm = TRUE),
+        max  = max(value, na.rm = TRUE),
+        mean = mean(value, na.rm = TRUE),
+        p10  = quantile(value, 0.10, na.rm = TRUE),
+        p25  = quantile(value, 0.25, na.rm = TRUE),
+        p50  = quantile(value, 0.50, na.rm = TRUE),
+        p75  = quantile(value, 0.75, na.rm = TRUE),
+        p90  = quantile(value, 0.90, na.rm = TRUE),
+        n    = n(),
+        unit = first(unit),
+        .groups = "drop"
+      )
+
+    # Append to historical statistics
+    stats_file <- file.path(OUTPUT_DIR, "historical_statistics.parquet")
+    if (file.exists(stats_file)) {
+      existing_stats <- read_parquet(stats_file)
+      combined_stats <- bind_rows(existing_stats, new_stats)
+    } else {
+      combined_stats <- new_stats
+    }
+
+    write_parquet(combined_stats, stats_file)
+    message(sprintf("Updated historical_statistics.parquet: %d total rows",
+                    nrow(combined_stats)))
+
+    # Reload historical_stats for use in daily processing
+    historical_stats <- combined_stats
+
+    # Generate backfill CSV for new locations
+    message("\n=== Generating backfill CSV for new locations ===\n")
+
+    # For each date in new_baseline, generate a CSV row with statistics
+    backfill_rows <- new_baseline |>
+      left_join(locations, by = "location_id") |>
+      mutate(
+        data_month = month(date),
+        data_day = day(date)
+      ) |>
+      left_join(
+        new_stats |> select(location_id, month, day, min, max, p10, p25, p50, p75, p90, mean),
+        by = c("location_id", "data_month" = "month", "data_day" = "day")
+      ) |>
+      mutate(
+        pct_median  = value / p50,
+        pct_average = value / mean,
+        pct_full    = value / capacity
+      ) |>
+      transmute(
+        SiteName       = label_popup,
+        Lat            = latitude,
+        Lon            = longitude,
+        State          = state,
+        DoiRegion      = doi_region,
+        Huc6           = huc6,
+        DataUnits      = unit.x,
+        DataValue      = value,
+        DataDate       = format(date, "%m/%d/%Y"),
+        DateQueried    = format(Sys.Date(), "%m/%d/%Y"),
+        DataDateMax    = max,
+        DataDateP90    = p90,
+        DataDateP75    = p75,
+        DataDateP50    = p50,
+        DataDateP25    = p25,
+        DataDateP10    = p10,
+        DataDateMin    = min,
+        DataDateAvg    = mean,
+        DataValuePctMdn = pct_median,
+        DataValuePctAvg = pct_average,
+        StatsPeriod    = STATS_PERIOD,
+        MaxCapacity    = capacity,
+        ActiveCapacity = active_capacity,
+        PctFull        = pct_full,
+        TeacupUrl      = NA_character_,
+        DataUrl        = NA_character_,
+        Comment        = "backfill"
+      )
+
+    backfill_filename <- sprintf("backfill_%s.csv", format(Sys.Date(), "%Y%m%d"))
+    backfill_path <- file.path(HYDROSHARE_DIR, backfill_filename)
+    write_csv(backfill_rows, backfill_path, na = "")
+
+    message(sprintf("Backfill CSV written to: %s", backfill_path))
+    message(sprintf("  Contains %d rows for %d new location(s)",
+                    nrow(backfill_rows), n_distinct(backfill_rows$SiteName)))
+
+    # Upload backfill to HydroShare (will happen later with main upload)
+    BACKFILL_PATH <- backfill_path
+  } else {
+    message("\nNo historical data retrieved for new locations")
+    BACKFILL_PATH <- NULL
+  }
+} else {
+  message("\nNo new locations detected")
+  BACKFILL_PATH <- NULL
+}
+
+# Reload statistics after potential updates
+historical_stats <- read_parquet(file.path(OUTPUT_DIR, "historical_statistics.parquet"))
+
+# Track which locations have historical statistics (for logging)
+locations_with_stats <- unique(historical_stats$location_id)
+n_with_stats <- sum(locations$location_id %in% locations_with_stats)
+message(sprintf("  %d locations have historical statistics", n_with_stats))
+message(sprintf("  %d locations will have NA for historical metrics",
+                nrow(locations) - n_with_stats))
 
 ################################################################################
 # DATA FETCHING FUNCTIONS
@@ -648,6 +982,16 @@ if (hs_username == "" || hs_password == "") {
   }, error = function(e) {
     message(sprintf("ERROR uploading to HydroShare: %s", e$message))
   })
+
+  # Upload backfill file if it exists
+  if (exists("BACKFILL_PATH") && !is.null(BACKFILL_PATH) && file.exists(BACKFILL_PATH)) {
+    message("\nUploading backfill file to HydroShare...")
+    tryCatch({
+      upload_to_hydroshare(BACKFILL_PATH, HYDROSHARE_RESOURCE_ID, hs_username, hs_password)
+    }, error = function(e) {
+      message(sprintf("ERROR uploading backfill to HydroShare: %s", e$message))
+    })
+  }
 }
 
 ################################################################################
