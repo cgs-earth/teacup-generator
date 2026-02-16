@@ -8,7 +8,8 @@ R workflow for generating reservoir conditions data for the WWDH Reservoir Dashb
 R-workflow/
 ├── config/                     # User-curated configuration
 │   ├── locations.csv           # Master reservoir list (input)
-│   └── locations.geojson       # Generated with coordinates & spatial attributes
+│   ├── locations.geojson       # Generated with coordinates & spatial attributes
+│   └── elevation_storage_curves.csv  # Elevation-to-storage lookup tables
 │
 ├── data/
 │   ├── manual/                 # Manually downloaded CSVs for problem locations
@@ -33,7 +34,8 @@ R-workflow/
 │
 ├── hydroshare/                 # HydroShare staging (git-ignored)
 │   ├── readme.md               # HydroShare resource description
-│   └── droughtDataYYYYMMDD.csv # Daily output CSV (uploaded to HydroShare)
+│   ├── droughtDataYYYYMMDD.csv # Daily output CSV (uploaded to HydroShare)
+│   └── backfill_YYYYMMDD.csv   # Backfill CSV for newly added locations
 │
 ├── Dockerfile                  # Docker build for daily production runs
 ├── .dockerignore               # Docker build exclusions
@@ -55,7 +57,7 @@ R-workflow/
 
 | Script | Purpose |
 |--------|---------|
-| `rezviz_data_generator.R` | **Main daily script.** Fetches current storage values, joins with historical statistics, generates output CSV, uploads to HydroShare. |
+| `rezviz_data_generator.R` | **Main daily script.** Fetches current storage values, joins with historical statistics, generates output CSV, uploads to HydroShare. **Auto-detects new locations and generates backfill data.** |
 
 ### Utility Scripts
 
@@ -167,6 +169,46 @@ datetime=2025-01-15/2025-01-16
 
 Scripts include 0.25-0.5 second delays between API calls to avoid overwhelming the server.
 
+### Elevation Data (Special Handling)
+
+Some reservoirs (like Upper Klamath Lake) report **water surface elevation** rather than storage volume. The workflow automatically detects these locations (via `Storage Data Type = Elevation` in locations.csv) and converts elevation to storage using lookup tables.
+
+**Elevation-Storage Curves** are defined in `config/elevation_storage_curves.csv`:
+
+```csv
+location_id,elevation_ft,storage_af
+11507001,4136.00,0
+11507001,4137.00,66775
+11507001,4138.00,134367
+...
+```
+
+The workflow uses linear interpolation between curve points. Elevation-to-storage conversion is supported for all data sources (RISE, USACE, USGS, CDEC), making it easy to add any reservoir that reports elevation instead of storage.
+
+For USGS specifically, elevation data queries parameter codes 62614 (NGVD29) or 62615 (NAVD88) instead of 00054 (storage).
+
+**Current elevation locations:**
+- Upper Klamath Lake (USGS 11507001) - uses 2017 KBAO elevation-capacity curve
+
+To add a new elevation-based reservoir from any source:
+1. Add the elevation-storage curve to `config/elevation_storage_curves.csv`
+2. Set `Storage Data Type = Elevation` in `config/locations.csv`
+
+## Auto-Backfill for New Locations
+
+When the daily script detects a new location (present in `locations.geojson` but not in `historical_baseline.parquet`), it automatically:
+
+1. **Fetches historical data** (1990-2020) from the appropriate source
+2. **Computes day-of-year statistics** and appends to the parquet files
+3. **Generates a backfill CSV** (`backfill_YYYYMMDD.csv`) with all historical rows
+4. **Uploads the backfill CSV** to HydroShare alongside the daily file
+
+This handles two scenarios:
+- **Newly added reservoirs** in `locations.csv`
+- **Status changes** from "Do Not Include" to "Include"
+
+The backfill CSV has the same schema as daily CSVs, with `Comment = "backfill"`. External database crawlers can process this file to populate historical records.
+
 ## Output Format
 
 The daily CSV contains columns compatible with the original .NET teacup generator:
@@ -217,17 +259,22 @@ flowchart LR
     subgraph sources["Data Sources"]
         RISE["RISE API<br/>~191 loc"]
         USACE["USACE CDA<br/>6 loc"]
-        USGS["USGS OGC<br/>6 loc"]
+        USGS["USGS OGC<br/>6 loc<br/>(incl. elevation)"]
         CDEC["CDEC<br/>1 loc"]
     end
 
+    subgraph config["Config"]
+        ELEV["elevation_storage<br/>_curves.csv"]
+    end
+
     subgraph processing["Processing"]
-        GEN["rezviz_data_generator.R"]
+        GEN["rezviz_data_generator.R<br/>(+ auto-backfill)"]
         STATS[("historical_statistics<br/>.parquet")]
     end
 
     subgraph output["Output"]
         CSV["droughtData<br/>YYYYMMDD.csv"]
+        BACKFILL["backfill_<br/>YYYYMMDD.csv"]
         HS["HydroShare"]
     end
 
@@ -240,8 +287,11 @@ flowchart LR
     USGS --> GEN
     CDEC --> GEN
     STATS --> GEN
+    ELEV --> GEN
     GEN --> CSV
+    GEN --> BACKFILL
     CSV --> HS
+    BACKFILL --> HS
     HS --> WWDH
 ```
 
@@ -266,7 +316,7 @@ Add a row with the following columns:
 | `Name` | Short name | `Cedar Bluff` |
 | `Post-Review Decision` | `Include` or `Do Not Include` | `Include` |
 | `Source for Storage Data` | Full source description | `USGS Cedar Bluff Res NR Ellis KS - USGS-06861500` |
-| `Storage Data Type` | Usually `Storage` | `Storage` |
+| `Storage Data Type` | `Storage` or `Elevation` | `Storage` |
 | `Source_Name` | One of: `RISE`, `USGS`, `USACE`, `CDEC` | `USGS` |
 | `Identifier` | API identifier (see below) | `06861500` |
 | `Source for Capacity` | Optional | |
@@ -330,18 +380,18 @@ docker build -t ghcr.io/cgs-earth/rezviz:latest .
 docker push ghcr.io/cgs-earth/rezviz:latest
 ```
 
-### Step 5: (Optional) Fetch Historical Data
+### Step 5: Historical Data (Automatic)
 
-If you want historical statistics for the new reservoir:
+Historical data is now **automatically fetched** when the daily script runs:
 
-```bash
-# Re-run historical baseline (will fetch new locations)
-Rscript setup_historical_baseline.R
+- The script detects new locations not in `historical_baseline.parquet`
+- Fetches 30 years of historical data (1990-2020) from the appropriate source
+- Computes statistics and updates the parquet files
+- Generates a `backfill_YYYYMMDD.csv` for database ingestion
 
-# Or manually download CSV and process
-# Place CSV in data/manual/{identifier}.csv
-Rscript process_manual_csvs.R
-```
+No manual intervention is required! Just add the location to `locations.csv`, regenerate geojson, and rebuild Docker. The next daily run handles the rest.
+
+**Note:** For locations changing from "Do Not Include" to "Include", the same automatic backfill process applies.
 
 ### Example: Adding a USGS Reservoir
 
@@ -382,3 +432,31 @@ RISE locations are the simplest—coordinates are auto-filled:
    (Leave Longitude/Latitude blank—they'll be filled from RISE)
 
 3. **Regenerate and rebuild** as above
+
+### Example: Adding an Elevation-Based Reservoir
+
+For reservoirs that report water surface elevation instead of storage:
+
+1. **Obtain the elevation-storage curve** from the operating agency (usually available in dam engineering documents or operational manuals)
+
+2. **Add the curve to `config/elevation_storage_curves.csv`**:
+   ```csv
+   # My Lake - curve from agency documentation
+   12345678,1000.0,0
+   12345678,1010.0,5000
+   12345678,1020.0,15000
+   12345678,1030.0,30000
+   12345678,1040.0,50000
+   ```
+
+3. **Add to `config/locations.csv`** with `Storage Data Type = Elevation`:
+   ```
+   My Lake,Include,USGS Elevation https://waterdata.usgs.gov/...,Elevation,USGS,12345678,,,,100000,80000,My Lake,My Lake (My Dam),-110.5,40.2,,,
+   ```
+
+4. **Regenerate geojson and rebuild Docker** as usual
+
+The daily script will automatically:
+- Fetch elevation data (USGS parameters 62614/62615)
+- Convert to storage using your curve
+- Include in output with proper storage values

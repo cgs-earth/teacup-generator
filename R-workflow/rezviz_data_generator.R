@@ -642,8 +642,10 @@ message(sprintf("  %d locations will have NA for historical metrics",
 ################################################################################
 
 #' Fetch from RISE via WWDH API
+#' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage using curve
 #' Returns list(value, date, unit, url)
-fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
+fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
+                       data_type = "Storage") {
   for (days_back in 0:lookback_days) {
     query_date <- target_date - days_back
     start_date <- query_date
@@ -672,10 +674,26 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
       data <- read_csv(I(csv_content), show_col_types = FALSE)
       if (nrow(data) == 0) next
 
+      raw_value <- data$value[1]
+      raw_date <- as.Date(data$datetime[1])
+      raw_unit <- data$unit[1]
+
+      # Convert elevation to storage if needed
+      if (tolower(data_type) == "elevation") {
+        storage_val <- elevation_to_storage(location_id, raw_value)
+        if (!is.na(storage_val)) {
+          message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
+          return(list(value = storage_val, date = raw_date, unit = "af", url = url))
+        } else {
+          message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
+          return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+        }
+      }
+
       return(list(
-        value = data$value[1],
-        date  = as.Date(data$datetime[1]),
-        unit  = data$unit[1],
+        value = raw_value,
+        date  = raw_date,
+        unit  = raw_unit,
         url   = url
       ))
     }, error = function(e) {
@@ -687,8 +705,10 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
 
 #' Fetch from USACE CDA API
 #' The location_id is "provider/ts_name" (e.g., "spa/Abiquiu.Stor.Inst.15Minutes.0.DCP-rev")
+#' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage using curve
 #' Returns list(value, date, unit, url)
-fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
+fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
+                        data_type = "Storage") {
   # Parse provider and timeseries name from identifier format: "provider/ts_name"
   id_str <- as.character(location_id)
   slash_pos <- str_locate(id_str, "/")[1, "start"]
@@ -758,9 +778,24 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS)
       "ac-ft"
     }
 
+    raw_value <- recent$value[1]
+    raw_date <- recent$date[1]
+
+    # Convert elevation to storage if needed
+    if (tolower(data_type) == "elevation") {
+      storage_val <- elevation_to_storage(location_id, raw_value)
+      if (!is.na(storage_val)) {
+        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
+        return(list(value = storage_val, date = raw_date, unit = "af", url = url))
+      } else {
+        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
+        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+      }
+    }
+
     return(list(
-      value = recent$value[1],
-      date  = recent$date[1],
+      value = raw_value,
+      date  = raw_date,
       unit  = unit_val,
       url   = url
     ))
@@ -881,8 +916,10 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 #' Fetch from CDEC API
 #' Sensor 15 = reservoir storage
 #' The location_id IS the CDEC station code (from geojson Identifier)
+#' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage using curve
 #' Returns list(value, date, unit, url)
-fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) {
+fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
+                       data_type = "Storage") {
   # location_id is the CDEC station code directly from geojson Identifier
   station <- as.character(location_id)
 
@@ -922,10 +959,24 @@ fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS) 
 
     # CDEC UNITS column
     unit_val <- if ("UNITS" %in% names(data)) data$UNITS[1] else "AF"
+    raw_value <- data$value[1]
+    raw_date <- data$date[1]
+
+    # Convert elevation to storage if needed
+    if (tolower(data_type) == "elevation") {
+      storage_val <- elevation_to_storage(location_id, raw_value)
+      if (!is.na(storage_val)) {
+        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
+        return(list(value = storage_val, date = raw_date, unit = "af", url = url))
+      } else {
+        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
+        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+      }
+    }
 
     return(list(
-      value = data$value[1],
-      date  = data$date[1],
+      value = raw_value,
+      date  = raw_date,
       unit  = tolower(unit_val),
       url   = url
     ))
@@ -943,12 +994,12 @@ fetch_current_value <- function(location_id, source_str, target_date,
   src_type <- classify_source(source_str)
 
   result <- switch(src_type,
-    "rise"     = fetch_rise(location_id, target_date, lookback_days),
-    "usace_cda" = fetch_usace(location_id, target_date, lookback_days),
+    "rise"     = fetch_rise(location_id, target_date, lookback_days, data_type),
+    "usace_cda" = fetch_usace(location_id, target_date, lookback_days, data_type),
     "usgs"     = fetch_usgs(location_id, target_date, lookback_days, data_type),
-    "cdec"     = fetch_cdec(location_id, target_date, lookback_days),
+    "cdec"     = fetch_cdec(location_id, target_date, lookback_days, data_type),
     # For "unknown" or RISE (Pending), still try RISE
-    fetch_rise(location_id, target_date, lookback_days)
+    fetch_rise(location_id, target_date, lookback_days, data_type)
   )
 
   return(result)
