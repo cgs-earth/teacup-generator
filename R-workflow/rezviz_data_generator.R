@@ -71,15 +71,56 @@ message(sprintf("Target date: %s", TARGET_DATE))
 message(sprintf("Run time: %s", Sys.time()))
 
 ################################################################################
-# PARQUET FILE PATHS
+# PARQUET SYNC FROM HYDROSHARE
 ################################################################################
 
-# Parquet files should be bundled in the Docker image or present locally.
-# After backfill, updated parquet files are uploaded to HydroShare.
-# Rebuild the Docker image periodically to incorporate backfills.
+# Always download the latest parquet files from HydroShare at runtime.
+# Bundled parquet files (from Docker build) serve as fallback if download fails.
+# This ensures backfills from previous runs are picked up without rebuilding
+# the Docker image - preventing the same locations from being re-backfilled
+# on every run.
 
-stats_file <- file.path(OUTPUT_DIR, "historical_statistics.parquet")
+stats_file    <- file.path(OUTPUT_DIR, "historical_statistics.parquet")
 baseline_file <- file.path(OUTPUT_DIR, "historical_baseline.parquet")
+
+# Get HydroShare credentials
+hs_username <- Sys.getenv("HYDROSHARE_USERNAME", "")
+hs_password <- Sys.getenv("HYDROSHARE_PASSWORD", "")
+
+download_parquet_from_hydroshare <- function(filename, dest_path, resource_id, username, password) {
+  url <- sprintf("%s/hsapi/resource/%s/files/%s/", HYDROSHARE_BASE_URL, resource_id, filename)
+  tmp <- paste0(dest_path, ".tmp")
+  tryCatch({
+    req <- request(url) |> req_timeout(300)
+    if (username != "" && password != "") {
+      req <- req |> req_auth_basic(username, password)
+    }
+    req |> req_perform() |> resp_body_raw() |> writeBin(tmp)
+    # Validate parquet magic bytes before replacing bundled file
+    magic <- readBin(tmp, "raw", n = 4)
+    if (rawToChar(magic) == "PAR1") {
+      file.rename(tmp, dest_path)
+      message(sprintf("  Updated %s from HydroShare (%.1f MB)", filename, file.size(dest_path) / 1e6))
+      return(TRUE)
+    } else {
+      file.remove(tmp)
+      message(sprintf("  WARNING: Downloaded %s failed validation, keeping bundled file", filename))
+      return(FALSE)
+    }
+  }, error = function(e) {
+    if (file.exists(tmp)) file.remove(tmp)
+    message(sprintf("  WARNING: Could not download %s: %s - using bundled file", filename, e$message))
+    return(FALSE)
+  })
+}
+
+message("\nSyncing parquet files from HydroShare...")
+download_parquet_from_hydroshare("historical_baseline.parquet",   baseline_file, HYDROSHARE_RESOURCE_ID, hs_username, hs_password)
+download_parquet_from_hydroshare("historical_statistics.parquet", stats_file,    HYDROSHARE_RESOURCE_ID, hs_username, hs_password)
+
+if (!file.exists(stats_file) || !file.exists(baseline_file)) {
+  stop("Parquet files not found and could not be downloaded from HydroShare.")
+}
 
 ################################################################################
 # LOAD HISTORICAL STATISTICS
@@ -1186,9 +1227,6 @@ for (j in seq_len(nrow(source_counts))) {
 ################################################################################
 
 message("\n=== Uploading to HydroShare ===\n")
-
-hs_username <- Sys.getenv("HYDROSHARE_USERNAME", unset = "")
-hs_password <- Sys.getenv("HYDROSHARE_PASSWORD", unset = "")
 
 if (hs_username == "" || hs_password == "") {
   message("WARNING: HYDROSHARE_USERNAME and/or HYDROSHARE_PASSWORD not set.")

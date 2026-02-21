@@ -137,10 +137,11 @@ HYDROSHARE_PASSWORD=yourpassword
 ```
 
 **Data Flow:**
-1. Docker build downloads latest parquet files from HydroShare
-2. If new locations are detected at runtime, historical data is backfilled
-3. Updated parquet files are uploaded to HydroShare
-4. Next Docker build gets the updated parquet files automatically
+1. Docker build downloads parquet files from HydroShare (bundled as baseline fallback)
+2. On each run, script downloads latest parquet files from HydroShare (overwriting bundled files)
+3. If new locations are detected, historical data is backfilled
+4. Updated parquet files are uploaded to HydroShare
+5. Next run downloads the updated parquet files automatically - no image rebuild needed
 
 ## Historical Statistics
 
