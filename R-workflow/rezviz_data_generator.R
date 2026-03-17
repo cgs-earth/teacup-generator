@@ -719,7 +719,7 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
       "?parameter-name=Storage",
       "&limit=10",
       "&datetime=", start_date, "/", end_date,
-      "&f=csv"
+      "&f=json"
     )
 
     tryCatch({
@@ -730,15 +730,41 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 
       if (resp_status(response) != 200) next
 
-      csv_content <- resp_body_string(response)
-      if (nchar(csv_content) < 30) next
+      body <- resp_body_json(response)
 
-      data <- read_csv(I(csv_content), show_col_types = FALSE)
-      if (nrow(data) == 0) next
+      # Extract from CoverageJSON structure (always a CoverageCollection with coverages list)
+      coverages <- body$coverages
+      if (is.null(coverages) || length(coverages) == 0) next
 
-      raw_value <- data$value[1]
-      raw_date <- as.Date(data$datetime[1])
-      raw_unit <- data$unit[1]
+      # Find first coverage with a valid value across the lookback window
+      found <- NULL
+      for (cov in coverages) {
+        t_vals    <- cov$domain$axes$t$values
+        ranges    <- cov$ranges
+        if (is.null(t_vals) || length(t_vals) == 0 || is.null(ranges) || length(ranges) == 0) next
+        param_key <- names(ranges)[1]
+        raw_values <- ranges[[param_key]]$values
+        if (is.null(raw_values) || length(raw_values) == 0) next
+        valid_idx <- which(!sapply(raw_values, is.null))[1]
+        if (is.na(valid_idx)) next
+        found <- list(
+          value     = as.numeric(raw_values[[valid_idx]]),
+          date      = as.Date(substr(t_vals[[valid_idx]], 1, 10)),
+          param_key = param_key
+        )
+        break
+      }
+      if (is.null(found)) next
+
+      raw_value <- found$value
+      raw_date  <- found$date
+      param_key <- found$param_key
+
+      # Unit from parameters block
+      raw_unit <- tryCatch({
+        u <- body$parameters[[param_key]]$unit$symbol
+        if (is.null(u)) "af" else u
+      }, error = function(e) "af")
 
       # Convert elevation to storage if needed
       if (tolower(data_type) == "elevation") {

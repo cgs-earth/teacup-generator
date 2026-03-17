@@ -10,6 +10,8 @@ current=$(date -j -f "%Y-%m-%d" "$END_DATE" +%s 2>/dev/null || date -d "$END_DAT
 end=$(date -j -f "%Y-%m-%d" "$START_DATE" +%s 2>/dev/null || date -d "$START_DATE" +%s)
 
 count=0
+processed=0
+skipped=0
 total=$(( (current - end) / 86400 + 1 ))
 
 echo "=== Backfill Daily Reports ==="
@@ -23,13 +25,25 @@ while [ $current -ge $end ]; do
     date_str=$(date -j -f "%s" "$current" +%Y-%m-%d 2>/dev/null || date -d "@$current" +%Y-%m-%d)
     count=$((count + 1))
     
+    # Check if output CSV already exists
+    date_compact=$(echo "$date_str" | tr -d '-')
+    csv_file="hydroshare/droughtData${date_compact}.csv"
+
+    if [ -f "$csv_file" ]; then
+        echo "[$count/$total] Skipping $date_str (already exists)"
+        skipped=$((skipped + 1))
+        current=$((current - 86400))
+        continue
+    fi
+
     echo "[$count/$total] Processing $date_str..."
-    
+
     # Run docker with the date
     docker run --rm --env-file .env -v $(pwd)/hydroshare:/app/hydroshare rezviz "$date_str" > /dev/null 2>&1
-    
+
     if [ $? -eq 0 ]; then
         echo "  Done"
+        processed=$((processed + 1))
     else
         echo "  FAILED"
     fi
@@ -40,4 +54,4 @@ done
 
 echo ""
 echo "=== Backfill Complete ==="
-echo "Generated $count daily reports"
+echo "Generated: $processed  |  Skipped (already existed): $skipped"
