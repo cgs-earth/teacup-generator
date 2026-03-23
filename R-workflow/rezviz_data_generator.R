@@ -710,87 +710,99 @@ message(sprintf("  %d locations will have NA for historical metrics",
 #' Returns list(value, date, unit, url)
 fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
                        data_type = "Storage") {
-  for (days_back in 0:lookback_days) {
-    query_date <- target_date - days_back
-    start_date <- query_date
-    end_date <- query_date + 1
+  # Query the entire lookback window at once (not day-by-day).
+  # The WWDH API returns empty results for single-day queries on recent dates
+  # but returns data correctly when queried as a date range.
+  start_date <- target_date - lookback_days
+  end_date   <- target_date + 1
 
-    url <- paste0(
-      WWDH_API_BASE,
-      "/collections/rise-edr/locations/", location_id,
-      "?parameter-name=Storage",
-      "&limit=10",
-      "&datetime=", start_date, "/", end_date,
-      "&f=json"
-    )
+  url <- paste0(
+    WWDH_API_BASE,
+    "/collections/rise-edr/locations/", location_id,
+    "?parameter-name=Storage",
+    "&limit=50",
+    "&datetime=", start_date, "/", end_date,
+    "&f=json"
+  )
 
-    tryCatch({
-      response <- request(url) |>
-        req_timeout(60) |>
-        req_retry(max_tries = 2, backoff = ~ 2) |>
-        req_perform()
+  tryCatch({
+    response <- request(url) |>
+      req_timeout(60) |>
+      req_retry(max_tries = 2, backoff = ~ 2) |>
+      req_perform()
 
-      if (resp_status(response) != 200) next
+    if (resp_status(response) != 200) {
+      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+    }
 
-      body <- resp_body_json(response)
+    body <- resp_body_json(response)
 
-      # Extract from CoverageJSON structure (always a CoverageCollection with coverages list)
-      coverages <- body$coverages
-      if (is.null(coverages) || length(coverages) == 0) next
+    # Extract from CoverageJSON structure (always a CoverageCollection with coverages list)
+    coverages <- body$coverages
+    if (is.null(coverages) || length(coverages) == 0) {
+      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+    }
 
-      # Find first coverage with a valid value across the lookback window
-      found <- NULL
-      for (cov in coverages) {
-        t_vals    <- cov$domain$axes$t$values
-        ranges    <- cov$ranges
-        if (is.null(t_vals) || length(t_vals) == 0 || is.null(ranges) || length(ranges) == 0) next
-        param_key <- names(ranges)[1]
-        raw_values <- ranges[[param_key]]$values
-        if (is.null(raw_values) || length(raw_values) == 0) next
-        valid_idx <- which(!sapply(raw_values, is.null))[1]
-        if (is.na(valid_idx)) next
-        found <- list(
-          value     = as.numeric(raw_values[[valid_idx]]),
-          date      = as.Date(substr(t_vals[[valid_idx]], 1, 10)),
-          param_key = param_key
-        )
-        break
-      }
-      if (is.null(found)) next
+    # Find the most recent valid value across all coverages
+    found <- NULL
+    for (cov in coverages) {
+      t_vals    <- cov$domain$axes$t$values
+      ranges    <- cov$ranges
+      if (is.null(t_vals) || length(t_vals) == 0 || is.null(ranges) || length(ranges) == 0) next
+      param_key <- names(ranges)[1]
+      raw_values <- ranges[[param_key]]$values
+      if (is.null(raw_values) || length(raw_values) == 0) next
 
-      raw_value <- found$value
-      raw_date  <- found$date
-      param_key <- found$param_key
-
-      # Unit from parameters block
-      raw_unit <- tryCatch({
-        u <- body$parameters[[param_key]]$unit$symbol
-        if (is.null(u)) "af" else u
-      }, error = function(e) "af")
-
-      # Convert elevation to storage if needed
-      if (tolower(data_type) == "elevation") {
-        storage_val <- elevation_to_storage(location_id, raw_value)
-        if (!is.na(storage_val)) {
-          message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
-          return(list(value = storage_val, date = raw_date, unit = "af", url = url))
-        } else {
-          message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
-          return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+      # Walk backwards from most recent to find the latest non-null value
+      for (i in rev(seq_along(raw_values))) {
+        if (!is.null(raw_values[[i]])) {
+          candidate_date <- as.Date(substr(t_vals[[i]], 1, 10))
+          if (is.null(found) || candidate_date > found$date) {
+            found <- list(
+              value     = as.numeric(raw_values[[i]]),
+              date      = candidate_date,
+              param_key = param_key
+            )
+          }
+          break
         }
       }
+    }
+    if (is.null(found)) {
+      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+    }
 
-      return(list(
-        value = raw_value,
-        date  = raw_date,
-        unit  = raw_unit,
-        url   = url
-      ))
-    }, error = function(e) {
-      # Continue to next day
-    })
-  }
-  return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = NA_character_))
+    raw_value <- found$value
+    raw_date  <- found$date
+    param_key <- found$param_key
+
+    # Unit from parameters block
+    raw_unit <- tryCatch({
+      u <- body$parameters[[param_key]]$unit$symbol
+      if (is.null(u)) "af" else u
+    }, error = function(e) "af")
+
+    # Convert elevation to storage if needed
+    if (tolower(data_type) == "elevation") {
+      storage_val <- elevation_to_storage(location_id, raw_value)
+      if (!is.na(storage_val)) {
+        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
+        return(list(value = storage_val, date = raw_date, unit = "af", url = url))
+      } else {
+        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
+        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+      }
+    }
+
+    return(list(
+      value = raw_value,
+      date  = raw_date,
+      unit  = raw_unit,
+      url   = url
+    ))
+  }, error = function(e) {
+    return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+  })
 }
 
 #' Fetch from USACE CDA API
