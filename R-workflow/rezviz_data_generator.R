@@ -309,6 +309,8 @@ baseline_location_ids <- if (file.exists(baseline_file)) {
 }
 
 new_location_ids <- setdiff(locations$location_id, baseline_location_ids)
+# Exclude locations with no valid identifier (e.g., "--" for RISE Pending)
+new_location_ids <- new_location_ids[!is.na(new_location_ids) & new_location_ids != "--" & new_location_ids != ""]
 new_locations <- locations |> filter(location_id %in% new_location_ids)
 
 if (nrow(new_locations) > 0) {
@@ -1118,6 +1120,20 @@ for (i in seq_len(nrow(locations))) {
   type_suffix <- if (tolower(data_type_str) == "elevation") " (elevation->storage)" else ""
   message(sprintf("[%d/%d] %s (ID: %s) [%s]%s...",
                   i, nrow(locations), location_name, location_id, src_type, type_suffix))
+
+  # Skip locations with no valid identifier (e.g., "--" for RISE Pending)
+  if (is.na(location_id) || location_id == "--" || location_id == "") {
+    message(sprintf("  Skipping: no valid identifier"))
+    results[[i]] <- tibble(
+      location_id = location_id,
+      name        = location_name,
+      data_value  = NA_real_,
+      data_date   = as.Date(NA),
+      data_unit   = NA_character_,
+      data_url    = NA_character_
+    )
+    next
+  }
 
   # Fetch current value from the appropriate source
   current <- fetch_current_value(location_id, source_str, TARGET_DATE,
