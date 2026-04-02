@@ -347,14 +347,14 @@ if (nrow(new_locations) > 0) {
     hist_data <- NULL
 
     if (src_type == "rise") {
-      # RISE: fetch full range via WWDH API
+      # RISE: fetch full range via WWDH API (JSON/CoverageJSON, not CSV which returns 500)
       url <- paste0(
         WWDH_API_BASE,
         "/collections/rise-edr/locations/", loc_id,
         "?parameter-name=Storage",
         "&limit=50000",
         "&datetime=", BASELINE_START, "/", BASELINE_END + 1,
-        "&f=csv"
+        "&f=json"
       )
 
       tryCatch({
@@ -364,17 +364,35 @@ if (nrow(new_locations) > 0) {
           req_perform()
 
         if (resp_status(response) == 200) {
-          csv_content <- resp_body_string(response)
-          if (nchar(csv_content) > 50) {
-            data <- read_csv(I(csv_content), show_col_types = FALSE)
-            if (nrow(data) > 0 && "datetime" %in% names(data)) {
-              hist_data <- data |>
-                transmute(
-                  location_id = loc_id,
-                  date = as.Date(datetime),
-                  value = value,
-                  unit = unit
-                ) |>
+          body <- resp_body_json(response)
+          coverages <- body$coverages
+          if (!is.null(coverages) && length(coverages) > 0) {
+            all_rows <- list()
+            param_key <- NULL
+            for (cov in coverages) {
+              t_vals <- cov$domain$axes$t$values
+              ranges <- cov$ranges
+              if (is.null(t_vals) || length(t_vals) == 0 || is.null(ranges) || length(ranges) == 0) next
+              if (is.null(param_key)) param_key <- names(ranges)[1]
+              raw_values <- ranges[[param_key]]$values
+              if (is.null(raw_values) || length(raw_values) == 0) next
+              for (j in seq_along(raw_values)) {
+                if (!is.null(raw_values[[j]])) {
+                  all_rows[[length(all_rows) + 1]] <- list(
+                    date  = as.Date(substr(t_vals[[j]], 1, 10)),
+                    value = as.numeric(raw_values[[j]])
+                  )
+                }
+              }
+            }
+            if (length(all_rows) > 0) {
+              raw_unit <- tryCatch({
+                u <- body$parameters[[param_key]]$unit$symbol
+                if (is.null(u)) "af" else u
+              }, error = function(e) "af")
+
+              hist_data <- bind_rows(all_rows) |>
+                mutate(location_id = loc_id, unit = raw_unit) |>
                 filter(!is.na(value)) |>
                 distinct(date, .keep_all = TRUE)
             }
