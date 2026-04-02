@@ -63,6 +63,9 @@ if (length(args) > 0) {
 # How many days to look back if no data on target date
 LOOKBACK_DAYS <- 7
 
+# Number of days to include in output CSV (target date + previous days)
+REPORT_DAYS <- 3
+
 # Historical statistics period
 STATS_PERIOD <- "10/1/1990 - 9/30/2020"
 
@@ -707,14 +710,15 @@ message(sprintf("  %d locations will have NA for historical metrics",
 
 #' Fetch from RISE via WWDH API
 #' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage using curve
-#' Returns list(value, date, unit, url)
+#' Returns tibble(date, value, unit, url) with all available daily values in range
 fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
                        data_type = "Storage") {
   # Query the entire lookback window at once (not day-by-day).
   # The WWDH API returns empty results for single-day queries on recent dates
   # but returns data correctly when queried as a date range.
+  # End date needs +2 buffer: the API excludes data near the end of the range.
   start_date <- target_date - lookback_days
-  end_date   <- target_date + 1
+  end_date   <- target_date + 2
 
   url <- paste0(
     WWDH_API_BASE,
@@ -725,56 +729,44 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
     "&f=json"
   )
 
+  empty <- tibble(date = as.Date(character(0)), value = numeric(0),
+                  unit = character(0), url = character(0))
+
   tryCatch({
     response <- request(url) |>
       req_timeout(60) |>
       req_retry(max_tries = 2, backoff = ~ 2) |>
       req_perform()
 
-    if (resp_status(response) != 200) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
+    if (resp_status(response) != 200) return(empty)
 
     body <- resp_body_json(response)
 
-    # Extract from CoverageJSON structure (always a CoverageCollection with coverages list)
     coverages <- body$coverages
-    if (is.null(coverages) || length(coverages) == 0) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
+    if (is.null(coverages) || length(coverages) == 0) return(empty)
 
-    # Find the most recent valid value across all coverages
-    found <- NULL
+    # Collect all date/value pairs across coverages
+    all_rows <- list()
+    param_key <- NULL
     for (cov in coverages) {
-      t_vals    <- cov$domain$axes$t$values
-      ranges    <- cov$ranges
+      t_vals <- cov$domain$axes$t$values
+      ranges <- cov$ranges
       if (is.null(t_vals) || length(t_vals) == 0 || is.null(ranges) || length(ranges) == 0) next
-      param_key <- names(ranges)[1]
+      if (is.null(param_key)) param_key <- names(ranges)[1]
       raw_values <- ranges[[param_key]]$values
       if (is.null(raw_values) || length(raw_values) == 0) next
 
-      # Walk backwards from most recent to find the latest non-null value
-      for (i in rev(seq_along(raw_values))) {
+      for (i in seq_along(raw_values)) {
         if (!is.null(raw_values[[i]])) {
-          candidate_date <- as.Date(substr(t_vals[[i]], 1, 10))
-          if (is.null(found) || candidate_date > found$date) {
-            found <- list(
-              value     = as.numeric(raw_values[[i]]),
-              date      = candidate_date,
-              param_key = param_key
-            )
-          }
-          break
+          all_rows[[length(all_rows) + 1]] <- list(
+            date  = as.Date(substr(t_vals[[i]], 1, 10)),
+            value = as.numeric(raw_values[[i]])
+          )
         }
       }
     }
-    if (is.null(found)) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
 
-    raw_value <- found$value
-    raw_date  <- found$date
-    param_key <- found$param_key
+    if (length(all_rows) == 0) return(empty)
 
     # Unit from parameters block
     raw_unit <- tryCatch({
@@ -782,48 +774,47 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
       if (is.null(u)) "af" else u
     }, error = function(e) "af")
 
+    result <- bind_rows(all_rows) |>
+      mutate(unit = raw_unit, url = url) |>
+      distinct(date, .keep_all = TRUE) |>
+      arrange(desc(date))
+
     # Convert elevation to storage if needed
     if (tolower(data_type) == "elevation") {
-      storage_val <- elevation_to_storage(location_id, raw_value)
-      if (!is.na(storage_val)) {
-        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
-        return(list(value = storage_val, date = raw_date, unit = "af", url = url))
-      } else {
-        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
-        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-      }
+      result <- result |>
+        rowwise() |>
+        mutate(value = elevation_to_storage(location_id, value)) |>
+        ungroup() |>
+        filter(!is.na(value)) |>
+        mutate(unit = "af")
     }
 
-    return(list(
-      value = raw_value,
-      date  = raw_date,
-      unit  = raw_unit,
-      url   = url
-    ))
+    return(result)
   }, error = function(e) {
-    return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+    return(empty)
   })
 }
 
 #' Fetch from USACE CDA API
 #' The location_id is "provider/ts_name" (e.g., "spa/Abiquiu.Stor.Inst.15Minutes.0.DCP-rev")
 #' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage using curve
-#' Returns list(value, date, unit, url)
+#' Returns tibble(date, value, unit, url) with all available daily values in range
 fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
                         data_type = "Storage") {
-  # Parse provider and timeseries name from identifier format: "provider/ts_name"
   id_str <- as.character(location_id)
   slash_pos <- str_locate(id_str, "/")[1, "start"]
 
+  empty <- tibble(date = as.Date(character(0)), value = numeric(0),
+                  unit = character(0), url = character(0))
+
   if (is.na(slash_pos)) {
     message(sprintf("    USACE: invalid identifier format '%s' (expected 'provider/ts_name')", id_str))
-    return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = NA_character_))
+    return(empty)
   }
 
   provider <- str_sub(id_str, 1, slash_pos - 1)
   ts_name  <- str_sub(id_str, slash_pos + 1)
 
-  # Query the full lookback window in one call
   begin_date <- target_date - lookback_days
   end_date   <- target_date + 1
   begin_str  <- paste0(format(begin_date, "%Y-%m-%dT00:00:00"), ".000Z")
@@ -831,9 +822,7 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 
   url <- sprintf(
     "https://water.usace.army.mil/cda/reporting/providers/%s/timeseries?name=%s&begin=%s&end=%s&format=csv",
-    provider,
-    URLencode(ts_name, reserved = TRUE),
-    begin_str, end_str
+    provider, URLencode(ts_name, reserved = TRUE), begin_str, end_str
   )
 
   tryCatch({
@@ -843,34 +832,11 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
       req_perform()
 
     body <- resp_body_string(response)
-
-    # USACE CDA CSV has ## comment lines, then datetime,value rows
-    # Strip \r from \r\n line endings
     body <- str_replace_all(body, "\r", "")
     lines <- str_split(body, "\n")[[1]]
     data_lines <- lines[!str_starts(lines, "##") & nchar(trimws(lines)) > 0]
 
-    if (length(data_lines) == 0) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
-
-    # Parse: each line is "datetime,value"
-    parsed <- tibble(raw = data_lines) |>
-      mutate(
-        datetime = str_extract(raw, "^[^,]+"),
-        value    = as.numeric(str_extract(raw, "[^,]+$")),
-        date     = as.Date(str_sub(datetime, 1, 10))
-      ) |>
-      filter(!is.na(value)) |>
-      arrange(desc(date))
-
-    if (nrow(parsed) == 0) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
-
-    # Find the most recent value on or before target_date
-    recent <- parsed |> filter(date <= target_date)
-    if (nrow(recent) == 0) recent <- parsed
+    if (length(data_lines) == 0) return(empty)
 
     # Extract unit from ## comment lines
     unit_line <- lines[str_starts(lines, "##unit:")]
@@ -880,30 +846,33 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
       "ac-ft"
     }
 
-    raw_value <- recent$value[1]
-    raw_date <- recent$date[1]
+    parsed <- tibble(raw = data_lines) |>
+      mutate(
+        datetime = str_extract(raw, "^[^,]+"),
+        value    = as.numeric(str_extract(raw, "[^,]+$")),
+        date     = as.Date(str_sub(datetime, 1, 10))
+      ) |>
+      filter(!is.na(value)) |>
+      distinct(date, .keep_all = TRUE) |>
+      arrange(desc(date)) |>
+      transmute(date, value, unit = unit_val, url = url)
+
+    if (nrow(parsed) == 0) return(empty)
 
     # Convert elevation to storage if needed
     if (tolower(data_type) == "elevation") {
-      storage_val <- elevation_to_storage(location_id, raw_value)
-      if (!is.na(storage_val)) {
-        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
-        return(list(value = storage_val, date = raw_date, unit = "af", url = url))
-      } else {
-        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
-        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-      }
+      parsed <- parsed |>
+        rowwise() |>
+        mutate(value = elevation_to_storage(location_id, value)) |>
+        ungroup() |>
+        filter(!is.na(value)) |>
+        mutate(unit = "af")
     }
 
-    return(list(
-      value = raw_value,
-      date  = raw_date,
-      unit  = unit_val,
-      url   = url
-    ))
+    return(parsed)
   }, error = function(e) {
     message(sprintf("    USACE fetch error: %s", conditionMessage(e)))
-    return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+    return(empty)
   })
 }
 
@@ -912,25 +881,23 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 #' Parameter 62614 = lake/reservoir water surface elevation (ft NGVD29)
 #' Parameter 62615 = lake/reservoir water surface elevation (ft NAVD88)
 #' Parameter 72275 = lake/reservoir elevation (ft USBR datum, e.g. Klamath Basin)
-#' Replaces legacy NWIS waterservices.usgs.gov (retiring Q1 2027)
-#' The location_id IS the USGS site number (from geojson Identifier)
 #' For elevation data, tries 62614 first, then falls back to 72275, then 62615
 #' @param data_type "Storage" or "Elevation" - if Elevation, converts to storage
-#' Returns list(value, date, unit, url)
+#' Returns tibble(date, value, unit, url) with all available daily values in range
 fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
                        data_type = "Storage") {
-  # location_id is the USGS site number directly from geojson Identifier
   site_no <- as.character(location_id)
 
   start_date <- target_date - lookback_days
   end_date   <- target_date
 
-  # Select parameter code based on data type
+  empty <- tibble(date = as.Date(character(0)), value = numeric(0),
+                  unit = character(0), url = character(0))
+
   if (tolower(data_type) == "elevation") {
-    # Try elevation parameters: 62614 (NGVD29) or 62615 (NAVD88)
-    param_code <- "62614"  # Primary elevation parameter
+    param_code <- "62614"
   } else {
-    param_code <- "00054"  # Storage in acre-feet
+    param_code <- "00054"
   }
 
   url <- sprintf(
@@ -946,11 +913,9 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 
     body <- resp_body_string(response)
     data <- jsonlite::fromJSON(body, simplifyVector = FALSE)
-
     features <- data$features
 
     # If elevation query returned nothing, try alternate elevation parameters
-    # Priority: 72275 (USBR datum, e.g. Klamath Basin) > 62615 (NAVD88) > 62614 (NGVD29)
     if (length(features) == 0 && tolower(data_type) == "elevation") {
       for (alt_param in c("72275", "62615")) {
         url <- sprintf(
@@ -968,56 +933,36 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
       }
     }
 
-    if (length(features) == 0) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
+    if (length(features) == 0) return(empty)
 
-    # Parse features into a tibble
     parsed <- tibble(
       date  = as.Date(sapply(features, function(f) f$properties$time)),
       value = as.numeric(sapply(features, function(f) f$properties$value)),
       unit  = sapply(features, function(f) f$properties$unit_of_measure)
     ) |>
       filter(!is.na(value)) |>
-      arrange(desc(date))
+      distinct(date, .keep_all = TRUE) |>
+      arrange(desc(date)) |>
+      mutate(unit = tolower(unit), url = url)
 
-    if (nrow(parsed) == 0) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
-
-    raw_value <- parsed$value[1]
-    raw_unit <- tolower(parsed$unit[1])
+    if (nrow(parsed) == 0) return(empty)
 
     # Convert elevation to storage if needed
     if (tolower(data_type) == "elevation") {
-      storage_val <- elevation_to_storage(location_id, raw_value)
-      if (!is.na(storage_val)) {
-        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
-        return(list(
-          value = storage_val,
-          date  = parsed$date[1],
-          unit  = "af",
-          url   = url
-        ))
-      } else {
-        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
-        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-      }
+      parsed <- parsed |>
+        rowwise() |>
+        mutate(value = elevation_to_storage(location_id, value)) |>
+        ungroup() |>
+        filter(!is.na(value)) |>
+        mutate(unit = "af")
+    } else {
+      parsed <- parsed |> mutate(unit = ifelse(unit == "acre-ft", "af", unit))
     }
 
-    # Normalize unit string for storage
-    unit_val <- raw_unit
-    if (unit_val == "acre-ft") unit_val <- "af"
-
-    return(list(
-      value = raw_value,
-      date  = parsed$date[1],
-      unit  = unit_val,
-      url   = url
-    ))
+    return(parsed)
   }, error = function(e) {
     message(sprintf("    USGS OGC API error: %s", conditionMessage(e)))
-    return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+    return(empty)
   })
 }
 
@@ -1028,11 +973,13 @@ fetch_usgs <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 #' Returns list(value, date, unit, url)
 fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
                        data_type = "Storage") {
-  # location_id is the CDEC station code directly from geojson Identifier
   station <- as.character(location_id)
 
   start_date <- target_date - lookback_days
   end_date   <- target_date
+
+  empty <- tibble(date = as.Date(character(0)), value = numeric(0),
+                  unit = character(0), url = character(0))
 
   url <- sprintf(
     "https://cdec.water.ca.gov/dynamicapp/req/CSVDataServlet?Stations=%s&SensorNums=15&dur_code=D&Start=%s&End=%s",
@@ -1051,54 +998,42 @@ fetch_cdec <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
                                      `OBS DATE` = col_character(),
                                      .default = col_guess()))
 
-    if (nrow(data) == 0 || !"VALUE" %in% names(data)) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
+    if (nrow(data) == 0 || !"VALUE" %in% names(data)) return(empty)
 
-    data <- data |>
+    unit_val <- if ("UNITS" %in% names(data)) tolower(data$UNITS[1]) else "af"
+
+    parsed <- data |>
       mutate(date  = as.Date(str_sub(`DATE TIME`, 1, 8), format = "%Y%m%d"),
              value = as.numeric(VALUE)) |>
       filter(!is.na(value)) |>
-      arrange(desc(date))
+      distinct(date, .keep_all = TRUE) |>
+      arrange(desc(date)) |>
+      transmute(date, value, unit = unit_val, url = url)
 
-    if (nrow(data) == 0) {
-      return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-    }
-
-    # CDEC UNITS column
-    unit_val <- if ("UNITS" %in% names(data)) data$UNITS[1] else "AF"
-    raw_value <- data$value[1]
-    raw_date <- data$date[1]
+    if (nrow(parsed) == 0) return(empty)
 
     # Convert elevation to storage if needed
     if (tolower(data_type) == "elevation") {
-      storage_val <- elevation_to_storage(location_id, raw_value)
-      if (!is.na(storage_val)) {
-        message(sprintf("    Converted elevation %.2f ft -> storage %.0f af", raw_value, storage_val))
-        return(list(value = storage_val, date = raw_date, unit = "af", url = url))
-      } else {
-        message(sprintf("    WARNING: Could not convert elevation %.2f ft to storage (no curve)", raw_value))
-        return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
-      }
+      parsed <- parsed |>
+        rowwise() |>
+        mutate(value = elevation_to_storage(location_id, value)) |>
+        ungroup() |>
+        filter(!is.na(value)) |>
+        mutate(unit = "af")
     }
 
-    return(list(
-      value = raw_value,
-      date  = raw_date,
-      unit  = tolower(unit_val),
-      url   = url
-    ))
+    return(parsed)
   }, error = function(e) {
-    return(list(value = NA, date = as.Date(NA), unit = NA_character_, url = url))
+    return(empty)
   })
 }
 
 #' Master fetch: dispatch to the correct source-specific function
 #' @param data_type "Storage" or "Elevation" - passed to source-specific fetchers
-#' Returns list(value, date, unit, url)
-fetch_current_value <- function(location_id, source_str, target_date,
-                                lookback_days = LOOKBACK_DAYS,
-                                data_type = "Storage") {
+#' Returns tibble(date, value, unit, url) with all available daily values in range
+fetch_all_values <- function(location_id, source_str, target_date,
+                             lookback_days = LOOKBACK_DAYS,
+                             data_type = "Storage") {
   src_type <- classify_source(source_str)
 
   result <- switch(src_type,
@@ -1106,7 +1041,6 @@ fetch_current_value <- function(location_id, source_str, target_date,
     "usace_cda" = fetch_usace(location_id, target_date, lookback_days, data_type),
     "usgs"     = fetch_usgs(location_id, target_date, lookback_days, data_type),
     "cdec"     = fetch_cdec(location_id, target_date, lookback_days, data_type),
-    # For "unknown" or RISE (Pending), still try RISE
     fetch_rise(location_id, target_date, lookback_days, data_type)
   )
 
@@ -1117,9 +1051,14 @@ fetch_current_value <- function(location_id, source_str, target_date,
 # MAIN PROCESSING LOOP
 ################################################################################
 
-message("\n=== Fetching current values ===\n")
+# Fetch once per location (using the 7-day lookback window), then extract
+# values for each of the last REPORT_DAYS days from the single API response.
 
-results <- list()
+report_dates <- TARGET_DATE - seq(0, REPORT_DAYS - 1)  # e.g., Apr 1, Mar 31, Mar 30
+message(sprintf("\n=== Fetching values (report dates: %s) ===\n",
+                paste(report_dates, collapse = ", ")))
+
+all_location_rows <- list()
 
 for (i in seq_len(nrow(locations))) {
   loc <- locations[i, ]
@@ -1133,57 +1072,66 @@ for (i in seq_len(nrow(locations))) {
   message(sprintf("[%d/%d] %s (ID: %s) [%s]%s...",
                   i, nrow(locations), location_name, location_id, src_type, type_suffix))
 
-  # Skip locations with no valid identifier (e.g., "--" for RISE Pending)
+  # Skip locations with no valid identifier
   if (is.na(location_id) || location_id == "--" || location_id == "") {
     message(sprintf("  Skipping: no valid identifier"))
-    results[[i]] <- tibble(
-      location_id = location_id,
-      name        = location_name,
-      data_value  = NA_real_,
-      data_date   = as.Date(NA),
-      data_unit   = NA_character_,
-      data_url    = NA_character_
-    )
+    for (rd in report_dates) {
+      all_location_rows[[length(all_location_rows) + 1]] <- tibble(
+        location_id = location_id, name = location_name,
+        report_date = as.Date(rd, origin = "1970-01-01"), data_value = NA_real_,
+        data_date = as.Date(NA), data_unit = NA_character_, data_url = NA_character_
+      )
+    }
     next
   }
 
-  # Fetch current value from the appropriate source
-  current <- fetch_current_value(location_id, source_str, TARGET_DATE,
-                                  data_type = data_type_str)
+  # Single API call returns all daily values in the lookback window
+  all_vals <- fetch_all_values(location_id, source_str, TARGET_DATE,
+                                data_type = data_type_str)
 
-  if (is.na(current$value)) {
+  if (nrow(all_vals) == 0) {
     message(sprintf("  No data found"))
-    results[[i]] <- tibble(
-      location_id = location_id,
-      name        = location_name,
-      data_value  = NA_real_,
-      data_date   = as.Date(NA),
-      data_unit   = NA_character_,
-      data_url    = if (!is.null(current$url)) current$url else NA_character_
-    )
+    for (rd in report_dates) {
+      all_location_rows[[length(all_location_rows) + 1]] <- tibble(
+        location_id = location_id, name = location_name,
+        report_date = as.Date(rd, origin = "1970-01-01"), data_value = NA_real_,
+        data_date = as.Date(NA), data_unit = NA_character_, data_url = NA_character_
+      )
+    }
     next
   }
 
-  message(sprintf("  Value: %s %s (date: %s)",
-                  format(current$value, big.mark = ","),
-                  current$unit,
-                  current$date))
+  # For each report date, find the most recent value on or before that date
+  for (rd in report_dates) {
+    candidates <- all_vals |> filter(date <= as.Date(rd, origin = "1970-01-01"))
+    if (nrow(candidates) > 0) {
+      best <- candidates |> slice(1)  # already sorted desc by date
+      all_location_rows[[length(all_location_rows) + 1]] <- tibble(
+        location_id = location_id, name = location_name,
+        report_date = as.Date(rd, origin = "1970-01-01"),
+        data_value = best$value, data_date = best$date,
+        data_unit = best$unit, data_url = best$url
+      )
+    } else {
+      all_location_rows[[length(all_location_rows) + 1]] <- tibble(
+        location_id = location_id, name = location_name,
+        report_date = rd, data_value = NA_real_, data_date = as.Date(NA),
+        data_unit = NA_character_, data_url = all_vals$url[1]
+      )
+    }
+  }
 
-  results[[i]] <- tibble(
-    location_id = location_id,
-    name        = location_name,
-    data_value  = current$value,
-    data_date   = current$date,
-    data_unit   = current$unit,
-    data_url    = current$url
-  )
+  dates_found <- all_vals |> filter(date %in% report_dates) |> pull(date)
+  message(sprintf("  Latest: %s %s (date: %s) | %d/%d report dates covered",
+                  format(all_vals$value[1], big.mark = ","),
+                  all_vals$unit[1], all_vals$date[1],
+                  length(dates_found), REPORT_DAYS))
 
-  # Rate limiting
   Sys.sleep(0.25)
 }
 
-# Combine results
-current_data <- bind_rows(results)
+# Combine all rows
+current_data <- bind_rows(all_location_rows)
 
 ################################################################################
 # JOIN WITH HISTORICAL STATISTICS
@@ -1191,29 +1139,27 @@ current_data <- bind_rows(results)
 
 message("\n=== Joining with historical statistics ===\n")
 
-# Get the month and day for the target date to look up correct historical stats
-target_month <- month(TARGET_DATE)
-target_day   <- day(TARGET_DATE)
-
-# Get historical stats for today's calendar day
-todays_stats <- historical_stats |>
-  filter(month == target_month, day == target_day) |>
-  select(location_id, min, max, p10, p25, p50, p75, p90, mean, unit)
-
-# Join current data with location metadata and historical stats
-# Use left_join so ALL locations appear even without stats
+# For each row, look up stats for that row's report_date (not data_date)
+# so percentiles match the calendar day being reported
 output_data <- current_data |>
   left_join(locations, by = c("location_id", "name")) |>
-  left_join(todays_stats, by = "location_id", suffix = c("", "_hist")) |>
   mutate(
-    # Calculate derived values (will be NA if stats or current value missing)
-    pct_median  = data_value / p50,
-    pct_average = data_value / mean,
-    pct_full    = data_value / capacity,
-    # Format dates
+    stat_month = month(report_date),
+    stat_day   = day(report_date)
+  ) |>
+  left_join(
+    historical_stats |> select(location_id, month, day, min, max, p10, p25, p50, p75, p90, mean, unit),
+    by = c("location_id", "stat_month" = "month", "stat_day" = "day"),
+    suffix = c("", "_hist")
+  ) |>
+  mutate(
+    pct_median    = data_value / p50,
+    pct_average   = data_value / mean,
+    pct_full      = data_value / capacity,
     data_date_fmt = format(data_date, "%m/%d/%Y"),
     date_queried  = format(Sys.Date(), "%m/%d/%Y")
-  )
+  ) |>
+  select(-stat_month, -stat_day)
 
 ################################################################################
 # GENERATE OUTPUT CSV
@@ -1261,7 +1207,7 @@ output_path <- file.path(HYDROSHARE_DIR, output_filename)
 write_csv(output_csv, output_path, na = "")
 
 message(sprintf("Output written to: %s", output_path))
-message(sprintf("  Total locations: %d", nrow(output_csv)))
+message(sprintf("  Total rows: %d (%d locations x %d days)", nrow(output_csv), nrow(locations), REPORT_DAYS))
 message(sprintf("  With data: %d", sum(!is.na(output_csv$DataValue))))
 message(sprintf("  Missing data: %d", sum(is.na(output_csv$DataValue))))
 message(sprintf("  With historical stats: %d", sum(!is.na(output_csv$DataDateP50))))
@@ -1379,12 +1325,13 @@ if (hs_username == "" || hs_password == "") {
 ################################################################################
 
 message("\n=== Summary ===")
-message(sprintf("Target date: %s", TARGET_DATE))
-message(sprintf("Locations processed: %d", nrow(output_csv)))
-message(sprintf("Locations with current data: %d (%.1f%%)",
+message(sprintf("Target date: %s (%d days of data)", TARGET_DATE, REPORT_DAYS))
+message(sprintf("Report dates: %s", paste(report_dates, collapse = ", ")))
+message(sprintf("Total rows: %d (%d locations x %d days)", nrow(output_csv), nrow(locations), REPORT_DAYS))
+message(sprintf("Rows with current data: %d (%.1f%%)",
                 sum(!is.na(output_csv$DataValue)),
                 100 * sum(!is.na(output_csv$DataValue)) / nrow(output_csv)))
-message(sprintf("Locations with historical stats: %d (%.1f%%)",
+message(sprintf("Rows with historical stats: %d (%.1f%%)",
                 sum(!is.na(output_csv$DataDateP50)),
                 100 * sum(!is.na(output_csv$DataDateP50)) / nrow(output_csv)))
 message(sprintf("Output file: %s", output_path))
