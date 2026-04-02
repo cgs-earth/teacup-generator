@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_JSON }}
       - name: Generate and upload reservoir data
         env:
           HYDROSHARE_USERNAME: ${{ secrets.HYDROSHARE_USERNAME }}
@@ -26,3 +30,6 @@ jobs:
 
           # Clean up
           rm .env
+      - name: Trigger Google Cloud load
+        run: |
+          gcloud run jobs execute ${{ secrets.GCP_JOB_NAME }} --region ${{ secrets.GCP_JOB_REGION }} --wait
