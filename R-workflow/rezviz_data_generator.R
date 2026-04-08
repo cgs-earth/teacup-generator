@@ -734,9 +734,10 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
   # Query the entire lookback window at once (not day-by-day).
   # The WWDH API returns empty results for single-day queries on recent dates
   # but returns data correctly when queried as a date range.
-  # End date needs +2 buffer: the API excludes data near the end of the range.
+  # Randomize end date far in future to bust WWDH API cache layer.
+  # Each run gets a unique URL, avoiding stale cached responses.
   start_date <- target_date - lookback_days
-  end_date   <- target_date + 2
+  end_date   <- target_date + sample(30:90, 1)
 
   url <- paste0(
     WWDH_API_BASE,
@@ -767,6 +768,9 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
     all_rows <- list()
     param_key <- NULL
     for (cov in coverages) {
+      # Skip modeled/forecast coverages — only use observed data
+      if (!is.null(cov$isModeled) && cov$isModeled == TRUE) next
+
       t_vals <- cov$domain$axes$t$values
       ranges <- cov$ranges
       if (is.null(t_vals) || length(t_vals) == 0 || is.null(ranges) || length(ranges) == 0) next
@@ -1093,10 +1097,10 @@ for (i in seq_len(nrow(locations))) {
   # Skip locations with no valid identifier
   if (is.na(location_id) || location_id == "--" || location_id == "") {
     message(sprintf("  Skipping: no valid identifier"))
-    for (rd in report_dates) {
+    for (di in seq_along(report_dates)) {
       all_location_rows[[length(all_location_rows) + 1]] <- tibble(
         location_id = location_id, name = location_name,
-        report_date = as.Date(rd, origin = "1970-01-01"), data_value = NA_real_,
+        report_date = report_dates[di], data_value = NA_real_,
         data_date = as.Date(NA), data_unit = NA_character_, data_url = NA_character_
       )
     }
@@ -1109,10 +1113,10 @@ for (i in seq_len(nrow(locations))) {
 
   if (nrow(all_vals) == 0) {
     message(sprintf("  No data found"))
-    for (rd in report_dates) {
+    for (di in seq_along(report_dates)) {
       all_location_rows[[length(all_location_rows) + 1]] <- tibble(
         location_id = location_id, name = location_name,
-        report_date = as.Date(rd, origin = "1970-01-01"), data_value = NA_real_,
+        report_date = report_dates[di], data_value = NA_real_,
         data_date = as.Date(NA), data_unit = NA_character_, data_url = NA_character_
       )
     }
@@ -1120,13 +1124,14 @@ for (i in seq_len(nrow(locations))) {
   }
 
   # For each report date, find the most recent value on or before that date
-  for (rd in report_dates) {
-    candidates <- all_vals |> filter(date <= as.Date(rd, origin = "1970-01-01"))
+  for (di in seq_along(report_dates)) {
+    rd <- report_dates[di]
+    candidates <- all_vals |> filter(date <= rd)
     if (nrow(candidates) > 0) {
       best <- candidates |> slice(1)  # already sorted desc by date
       all_location_rows[[length(all_location_rows) + 1]] <- tibble(
         location_id = location_id, name = location_name,
-        report_date = as.Date(rd, origin = "1970-01-01"),
+        report_date = rd,
         data_value = best$value, data_date = best$date,
         data_unit = best$unit, data_url = best$url
       )
