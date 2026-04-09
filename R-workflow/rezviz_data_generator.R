@@ -347,12 +347,12 @@ if (nrow(new_locations) > 0) {
     hist_data <- NULL
 
     if (src_type == "rise") {
-      # RISE: fetch full range via WWDH API (JSON/CoverageJSON, not CSV which returns 500)
+      # RISE: fetch full range via WWDH API (CoverageJSON)
+      # No parameter-name filter (API rejects it as of April 2026) — filter in response
       url <- paste0(
         WWDH_API_BASE,
         "/collections/rise-edr/locations/", loc_id,
-        "?parameter-name=Storage",
-        "&limit=50000",
+        "?limit=50000",
         "&datetime=", BASELINE_START, "/", BASELINE_END + 1,
         "&f=json"
       )
@@ -367,14 +367,29 @@ if (nrow(new_locations) > 0) {
           body <- resp_body_json(response)
           coverages <- body$coverages
           if (!is.null(coverages) && length(coverages) > 0) {
+            # Find storage parameter key from response
+            storage_key <- NULL
+            bp <- body$parameters
+            if (!is.null(bp)) {
+              for (pk in names(bp)) {
+                label <- tryCatch(bp[[pk]]$observedProperty$label$en, error = function(e) "")
+                if (!is.null(label) && grepl("Storage", label, ignore.case = TRUE) &&
+                    !grepl("Change In Storage|Bank Storage", label, ignore.case = TRUE)) {
+                  storage_key <- pk
+                  break
+                }
+              }
+            }
+            if (is.null(storage_key)) storage_key <- "3"
+
             all_rows <- list()
-            param_key <- NULL
             for (cov in coverages) {
+              if (!is.null(cov$isModeled) && isTRUE(cov$isModeled)) next
               t_vals <- cov$domain$axes$t$values
               ranges <- cov$ranges
               if (is.null(t_vals) || length(t_vals) == 0 || is.null(ranges) || length(ranges) == 0) next
-              if (is.null(param_key)) param_key <- names(ranges)[1]
-              raw_values <- ranges[[param_key]]$values
+              if (!storage_key %in% names(ranges)) next
+              raw_values <- ranges[[storage_key]]$values
               if (is.null(raw_values) || length(raw_values) == 0) next
               for (j in seq_along(raw_values)) {
                 if (!is.null(raw_values[[j]])) {
@@ -387,7 +402,7 @@ if (nrow(new_locations) > 0) {
             }
             if (length(all_rows) > 0) {
               raw_unit <- tryCatch({
-                u <- body$parameters[[param_key]]$unit$symbol
+                u <- body$parameters[[storage_key]]$unit$symbol
                 if (is.null(u)) "af" else u
               }, error = function(e) "af")
 
@@ -739,11 +754,12 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
   start_date <- target_date - lookback_days
   end_date   <- target_date + sample(30:90, 1)
 
+  # No parameter-name filter: the API rejects "parameter-name=Storage" as of April 2026.
+  # Instead, fetch all parameters and filter for Storage (param "3") in the response.
   url <- paste0(
     WWDH_API_BASE,
     "/collections/rise-edr/locations/", location_id,
-    "?parameter-name=Storage",
-    "&limit=50",
+    "?limit=50",
     "&datetime=", start_date, "/", end_date,
     "&f=json"
   )
@@ -764,18 +780,37 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
     coverages <- body$coverages
     if (is.null(coverages) || length(coverages) == 0) return(empty)
 
-    # Collect all date/value pairs across coverages
+    # Identify the storage parameter key from the parameters block.
+    # Look for param whose label contains "Storage" (typically key "3").
+    storage_key <- NULL
+    params <- body$parameters
+    if (!is.null(params)) {
+      for (pk in names(params)) {
+        label <- tryCatch(params[[pk]]$observedProperty$label$en, error = function(e) "")
+        if (!is.null(label) && grepl("Storage", label, ignore.case = TRUE) &&
+            !grepl("Change In Storage|Bank Storage", label, ignore.case = TRUE)) {
+          storage_key <- pk
+          break
+        }
+      }
+    }
+    # Fallback: use key "3" (the standard RISE storage parameter)
+    if (is.null(storage_key)) storage_key <- "3"
+
+    # Collect date/value pairs from storage coverages only
     all_rows <- list()
-    param_key <- NULL
     for (cov in coverages) {
       # Skip modeled/forecast coverages — only use observed data
-      if (!is.null(cov$isModeled) && cov$isModeled == TRUE) next
+      if (!is.null(cov$isModeled) && isTRUE(cov$isModeled)) next
 
       t_vals <- cov$domain$axes$t$values
       ranges <- cov$ranges
       if (is.null(t_vals) || length(t_vals) == 0 || is.null(ranges) || length(ranges) == 0) next
-      if (is.null(param_key)) param_key <- names(ranges)[1]
-      raw_values <- ranges[[param_key]]$values
+
+      # Only process coverages that contain the storage parameter
+      if (!storage_key %in% names(ranges)) next
+
+      raw_values <- ranges[[storage_key]]$values
       if (is.null(raw_values) || length(raw_values) == 0) next
 
       for (i in seq_along(raw_values)) {
@@ -792,7 +827,7 @@ fetch_rise <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 
     # Unit from parameters block
     raw_unit <- tryCatch({
-      u <- body$parameters[[param_key]]$unit$symbol
+      u <- body$parameters[[storage_key]]$unit$symbol
       if (is.null(u)) "af" else u
     }, error = function(e) "af")
 
