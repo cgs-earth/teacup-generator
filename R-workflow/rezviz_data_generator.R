@@ -325,9 +325,15 @@ if (nrow(new_locations) > 0) {
   }
   message("")
 
-  # Historical period for baseline
+  # Historical period for baseline statistics (used for percentiles).
   BASELINE_START <- as.Date("1990-10-01")
   BASELINE_END   <- as.Date("2020-09-30")
+
+  # Backfill fetch range: pull every available daily observation from the
+  # baseline start through today, so the new location lands in the daily
+  # droughtData CSV with its full record (not just the 1990-2020 window).
+  # The stats computation below still filters to BASELINE_START..BASELINE_END.
+  BACKFILL_END <- Sys.Date()
 
   new_baseline_data <- list()
 
@@ -353,7 +359,7 @@ if (nrow(new_locations) > 0) {
         WWDH_API_BASE,
         "/collections/rise-edr/locations/", loc_id,
         "?limit=50000",
-        "&datetime=", BASELINE_START, "/", BASELINE_END + 1,
+        "&datetime=", BASELINE_START, "/", BACKFILL_END + 1,
         "&f=json"
       )
 
@@ -427,7 +433,7 @@ if (nrow(new_locations) > 0) {
         ts_name  <- str_sub(id_str, slash_pos + 1)
 
         begin_str <- paste0(format(BASELINE_START, "%Y-%m-%dT00:00:00"), ".000Z")
-        end_str   <- paste0(format(BASELINE_END + 1, "%Y-%m-%dT00:00:00"), ".000Z")
+        end_str   <- paste0(format(BACKFILL_END + 1, "%Y-%m-%dT00:00:00"), ".000Z")
 
         url <- sprintf(
           "https://water.usace.army.mil/cda/reporting/providers/%s/timeseries?name=%s&begin=%s&end=%s&format=csv",
@@ -482,7 +488,7 @@ if (nrow(new_locations) > 0) {
 
       url <- sprintf(
         "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=%s&time=%s/%s&limit=50000",
-        site_no, param_code, BASELINE_START, BASELINE_END
+        site_no, param_code, BASELINE_START, BACKFILL_END
       )
 
       tryCatch({
@@ -503,7 +509,7 @@ if (nrow(new_locations) > 0) {
             message(sprintf("    Trying alternate elevation parameter %s...", alt_param))
             url <- sprintf(
               "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=%s&time=%s/%s&limit=50000",
-              site_no, alt_param, BASELINE_START, BASELINE_END
+              site_no, alt_param, BASELINE_START, BACKFILL_END
             )
             response <- request(url) |>
               req_timeout(300) |>
@@ -559,7 +565,7 @@ if (nrow(new_locations) > 0) {
       station <- as.character(loc_id)
       url <- sprintf(
         "https://cdec.water.ca.gov/dynamicapp/req/CSVDataServlet?Stations=%s&SensorNums=15&dur_code=D&Start=%s&End=%s",
-        station, BASELINE_START, BASELINE_END
+        station, BASELINE_START, BACKFILL_END
       )
 
       tryCatch({
