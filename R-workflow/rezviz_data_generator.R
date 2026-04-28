@@ -656,10 +656,12 @@ if (nrow(new_locations) > 0) {
     # Reload historical_stats for use in daily processing
     historical_stats <- combined_stats
 
-    # Generate backfill CSV for new locations
-    message("\n=== Generating backfill CSV for new locations ===\n")
+    # Generate backfill rows for new locations - to be merged into daily CSV
+    message("\n=== Generating backfill rows for new locations ===\n")
 
     # For each date in new_baseline, generate a CSV row with statistics
+    # These rows will be appended to the daily droughtData CSV (only on first detection
+    # of a new location, which is naturally the case since locations only get backfilled once).
     backfill_rows <- new_baseline |>
       left_join(locations, by = "location_id") |>
       mutate(
@@ -705,25 +707,18 @@ if (nrow(new_locations) > 0) {
         Comment        = "backfill"
       )
 
-    backfill_filename <- sprintf("backfill_%s.csv", format(Sys.Date(), "%Y%m%d"))
-    backfill_path <- file.path(HYDROSHARE_DIR, backfill_filename)
-    write_csv(backfill_rows, backfill_path, na = "")
-
-    message(sprintf("Backfill CSV written to: %s", backfill_path))
-    message(sprintf("  Contains %d rows for %d new location(s)",
+    message(sprintf("Backfill prepared: %d rows for %d new location(s) (will be merged into daily CSV)",
                     nrow(backfill_rows), n_distinct(backfill_rows$SiteName)))
 
-    # Upload backfill to HydroShare (will happen later with main upload)
-    BACKFILL_PATH <- backfill_path
     PARQUET_UPDATED <- TRUE  # Flag to upload parquet files at end
   } else {
     message("\nNo historical data retrieved for new locations")
-    BACKFILL_PATH <- NULL
+    backfill_rows <- NULL
     PARQUET_UPDATED <- FALSE
   }
 } else {
   message("\nNo new locations detected")
-  BACKFILL_PATH <- NULL
+  backfill_rows <- NULL
   PARQUET_UPDATED <- FALSE
 }
 
@@ -1256,6 +1251,16 @@ output_csv <- output_data |>
     Comment        = NA_character_
   )
 
+# Append backfill rows (historical data for newly-detected locations) to daily CSV.
+# Backfill only happens on first detection of a new location, so this is one-shot per location.
+n_backfill <- 0
+if (exists("backfill_rows") && !is.null(backfill_rows) && nrow(backfill_rows) > 0) {
+  n_backfill <- nrow(backfill_rows)
+  output_csv <- bind_rows(output_csv, backfill_rows)
+  message(sprintf("Merged %d backfill row(s) for %d new location(s) into daily CSV",
+                  n_backfill, n_distinct(backfill_rows$SiteName)))
+}
+
 # Generate filename and write to hydroshare directory (git-ignored, uploaded to HS)
 output_filename <- sprintf("droughtData%s.csv", format(TARGET_DATE, "%Y%m%d"))
 if (!dir.exists(HYDROSHARE_DIR)) dir.create(HYDROSHARE_DIR, recursive = TRUE)
@@ -1265,7 +1270,8 @@ output_path <- file.path(HYDROSHARE_DIR, output_filename)
 write_csv(output_csv, output_path, na = "")
 
 message(sprintf("Output written to: %s", output_path))
-message(sprintf("  Total rows: %d (%d locations x %d days)", nrow(output_csv), nrow(locations), REPORT_DAYS))
+message(sprintf("  Total rows: %d (%d locations x %d days + %d backfill)",
+                nrow(output_csv), nrow(locations), REPORT_DAYS, n_backfill))
 message(sprintf("  With data: %d", sum(!is.na(output_csv$DataValue))))
 message(sprintf("  Missing data: %d", sum(is.na(output_csv$DataValue))))
 message(sprintf("  With historical stats: %d", sum(!is.na(output_csv$DataDateP50))))
@@ -1335,16 +1341,6 @@ if (hs_username == "" || hs_password == "") {
   }, error = function(e) {
     message(sprintf("ERROR uploading to HydroShare: %s", e$message))
   })
-
-  # Upload backfill file if it exists
-  if (exists("BACKFILL_PATH") && !is.null(BACKFILL_PATH) && file.exists(BACKFILL_PATH)) {
-    message("\nUploading backfill file to HydroShare...")
-    tryCatch({
-      upload_to_hydroshare(BACKFILL_PATH, HYDROSHARE_RESOURCE_ID, hs_username, hs_password)
-    }, error = function(e) {
-      message(sprintf("ERROR uploading backfill to HydroShare: %s", e$message))
-    })
-  }
 
   # Upload updated parquet files if backfill occurred
   # This ensures the next run starts with the latest historical data
