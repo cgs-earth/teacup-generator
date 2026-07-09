@@ -2,6 +2,8 @@ name: Load Teacup Locations
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'R-workflow/config/locations.geojson'
   workflow_dispatch:  # Allow manual trigger
