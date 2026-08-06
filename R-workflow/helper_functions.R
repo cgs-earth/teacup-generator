@@ -169,21 +169,27 @@ calculate_daily_stats <- function(data, location_id) {
 #' Render historical observations into the daily droughtData CSV schema.
 #'
 #' Produces the exact 27-column schema the downstream PostgreSQL loader ingests
-#' (SiteName, DataDate as %m/%d/%Y, DataValue, DataDateAvg/P10/P90, ...), with
-#' `Comment = "backfill"`. Used both by the daily script when it backfills a
-#' newly-detected location and by backfill_history.R when it stages gap-filled
-#' observations for the next daily run — keeping the two row layouts identical
-#' so they cannot drift out of sync with the loader's expectations.
+#' (SiteName, DataDate as %m/%d/%Y, DataValue, DataDateAvg/P10/P90, ...). Used by
+#' the daily script when it backfills a newly-detected location, by
+#' backfill_history.R when it stages gap-filled observations for the next daily
+#' run, and by revision_sweep.R when it re-publishes a recent window — keeping
+#' all three row layouts identical so they cannot drift out of sync with the
+#' loader's expectations.
 #'
 #' @param obs tibble(location_id, date, value, unit) of observations to render.
+#'   May optionally carry a `data_url` column (the API request the value came
+#'   from); when absent, DataUrl is NA.
 #' @param locations location metadata (must include location_id, label_popup,
 #'   latitude, longitude, state, doi_region, huc6, capacity, active_capacity).
 #' @param stats_lookup day-of-year statistics keyed by (location_id, month, day)
 #'   with columns min, max, p10, p25, p50, p75, p90, mean. Rows with no matching
 #'   stats get NA percentile columns (the loader still ingests the raw value).
 #' @param stats_period the StatsPeriod label string (e.g. "10/1/1990 - 9/30/2020").
+#' @param comment value for the Comment column, used as provenance for rows that
+#'   did not come from a normal daily fetch ("backfill", "revision", ...).
 #' @return tibble in the daily droughtData CSV schema.
-build_drought_csv_rows <- function(obs, locations, stats_lookup, stats_period) {
+build_drought_csv_rows <- function(obs, locations, stats_lookup, stats_period,
+                                   comment = "backfill") {
   # Be robust to an empty / column-less stats table (e.g. no statistics computed
   # yet): fall back to a zero-row lookup so every observation still renders, just
   # with NA percentile columns (the loader ingests the raw value regardless).
@@ -194,6 +200,11 @@ build_drought_csv_rows <- function(obs, locations, stats_lookup, stats_period) {
       p50 = double(), p75 = double(), p90 = double(), mean = double()
     )
   }
+
+  # DataUrl is optional: the revision sweep records the API request each value
+  # came from so its rows are column-identical to daily rows (important now that
+  # the loader upserts — a blank DataUrl could otherwise overwrite a real one).
+  if (!"data_url" %in% names(obs)) obs$data_url <- NA_character_
 
   obs |>
     left_join(locations, by = "location_id") |>
@@ -236,8 +247,8 @@ build_drought_csv_rows <- function(obs, locations, stats_lookup, stats_period) {
       ActiveCapacity = active_capacity,
       PctFull        = pct_full,
       TeacupUrl      = NA_character_,
-      DataUrl        = NA_character_,
-      Comment        = "backfill"
+      DataUrl        = data_url,
+      Comment        = comment
     ) |>
     # Drop any row with no usable value — the loader skips empty DataValue anyway,
     # and this keeps both callers (daily new-location backfill and backfill_history.R)
@@ -265,7 +276,8 @@ build_drought_csv_rows <- function(obs, locations, stats_lookup, stats_period) {
 #' @param backfill_end Date — latest date to request (typically Sys.Date()).
 #' @param wwdh_api_base Base URL for the WWDH/RISE EDR API.
 #' @return tibble(location_id, date, value, unit) of observations, or NULL if
-#'   nothing could be retrieved.
+#'   nothing could be retrieved. Carries a "source_url" attribute with the API
+#'   request the values came from.
 fetch_full_history <- function(loc, baseline_start, backfill_end,
                                wwdh_api_base = WWDH_API_BASE) {
   loc_id        <- loc$location_id
@@ -279,6 +291,11 @@ fetch_full_history <- function(loc, baseline_start, backfill_end,
   WWDH_API_BASE  <- wwdh_api_base
 
   hist_data <- NULL
+
+  # Request URL actually used, returned as the "source_url" attribute on the
+  # result so callers that publish these observations (revision_sweep.R) can
+  # populate the DataUrl column exactly as the daily script does.
+  source_url <- NA_character_
 
   if (src_type == "rise") {
     # RISE: fetch full range via WWDH API (CoverageJSON) in 5-year chunks.
@@ -308,6 +325,7 @@ fetch_full_history <- function(loc, baseline_start, backfill_end,
         "&datetime=", cs, "/", ce,
         "&f=json"
       )
+      source_url <- url
 
       tryCatch({
         response <- request(url) |>
@@ -392,6 +410,7 @@ fetch_full_history <- function(loc, baseline_start, backfill_end,
         "https://water.usace.army.mil/cda/reporting/providers/%s/timeseries?name=%s&begin=%s&end=%s&format=csv",
         provider, URLencode(ts_name, reserved = TRUE), begin_str, end_str
       )
+      source_url <- url
 
       tryCatch({
         response <- request(url) |>
@@ -417,6 +436,10 @@ fetch_full_history <- function(loc, baseline_start, backfill_end,
               date = as.Date(str_sub(datetime, 1, 10))
             ) |>
             filter(!is.na(value), !is.na(date)) |>
+            # Collapse sub-daily (15-min) readings to the LAST value of each day;
+            # arrange explicitly so this does not rely on the API's row order.
+            # The daily fetcher (fetch_usace) uses the same last-of-day rule.
+            arrange(datetime) |>
             group_by(date) |>
             summarize(value = last(value), .groups = "drop") |>
             mutate(location_id = loc_id, unit = unit_val) |>
@@ -452,6 +475,7 @@ fetch_full_history <- function(loc, baseline_start, backfill_end,
       "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=%s&time=%s/%s&limit=50000",
       site_no, param_code, BASELINE_START, BACKFILL_END
     )
+    source_url <- url
 
     tryCatch({
       response <- request(url) |>
@@ -474,6 +498,7 @@ fetch_full_history <- function(loc, baseline_start, backfill_end,
             "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&monitoring_location_id=USGS-%s&parameter_code=%s&time=%s/%s&limit=50000",
             site_no, alt_param, BASELINE_START, BACKFILL_END
           )
+          source_url <- url
           response <- request(url) |>
             req_timeout(300) |>
             req_retry(max_tries = 3, backoff = ~ 10) |>
@@ -530,6 +555,7 @@ fetch_full_history <- function(loc, baseline_start, backfill_end,
       "https://cdec.water.ca.gov/dynamicapp/req/CSVDataServlet?Stations=%s&SensorNums=15&dur_code=D&Start=%s&End=%s",
       station, BASELINE_START, BACKFILL_END
     )
+    source_url <- url
 
     tryCatch({
       response <- request(url) |>
@@ -558,6 +584,10 @@ fetch_full_history <- function(loc, baseline_start, backfill_end,
     }, error = function(e) {
       message(sprintf("    Error fetching CDEC historical: %s", conditionMessage(e)))
     })
+  }
+
+  if (!is.null(hist_data) && nrow(hist_data) > 0) {
+    attr(hist_data, "source_url") <- source_url
   }
 
   hist_data

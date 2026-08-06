@@ -17,6 +17,10 @@
 # updates the parquet files on HydroShare). Override the entrypoint:
 #   docker run --entrypoint Rscript --env-file .env rezviz backfill_history.R
 #
+# Run the weekly revision sweep (re-reads the last 90 days for every reservoir so
+# source-side revisions are re-published). Override the entrypoint:
+#   docker run --entrypoint Rscript --env-file .env rezviz revision_sweep.R
+#
 # Historical parquet files are downloaded from HydroShare during build.
 # If new locations are backfilled at runtime, updated parquet files are
 # uploaded to HydroShare. Rebuild the image to incorporate backfills.
@@ -35,6 +39,7 @@ WORKDIR /app
 # Copy runtime files
 COPY rezviz_data_generator.R .
 COPY backfill_history.R .
+COPY revision_sweep.R .
 COPY helper_functions.R .
 COPY config/locations.geojson config/
 COPY config/elevation_storage_curves.csv config/

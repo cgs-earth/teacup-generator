@@ -302,6 +302,92 @@ runs this routine **once a month** (09:00 UTC on the 1st) and **on demand** via
 `location_ids` input to restrict the sweep. The monthly run stages the rows; the
 next scheduled daily run ingests them into the database automatically.
 
+## Weekly Revision Sweep
+
+`backfill_history.R` only **adds** observations that are *missing* from the
+baseline — it never re-reads a `(location, date)` we already hold. But the sources
+(RISE/USBR, USACE, USGS, CDEC) routinely **revise** provisional values weeks or
+months after first publishing them. The daily run's 7-day window has already moved
+past those dates by the time the correction lands, so nothing re-reads them.
+
+`revision_sweep.R` closes that gap. It **re-reads a recent window (default: the
+last 90 days) for every reservoir** and re-publishes it, so a value the source
+changed overwrites the stale one in the database.
+
+On each run it:
+
+1. **Downloads** the latest `historical_baseline.parquet` and
+   `historical_statistics.parquet` from HydroShare.
+2. **Re-fetches** the window (`TARGET_DATE − REVISION_DAYS + 1` → `TARGET_DATE`)
+   for every reservoir via the shared `fetch_full_history()` helper.
+3. **Diffs** each re-read value against the baseline and writes a per-observation
+   report (`output/revision_report_YYYYMMDD.csv`) listing every `revised` / `new`
+   value — the GitHub Action publishes this as a build artifact.
+4. **Renders** the window into the daily CSV schema (via the shared
+   `build_drought_csv_rows()`, `Comment = "revision"`, real `DataDate`/`DataUrl`)
+   and writes it as **`droughtDataYYYYMMDD.csv`** — the ordinary daily filename,
+   because the loader ingests only files matching that convention.
+5. **Uploads** the CSV to HydroShare, replacing that day's file.
+6. The workflow's `gcloud run jobs execute` step then **loads** the CSV.
+
+> **Requires an upserting loader.** This only works because the Cloud Run loader
+> now **upserts** (insert-or-update on `SiteId.DataDate.parameter`). Under the
+> older insert-or-**ignore** behavior the re-read rows would be dropped as
+> duplicates and the sweep would be a silent no-op.
+
+Re-publishing under the normal daily filename is safe: a later daily run
+overwriting that same `droughtDataYYYYMMDD.csv` with its 7-day version is harmless
+because the revised values are already in the database by then.
+
+```bash
+# Last 90 days, CSV dated yesterday (default)
+Rscript revision_sweep.R
+
+# CSV dated a specific day
+Rscript revision_sweep.R 2026-08-04
+
+# Only specific location_ids
+Rscript revision_sweep.R 2026-08-04 7166,393,THC
+
+# Via Docker (override the entrypoint)
+docker run --entrypoint Rscript --env-file .env ghcr.io/cgs-earth/rezviz:latest revision_sweep.R
+
+# Publish ONLY observations that differ from the baseline (smaller CSV)
+REVISION_ONLY_CHANGED=1 Rscript revision_sweep.R
+
+# Dry run (generate the CSV + diff locally, skip all uploads)
+REVISION_DRY_RUN=1 Rscript revision_sweep.R
+
+# Shorter/longer window
+REVISION_DAYS=30 Rscript revision_sweep.R
+```
+
+Environment overrides: `REVISION_DAYS`, `REVISION_TARGET_DATE`,
+`REVISION_LOCATION_IDS`, `REVISION_ONLY_CHANGED`, `REVISION_UPDATE_BASELINE`
+(also write revised values back into `historical_baseline.parquet` — off by
+default), `REVISION_DRY_RUN`, `REVISION_COMMENT`.
+
+**Automation:** The `.github/workflows/revision-sweep.yml` GitHub Action runs this
+**weekly** (Sundays 10:00 UTC — between the daily run's 07:00 and 15:00 UTC slots
+so they never contend for the same HydroShare file) and **on demand** via
+`workflow_dispatch` (inputs: `days`, `target_date`, `location_ids`,
+`only_changed`, `update_baseline`).
+
+> **Note — day-of-year statistics are *not* recomputed here.** The percentile
+> columns come from the 1990-2020 window, so recent revisions never affect them.
+> The sweep attaches the current stored percentiles to the re-published rows,
+> exactly as the daily run does. If a revision falls *inside* the 1990-2020 window
+> (only possible with a very long `REVISION_DAYS`), run `backfill_history.R` to
+> refresh the statistics.
+>
+> **Caveat — USACE 15-minute sites.** For the 6 USACE reservoirs the daily
+> fetcher records the *first* sub-daily reading of each day (00:00) while
+> `fetch_full_history()` records the *last* (23:45). The revision sweep therefore
+> re-publishes the last-of-day value, so a USACE row can shift by a small
+> intra-day amount even when the source did not truly revise it. This is a
+> pre-existing difference between the two fetchers (`backfill_history.R` already
+> writes last-of-day) — not introduced by the sweep.
+
 ## Output Format
 
 The daily CSV contains columns compatible with the original .NET teacup generator:
