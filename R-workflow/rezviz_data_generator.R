@@ -597,24 +597,36 @@ fetch_usace <- function(location_id, target_date, lookback_days = LOOKBACK_DAYS,
 
     if (length(data_lines) == 0) return(empty)
 
-    # Extract unit from ## comment lines
+    # Extract unit from ## comment lines. Normalize "ac-ft" -> "af" to match
+    # fetch_full_history() (helper_functions.R), so USACE rows carry the same
+    # unit label whether they came from the daily fetch or the backfill/revision
+    # path.
     unit_line <- lines[str_starts(lines, "##unit:")]
     unit_val <- if (length(unit_line) > 0) {
       trimws(str_remove(unit_line[1], "##unit:"))
     } else {
       "ac-ft"
     }
+    if (tolower(unit_val) == "ac-ft") unit_val <- "af"
 
+    # USACE timeseries are sub-daily (15-minute). Collapse to one value per day.
+    # Take the LAST reading of each day (end-of-day storage) so the daily value
+    # matches what fetch_full_history() stores in the baseline — otherwise the
+    # daily run would write first-of-day (00:00) values while the backfill and
+    # revision sweep write last-of-day (23:45), and the revision sweep would
+    # report a spurious change on these 6 reservoirs every week.
     parsed <- tibble(raw = data_lines) |>
       mutate(
         datetime = str_extract(raw, "^[^,]+"),
         value    = as.numeric(str_extract(raw, "[^,]+$")),
         date     = as.Date(str_sub(datetime, 1, 10))
       ) |>
-      filter(!is.na(value)) |>
-      distinct(date, .keep_all = TRUE) |>
+      filter(!is.na(value), !is.na(date)) |>
+      arrange(datetime) |>
+      group_by(date) |>
+      summarize(value = last(value), .groups = "drop") |>
       arrange(desc(date)) |>
-      transmute(date, value, unit = unit_val, url = url)
+      mutate(unit = unit_val, url = url)
 
     if (nrow(parsed) == 0) return(empty)
 

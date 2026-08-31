@@ -1,0 +1,114 @@
+name: Reservoir Revision Sweep
+
+# Re-reads a recent window (default: the last 90 days) for every reservoir and
+# re-publishes it as that day's droughtDataYYYYMMDD.csv, so values the upstream
+# sources have REVISED since we first read them land in the database.
+#
+# The daily run only publishes the last 7 days, and backfill_history.R only adds
+# observations MISSING from the baseline — neither re-reads a value we already
+# hold. This workflow is the one that catches late corrections.
+#
+# Depends on the Cloud Run loader upserting (insert-or-update on
+# SiteId.DataDate.parameter). Under the older insert-or-ignore behavior these rows
+# would be discarded as duplicates and the sweep would be a no-op.
+
+on:
+  schedule:
+    # Weekly: Sundays at 10:00 UTC (≈ 3 AM Mountain Time). Deliberately between
+    # the daily run's 07:00 and 15:00 UTC slots so the two never contend for the
+    # same droughtData CSV on HydroShare.
+    - cron: '0 10 * * 0'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Look-back window in days (default 90)'
+        required: false
+        default: '90'
+      target_date:
+        description: 'Date to name the output CSV for, YYYY-MM-DD (blank = yesterday)'
+        required: false
+        default: ''
+      location_ids:
+        description: 'Optional comma-separated location_ids to restrict the sweep (blank = all)'
+        required: false
+        default: ''
+      only_changed:
+        description: 'Publish only observations that differ from the stored baseline'
+        type: boolean
+        required: false
+        default: false
+      update_baseline:
+        description: 'Also write revised values back into historical_baseline.parquet'
+        type: boolean
+        required: false
+        default: false
+
+# Never let two sweeps overlap — they would fight over the same HydroShare file.
+concurrency:
+  group: reservoir-revision-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    # ~214 locations x (one range request + 1s pacing), plus parquet sync.
+    timeout-minutes: 180
+
+    steps:
+      - name: Set up Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_JSON }}
+
+      - name: Re-read the revision window and upload the CSV to HydroShare
+        env:
+          HYDROSHARE_USERNAME: ${{ secrets.HYDROSHARE_USERNAME }}
+          HYDROSHARE_PASSWORD: ${{ secrets.HYDROSHARE_PASSWORD }}
+          REVISION_DAYS: ${{ github.event.inputs.days || '90' }}
+          REVISION_TARGET_DATE: ${{ github.event.inputs.target_date }}
+          REVISION_LOCATION_IDS: ${{ github.event.inputs.location_ids }}
+          REVISION_ONLY_CHANGED: ${{ github.event.inputs.only_changed == 'true' && '1' || '' }}
+          REVISION_UPDATE_BASELINE: ${{ github.event.inputs.update_baseline == 'true' && '1' || '' }}
+        run: |
+          # Create env file
+          {
+            echo "HYDROSHARE_USERNAME=$HYDROSHARE_USERNAME"
+            echo "HYDROSHARE_PASSWORD=$HYDROSHARE_PASSWORD"
+            echo "REVISION_DAYS=$REVISION_DAYS"
+            echo "REVISION_TARGET_DATE=$REVISION_TARGET_DATE"
+            echo "REVISION_LOCATION_IDS=$REVISION_LOCATION_IDS"
+            echo "REVISION_ONLY_CHANGED=$REVISION_ONLY_CHANGED"
+            echo "REVISION_UPDATE_BASELINE=$REVISION_UPDATE_BASELINE"
+          } > .env
+
+          # Override the image entrypoint to run the revision sweep. Named so the
+          # per-observation diff can be copied out below.
+          docker run --name revision-sweep --env-file .env --entrypoint Rscript \
+            ghcr.io/cgs-earth/rezviz:latest revision_sweep.R
+
+          # Clean up
+          rm .env
+
+      - name: Extract the revision diff
+        if: always()
+        continue-on-error: true
+        run: |
+          mkdir -p revision-out
+          docker cp revision-sweep:/app/output/. revision-out/ || true
+          # Only the diff is wanted; drop the parquet/CSV generator state.
+          rm -f revision-out/*.parquet revision-out/historical_statistics.csv
+          ls -1 revision-out/revision_report_*.csv || echo "No revision report produced."
+
+      - name: Upload the revision diff as an artifact
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: revision-report
+          path: revision-out/revision_report_*.csv
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Trigger Google Cloud load
+        run: |
+          gcloud run jobs execute ${{ secrets.GCP_JOB_NAME }} --region ${{ secrets.GCP_JOB_REGION }} --wait
