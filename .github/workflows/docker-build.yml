@@ -10,6 +10,8 @@ on:
       - 'R-workflow/backfill_history.R'
       - 'R-workflow/revision_sweep.R'
       - 'R-workflow/helper_functions.R'
+      - 'R-workflow/create_locations_geojson.R'
+      - 'R-workflow/data/reference/**'
       - 'R-workflow/config/locations.csv'
       - 'R-workflow/config/locations.geojson'
       - 'R-workflow/output/historical_statistics.parquet'
@@ -22,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
+      contents: read
       packages: write
 
     steps:
@@ -31,17 +33,15 @@ jobs:
 
       - name: Regenerate locations.geojson from locations.csv
         run: |
-          docker run --rm -v ${{ github.workspace }}/R-workflow:/app -w /app rocker/geospatial:4.4.2 \
+          docker run --rm -v "$GITHUB_WORKSPACE/R-workflow:/app" -w /app rocker/geospatial:4.4.2 \
             Rscript create_locations_geojson.R
 
-      - name: Commit updated locations.geojson
+      - name: Verify locations.geojson is up to date
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add R-workflow/config/locations.geojson
-          git diff --staged --quiet || git commit -m "Auto-regenerate locations.geojson from locations.csv"
-          git pull --rebase
-          git push
+          if ! git diff --exit-code -- R-workflow/config/locations.geojson; then
+            echo "::error::Regenerate locations.geojson on the source branch and include it in the PR before merging."
+            exit 1
+          fi
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4

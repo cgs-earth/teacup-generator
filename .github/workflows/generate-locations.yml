@@ -1,0 +1,44 @@
+name: Generate locations
+
+on:
+  push:
+    branches: [allison-edits]
+    paths:
+      - 'R-workflow/config/locations.csv'
+      - 'R-workflow/create_locations_geojson.R'
+      - 'R-workflow/data/reference/**'
+      - '.github/workflows/generate-locations.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-locations-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Generate GeoJSON
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/R-workflow:/app" \
+            -w /app rocker/geospatial:4.4.2 \
+            Rscript create_locations_geojson.R
+
+      - name: Commit to the source branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add R-workflow/config/locations.geojson
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Regenerate locations.geojson"
+          git push origin "HEAD:$GITHUB_REF_NAME"
