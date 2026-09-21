@@ -41,9 +41,17 @@ Use a separate GitHub App with a loopback callback for local testing if the prod
 
 See GitHub's [user access token documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app) for registration and authorization details.
 
-## Deployment
+## Free hosting on Render
 
-The server serves both the React build and API from one origin. It needs an HTTPS service with a Node.js runtime or containers, such as Cloud Run. GitHub Pages alone cannot run the authentication backend.
+The repository's `render.yaml` defines one Docker web service on Render's **Free** compute plan. It has no database, disk, or paid service. The server serves the React build and GitHub sign-in API from one HTTPS origin. This deployment is separate from the Western Water Datahub's GCP infrastructure.
+
+Create a Render Blueprint from this repository's `main` branch. The blueprint prompts for the GitHub App's client ID and client secret and generates a persistent random session secret. Render provides `RENDER_EXTERNAL_URL`, which the server uses for the OAuth callback and origin checks. Set the GitHub App's homepage to that URL and its callback to `<RENDER_EXTERNAL_URL>/auth/callback`. For a custom domain, set `APP_ORIGIN` to the custom HTTPS origin and update the GitHub App callback to match.
+
+Render deploys changes under `locations-editor/` after the linked branch's CI checks pass. Keep the compute plan set to **Free**, leave PR previews disabled, and use a workspace without a payment method so usage limits cannot result in charges. Free instances sleep after 15 minutes without traffic and take about one minute to wake. The free allowance is 750 instance hours per workspace per month. See [Render's free hosting limits](https://render.com/docs/free) and [billing FAQ](https://render.com/docs/faq).
+
+GitHub stores committed data, encrypted cookies hold sessions, and the browser keeps unsent drafts. The app does not depend on Render's temporary filesystem surviving a restart. GitHub Pages alone cannot run the authentication backend.
+
+## Container configuration
 
 Build from this directory:
 
@@ -56,7 +64,7 @@ Set these runtime values in the hosting service:
 | Variable | Value |
 | --- | --- |
 | `NODE_ENV` | `production` (already set in the container) |
-| `APP_ORIGIN` | The exact public HTTPS origin, with no trailing slash or path |
+| `APP_ORIGIN` | The exact public HTTPS origin, with no trailing slash or path; defaults to `RENDER_EXTERNAL_URL` on Render |
 | `PORT` | The platform's listening port; the container defaults to `8080` |
 | `GITHUB_CLIENT_ID` | The registered GitHub App's client ID |
 | `GITHUB_CLIENT_SECRET` | The app's client secret, stored as a hosting secret |
@@ -64,9 +72,11 @@ Set these runtime values in the hosting service:
 | `GITHUB_REPOSITORY` | `cgs-earth/teacup-generator` |
 | `GITHUB_REPOSITORY_ID` | `1135150705` |
 
-Generate the session secret with `openssl rand -base64 48` and enter it directly into the host's secret manager. Keep the same secret across replicas. Rotating it signs everyone out. Never commit `.env`, app secrets, or session values. For Cloud Run, use Secret Manager references for both secrets and a service account with access only to those secrets. The app does not need the data pipeline's Google Cloud or HydroShare credentials.
+Render generates `SESSION_SECRET` from the blueprint. For another container host, generate it with `openssl rand -base64 48` and enter it directly into the host's secret manager. Keep the same secret across replicas. Rotating it signs everyone out. Never commit `.env`, app secrets, or session values. The app does not need the data pipeline's Google Cloud or HydroShare credentials.
 
 The service must accept browser traffic; GitHub authentication and repository permissions control editing. `/healthz` is the health endpoint. Set the GitHub callback to the final service URL before enabling sign-in. Production startup fails when the origin or required secrets are missing.
+
+After deployment, check `/healthz`, browse the reservoir list, complete GitHub sign-in, and verify repository write access. If sign-in fails or unauthorized edits become possible, suspend the service in Render while investigating. For a code regression, use Render's rollback to the previous successful deploy. Suspending or rolling back the editor does not change repository CSV data or existing PRs.
 
 ## Request handling
 

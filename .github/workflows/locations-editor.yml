@@ -6,12 +6,14 @@ on:
       - 'locations-editor/**'
       - 'R-workflow/config/locations.csv'
       - '.github/workflows/locations-editor.yml'
+      - 'render.yaml'
   push:
     branches: [main]
     paths:
       - 'locations-editor/**'
       - 'R-workflow/config/locations.csv'
       - '.github/workflows/locations-editor.yml'
+      - 'render.yaml'
 
 permissions:
   contents: read

@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: teacup-reservoir-editor
+    runtime: docker
+    plan: free
+    region: oregon
+    repo: https://github.com/cgs-earth/teacup-generator
+    branch: main
+    rootDir: locations-editor
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GITHUB_REPOSITORY
+        value: cgs-earth/teacup-generator
+      - key: GITHUB_REPOSITORY_ID
+        value: '1135150705'
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
