@@ -13,8 +13,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: generate-locations-${{ github.ref }}
-  cancel-in-progress: true
+  # Share the lock with the main workflow, which also writes allison-edits.
+  group: locations-updates
+  queue: max
 
 jobs:
   generate:

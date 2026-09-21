@@ -6,6 +6,7 @@ on:
       - main
       - add-R-workflow
     paths:
+      - '.github/workflows/docker-build.yml'
       - 'R-workflow/rezviz_data_generator.R'
       - 'R-workflow/backfill_history.R'
       - 'R-workflow/revision_sweep.R'
@@ -19,29 +20,64 @@ on:
       - 'R-workflow/Dockerfile'
   workflow_dispatch:  # Allow manual trigger
 
+concurrency:
+  # Queue both writers so neither branch loses a pending generation run.
+  group: locations-updates
+  queue: max
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       packages: write
+      actions: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - name: Regenerate locations.geojson from locations.csv
         run: |
           docker run --rm -v "$GITHUB_WORKSPACE/R-workflow:/app" -w /app rocker/geospatial:4.4.2 \
             Rscript create_locations_geojson.R
 
-      - name: Verify locations.geojson is up to date
+      - name: Commit updated locations.geojson
+        id: locations
         run: |
-          if ! git diff --exit-code -- R-workflow/config/locations.geojson; then
-            echo "::error::Regenerate locations.geojson on the source branch and include it in the PR before merging."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add R-workflow/config/locations.geojson
+          if ! git diff --cached --quiet; then
+            git commit -m "Regenerate locations.geojson"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # Keep the loader eligible when retrying a run that already committed.
+          if git diff --quiet "$GITHUB_SHA" HEAD -- R-workflow/config/locations.geojson; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Merge main into allison-edits
+        if: github.ref == 'refs/heads/main'
+        env:
+          MAIN_SHA: ${{ steps.locations.outputs.sha }}
+        run: |
+          git fetch origin allison-edits
+          sync_dir="$RUNNER_TEMP/allison-edits-sync"
+          git worktree add --detach "$sync_dir" FETCH_HEAD
+          if ! git -C "$sync_dir" merge --no-edit "$MAIN_SHA"; then
+            git -C "$sync_dir" merge --abort || true
+            echo "::error::Could not merge main into allison-edits. Resolve the conflict manually; allison-edits has not been pushed."
             exit 1
           fi
+          git -C "$sync_dir" push origin HEAD:refs/heads/allison-edits
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
@@ -57,4 +93,12 @@ jobs:
           push: true
           tags: |
             ghcr.io/cgs-earth/rezviz:latest
-            ghcr.io/cgs-earth/rezviz:${{ github.sha }}
+            ghcr.io/cgs-earth/rezviz:${{ steps.locations.outputs.sha }}
+
+      - name: Load regenerated locations
+        if: github.ref == 'refs/heads/main' && steps.locations.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        # GITHUB_TOKEN commits do not trigger the loader's push event.
+        run: gh workflow run locations.yml --ref main
