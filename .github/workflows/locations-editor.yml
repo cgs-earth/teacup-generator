@@ -1,0 +1,51 @@
+name: Check locations editor
+
+on:
+  pull_request:
+    paths:
+      - 'locations-editor/**'
+      - 'R-workflow/config/locations.csv'
+      - '.github/workflows/locations-editor.yml'
+      - 'render.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'locations-editor/**'
+      - 'R-workflow/config/locations.csv'
+      - '.github/workflows/locations-editor.yml'
+      - 'render.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: locations-editor
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm build
+      - name: Build production container
+        run: docker build -t locations-editor:check .
+      - name: Check container health
+        run: |
+          docker run --rm --detach --name locations-editor-check \
+            --publish 127.0.0.1:4080:8080 \
+            --env APP_ORIGIN=https://editor.example \
+            --env GITHUB_CLIENT_ID=test-client \
+            --env GITHUB_CLIENT_SECRET=test-secret \
+            --env SESSION_SECRET=test-only-secret-with-at-least-32-characters \
+            locations-editor:check
+          trap 'docker logs locations-editor-check; docker stop locations-editor-check' EXIT
+          curl --fail --silent --show-error --retry 10 --retry-all-errors \
+            --retry-delay 1 --max-time 5 http://127.0.0.1:4080/healthz
