@@ -45,7 +45,7 @@ See GitHub's [user access token documentation](https://docs.github.com/en/apps/c
 
 ## Free hosting on Render
 
-The service runs in [the Render dashboard](https://dashboard.render.com/web/srv-dap972tg1s2s739so6mg) from `codex/locations-web-editor`. Its [GitHub App settings](https://github.com/organizations/cgs-earth/settings/apps/cgs-teacup-reservoir-editor) use the hosted editor URL above and `https://teacup-reservoir-editor.onrender.com/auth/callback`. The app is installed only on `cgs-earth/teacup-generator`.
+The service runs in [the Render dashboard](https://dashboard.render.com/web/srv-dap972tg1s2s739so6mg) from `main`. Its [GitHub App settings](https://github.com/organizations/cgs-earth/settings/apps/cgs-teacup-reservoir-editor) use the hosted editor URL above and `https://teacup-reservoir-editor.onrender.com/auth/callback`. The app is installed only on `cgs-earth/teacup-generator`.
 
 The repository's `render.yaml` defines one Docker web service on Render's **Free** compute plan. It has no database, disk, or paid service. The server serves the React build and GitHub sign-in API from one HTTPS origin. This deployment is separate from the Western Water Datahub's GCP infrastructure.
 
