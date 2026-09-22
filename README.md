@@ -2,6 +2,10 @@
 
 This repository generates reservoir conditions data for the WWDH Reservoir Dashboard and RISE teacup visualizations.
 
+## Reservoir locations editor
+
+Open the [reservoir editor](https://teacup-reservoir-editor.onrender.com) to browse `R-workflow/config/locations.csv`. Sign in with a GitHub account that has repository write access to edit values, review the changes, and open a pull request against `main`. The free service may take about a minute to wake after inactivity. See the [editor documentation](locations-editor/README.md) for deployment and maintenance details.
+
 ## R Workflow (Current)
 
 **The R workflow is the current production system.** It generates daily CSV files with storage values and historical statistics for 214 western US reservoirs, uploading them to HydroShare for consumption by the WWDH Dashboard.

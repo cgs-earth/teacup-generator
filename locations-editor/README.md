@@ -1,5 +1,7 @@
 # Reservoir editor
 
+Hosted editor: [teacup-reservoir-editor.onrender.com](https://teacup-reservoir-editor.onrender.com).
+
 Browse and edit `R-workflow/config/locations.csv`, review the old and proposed values, and open a pull request against `main`. The editor supports existing reservoir rows and every CSV column. It preserves untouched fields, quoting, and line endings.
 
 Users sign in with GitHub. The server checks repository write access before allowing edits and checks it again before submitting. Each submission creates a `locations/editor-<login>-<uuid>` branch with a CSV commit, then opens a PR. The editor never commits to `main` or `allison-edits` and never merges PRs. Repository rules still apply.
@@ -42,6 +44,8 @@ Use a separate GitHub App with a loopback callback for local testing if the prod
 See GitHub's [user access token documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app) for registration and authorization details.
 
 ## Free hosting on Render
+
+The service runs in [the Render dashboard](https://dashboard.render.com/web/srv-dap972tg1s2s739so6mg) from `codex/locations-web-editor`. Its [GitHub App settings](https://github.com/organizations/cgs-earth/settings/apps/cgs-teacup-reservoir-editor) use the hosted editor URL above and `https://teacup-reservoir-editor.onrender.com/auth/callback`. The app is installed only on `cgs-earth/teacup-generator`.
 
 The repository's `render.yaml` defines one Docker web service on Render's **Free** compute plan. It has no database, disk, or paid service. The server serves the React build and GitHub sign-in API from one HTTPS origin. This deployment is separate from the Western Water Datahub's GCP infrastructure.
 
