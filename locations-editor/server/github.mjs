@@ -1,4 +1,5 @@
 import { applyChanges, parseCsv } from "../shared/csv.mjs";
+import { createHash } from "node:crypto";
 
 export const CSV_PATH = "R-workflow/config/locations.csv";
 export const BASE_BRANCH = "main";
@@ -84,6 +85,31 @@ export class GitHub {
   }
 
   async snapshot(token) {
+    if (!token) {
+      // Public previews use GitHub's file CDN instead of a shared host's REST quota.
+      const response = await this.fetcher(
+        `https://raw.githubusercontent.com/${this.repository}/refs/heads/${BASE_BRANCH}/${CSV_PATH}`,
+        { signal: AbortSignal.timeout(15_000) },
+      );
+      if (!response.ok)
+        throw new AppError(
+          502,
+          "The public reservoir list is temporarily unavailable. Sign in with GitHub or try again.",
+        );
+      const bytes = Buffer.from(await response.arrayBuffer());
+      const sha = createHash("sha1")
+        .update(`blob ${bytes.length}\0`)
+        .update(bytes)
+        .digest("hex");
+      return {
+        text: bytes.toString("utf8"),
+        sha,
+        commitSha: null,
+        repository: this.repository,
+        baseBranch: BASE_BRANCH,
+        path: CSV_PATH,
+      };
+    }
     const ref = await this.request(
       `${this.repoPath}/git/ref/heads/${BASE_BRANCH}`,
       token,

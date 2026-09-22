@@ -13,7 +13,7 @@ export type CsvDocument = {
 export type Snapshot = {
   text: string;
   sha: string;
-  commitSha: string;
+  commitSha: string | null;
   repository: string;
   baseBranch: string;
   path: string;

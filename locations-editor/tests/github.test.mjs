@@ -2,6 +2,32 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { GitHub, CSV_PATH } from "../server/github.mjs";
 
+test("public previews avoid the REST API and preserve the exact Git blob version", async () => {
+  const csv = "\ufeffName,reservoir_notes\r\nAgate,café\r\n";
+  const github = new GitHub({
+    fetcher: async (url, options) => {
+      assert.equal(
+        url,
+        `https://raw.githubusercontent.com/cgs-earth/teacup-generator/refs/heads/main/${CSV_PATH}`,
+      );
+      assert.equal(options.headers?.Authorization, undefined);
+      return new Response(Buffer.from(csv));
+    },
+  });
+  const snapshot = await github.snapshot();
+  assert.equal(snapshot.text, csv);
+  // Expected value from git hash-object, including the BOM, Unicode and CRLF.
+  assert.equal(snapshot.sha, "8d9773c0207e63eae8fcb28f913932b4da8e7d13");
+  assert.equal(snapshot.commitSha, null);
+});
+
+test("public file failures do not return error pages as CSV", async () => {
+  const github = new GitHub({
+    fetcher: async () => new Response("Unavailable", { status: 503 }),
+  });
+  await assert.rejects(github.snapshot(), (error) => error.status === 502);
+});
+
 function fixture({ writable = true, failPrOnce = false } = {}) {
   const original = "Name,reservoir_notes\r\nAgate,\r\n";
   const sha = "a".repeat(40),

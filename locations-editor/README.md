@@ -88,4 +88,6 @@ OAuth uses state and PKCE. Access tokens stay in authenticated, encrypted HttpOn
 
 The server fixes the repository, file path, and base branch. It loads an immutable snapshot of `main` and rejects a submission if the CSV changed while the user was editing. It validates the reviewed field edits again before writing. A retry uses the same branch and returns the existing open PR if one was already created. If GitHub creates the branch but cannot open the PR, the response links to that branch for recovery.
 
+Signed-out previews load the public CSV from GitHub's raw-file CDN to avoid the unauthenticated REST quota shared by other users of the hosting network. The server computes the file's Git blob SHA from its original bytes. Authenticated reads and PR submissions use the GitHub API and an immutable commit on `main`.
+
 Unsent edits stay in the tab's session storage through GitHub sign-in. Users can download an unfinished CSV draft, including values that still need correction. Invalid values cannot be submitted. If `main` changes, download the draft before reloading and reapplying edits. The editor does not automatically merge concurrent edits or add and delete reservoirs.
