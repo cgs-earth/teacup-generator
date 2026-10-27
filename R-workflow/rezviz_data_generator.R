@@ -193,8 +193,10 @@ locations <- locations_sf |>
   transmute(
     name = Name,
     location_id = Identifier,
-    capacity = as.numeric(str_remove_all(`Total.Capacity`, ",")),
-    active_capacity = as.numeric(str_remove_all(`Active.Capacity`, ",")),
+    # capacity_value is the curated capacity; storage_capacity_label says which
+    # kind it is (Total / Active / Live). Same value the WWDH dashboard uses.
+    capacity = as.numeric(capacity_value),
+    active_capacity = if_else(storage_capacity_label == "Active", capacity, NA_real_),
     label_map = `Preferred.Label.for.Map.and.Table`,
     label_popup = `Preferred.Label.for.PopUp.and.Modal`,
     state = state,

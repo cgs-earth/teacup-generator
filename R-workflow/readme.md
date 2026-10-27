@@ -498,11 +498,10 @@ Add a row with the following columns:
 | `Storage Data Type` | `Storage` or `Elevation` | `Storage` |
 | `Source_Name` | One of: `RISE`, `USGS`, `USACE`, `CDEC` | `USGS` |
 | `Identifier` | API identifier (see below) | `06861500` |
-| `Source for Capacity` | Optional | |
-| `Data Source Notes` | URL or notes | `https://waterdata.usgs.gov/monitoring-location/USGS-06861500` |
-| `Actions to Allow Inclusion` | Optional notes | |
-| `Total Capacity` | Total capacity in acre-feet | `364342` |
-| `Active Capacity` | Active capacity (optional) | `335768` |
+| `capacity_value` | Capacity in acre-feet used for percent full, in both the daily CSV and the WWDH dashboard | `364342` |
+| `storage_capacity_label` | Which capacity `capacity_value` is: `Total`, `Active`, or `Live` | `Total` |
+| `Ownership` | Owning agency. The WWDH dashboard only shows `Reclamation` reservoirs | `Reclamation` |
+| `Total Capacity` | Legacy. Not read by this repo; kept only until the WWDH teacup loader stops reading it | |
 | `Preferred Label for Map and Table` | Short display label | `Cedar Bluff` |
 | `Preferred Label for PopUp and Modal` | Full display name | `Cedar Bluff Reservoir (Cedar Bluff Dam)` |
 | `Longitude` | Decimal degrees (optional, auto-filled for RISE) | `-99.7222` |

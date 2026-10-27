@@ -15,7 +15,7 @@ CONFIG_DIR <- "config"
 OUTPUT_DIR <- "output"
 EXAMPLES_DIR <- "examples"
 
-# Load locations geojson (now includes Active.Capacity)
+# Load locations geojson (capacity comes from capacity_value)
 message("Loading locations.geojson...")
 locations <- st_read(file.path(CONFIG_DIR, "locations.geojson"), quiet = TRUE)
 message(sprintf("  %d locations loaded", nrow(locations)))
@@ -58,11 +58,8 @@ for (target_date in dates) {
 
   locations_with_stats <- locations_with_stats |>
     mutate(
-      # Parse capacities - remove commas and handle "--" as NA
-      TotalCapacityNum = as.numeric(str_remove_all(
-        ifelse(is.na(`Total.Capacity`) | `Total.Capacity` == "--", NA, `Total.Capacity`), ",")),
-      ActiveCapacityNum = as.numeric(str_remove_all(
-        ifelse(is.na(`Active.Capacity`) | `Active.Capacity` == "--", NA, `Active.Capacity`), ",")),
+      # Curated capacity (type given by storage_capacity_label)
+      TotalCapacityNum = as.numeric(capacity_value),
       # Generate dummy storage for ALL locations
       # For locations with stats: use range between p10 and p90
       # For locations without stats: use 20-80% of capacity
@@ -98,8 +95,8 @@ for (target_date in dates) {
       State = state,
       DoiRegion = doiRegion,
       Huc6 = huc6,
-      TotalCapacity = `Total.Capacity`,
-      ActiveCapacity = `Active.Capacity`
+      TotalCapacity = capacity_value,
+      ActiveCapacity = if_else(storage_capacity_label == "Active", capacity_value, NA_real_)
     ) |>
     select(
       Name,
