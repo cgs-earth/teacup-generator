@@ -84,7 +84,7 @@ locations <- locations_raw |>
     source = `Source for Storage Data`,
     # For RISE locations, this is the RISE Location ID used with the WWDH API
     rise_location_id = `RISE Location ID`,
-    capacity = as.numeric(str_remove_all(`Total Capacity`, ",")),
+    capacity = as.numeric(capacity_value),
     label_map = `Preferred Label for Map and Table`,
     label_popup = `Preferred Label for PopUp and Modal`
   ) |>
